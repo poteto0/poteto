@@ -1,3 +1,3 @@
-module github.com/poteto0/poteto/v0.1.0
+module github.com/poteto0/poteto
 
 go 1.21.8
