@@ -1,32 +1,44 @@
 package poteto
 
 import (
+	"fmt"
 	"net/http"
-
-	"github.com/poteto0/poteto/router"
 )
 
 type Poteto struct {
-	Router *router.Router
+	Router *Router
 }
 
-func NewPoteto() *Poteto {
+func New() *Poteto {
 	return &Poteto{
-		Router: &router.Router{
-			RoutingTable: make(map[string]func(w http.ResponseWriter, r *http.Request)),
+		Router: &Router{
+			Routes: map[string]*Route{
+				"GET":    NewRoute(),
+				"POST":   NewRoute(),
+				"PUT":    NewRoute(),
+				"DELETE": NewRoute(),
+			},
 		},
 	}
 }
 
 func (p *Poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		handler := p.Router.RoutingTable[r.URL.Path]
-		if handler == nil {
-			w.WriteHeader(http.StatusNotFound)
-		}
+	ctx := NewContext(w, r)
+	routes := p.Router.Routes[r.Method]
+
+	targetRoute := routes.Search(r.URL.Path)
+
+	if targetRoute == nil || targetRoute.handler == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
+
+	ctx.SetPath(r.URL.Path)
+	targetRoute.handler(ctx)
 }
 
 func (p *Poteto) Run(addr string) {
-	http.ListenAndServe(addr, p)
+	if err := http.ListenAndServe(addr, p); err != nil {
+		fmt.Println("Error occured")
+	}
 }
