@@ -6,39 +6,33 @@ import (
 )
 
 type Poteto struct {
-	Router *Router
+	Router Router
 }
 
 func New() *Poteto {
 	return &Poteto{
-		Router: &Router{
-			Routes: map[string]*Route{
-				"GET":    NewRoute(),
-				"POST":   NewRoute(),
-				"PUT":    NewRoute(),
-				"DELETE": NewRoute(),
-			},
-		},
+		Router: NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
 	}
 }
 
 func (p *Poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := NewContext(w, r)
-	routes := p.Router.Routes[r.Method]
+	routes := p.Router.GetRoutesByMethod(r.Method)
 
 	targetRoute := routes.Search(r.URL.Path)
+	handler := targetRoute.GetHandler()
 
-	if targetRoute == nil || targetRoute.handler == nil {
+	if targetRoute == nil || handler == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	ctx.SetPath(r.URL.Path)
-	targetRoute.handler(ctx)
+	handler(ctx)
 }
 
 func (p *Poteto) Run(addr string) {
 	if err := http.ListenAndServe(addr, p); err != nil {
-		fmt.Println("Error occured")
+		fmt.Println("Error occurred")
 	}
 }

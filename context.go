@@ -2,20 +2,24 @@ package poteto
 
 import "net/http"
 
-type Context struct {
-	w    http.ResponseWriter
-	r    *http.Request
-	path string
+type Context interface {
+	SetPath(path string)
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request) *Context {
-	return &Context{
-		w:    w,
-		r:    r,
-		path: "",
+type context struct {
+	response http.ResponseWriter
+	request  *http.Request
+	path     string
+}
+
+func NewContext(w http.ResponseWriter, r *http.Request) Context {
+	return &context{
+		response: w,
+		request:  r,
+		path:     "",
 	}
 }
 
-func (ctx *Context) SetPath(path string) {
+func (ctx *context) SetPath(path string) {
 	ctx.path = path
 }
