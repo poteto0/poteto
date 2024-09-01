@@ -23,7 +23,7 @@ func (p *Poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handler := targetRoute.GetHandler()
 
 	if targetRoute == nil || handler == nil {
-		w.WriteHeader(http.StatusNotFound)
+		ctx.WriteHeader(http.StatusNotFound)
 		return
 	}
 
