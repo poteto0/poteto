@@ -1,5 +1,7 @@
 package poteto
 
+import "errors"
+
 type Router interface {
 	add(method, path string, handler func(ctx Context)) error
 	GET(path string, handler func(ctx Context)) error
@@ -29,7 +31,7 @@ func (r *router) add(method, path string, handler func(ctx Context)) error {
 	routes := r.GetRoutesByMethod(method)
 
 	if that_route := routes.Search(path); that_route != nil {
-		panic("[" + method + "] " + path + " is already used")
+		return errors.New("[" + method + "] " + path + " is already used")
 	}
 
 	routes.Insert(method, path, handler)

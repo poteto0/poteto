@@ -4,16 +4,6 @@ import (
 	"testing"
 )
 
-func ArrangeRoute() Route {
-	url := "https://example.com/v1/users/find/poteto"
-
-	route := NewRoute().(*route)
-
-	route.Insert("GET", url, nil)
-
-	return route
-}
-
 func TestNewRoute(t *testing.T) {
 	// Arrange
 	want := &route{
@@ -37,8 +27,12 @@ func TestNewRoute(t *testing.T) {
 	}
 }
 
-func TestSearch(t *testing.T) {
-	route := ArrangeRoute().(*route)
+func TestInsertAndSearch(t *testing.T) {
+	url := "https://example.com/v1/users/find/poteto"
+
+	route := NewRoute().(*route)
+
+	route.Insert("GET", url, nil)
 
 	tests := []struct {
 		name string
@@ -63,5 +57,48 @@ func TestSearch(t *testing.T) {
 			}
 		})
 	}
+}
 
+func BenchmarkInsertAndSearch(b *testing.B) {
+	urls := []string{
+		"https://example.com/v1/users/find/poteto",
+		"https://example.com/v1/users/find/potato",
+		"https://example.com/v1/users/find/jagaimo",
+		"https://example.com/v1/users/create/poteto",
+		"https://example.com/v1/users/create/potato",
+		"https://example.com/v1/users/create/jagaimo",
+		"https://example.com/v1/members/find/poteto",
+		"https://example.com/v1/members/find/potato",
+		"https://example.com/v1/members/find/jagaimo",
+		"https://example.com/v1/members/create/poteto",
+		"https://example.com/v1/members/create/potato",
+		"https://example.com/v1/members/create/jagaimo",
+		"https://example.com/v2/users/find/poteto",
+		"https://example.com/v2/users/find/potato",
+		"https://example.com/v2/users/find/jagaimo",
+		"https://example.com/v2/users/create/poteto",
+		"https://example.com/v2/users/create/potato",
+		"https://example.com/v2/users/create/jagaimo",
+		"https://example.com/v2/members/find/poteto",
+		"https://example.com/v2/members/find/potato",
+		"https://example.com/v2/members/find/jagaimo",
+		"https://example.com/v2/members/create/poteto",
+		"https://example.com/v2/members/create/potato",
+		"https://example.com/v2/members/create/jagaimo",
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		// Insert
+		route := NewRoute().(*route)
+		for _, url := range urls {
+			route.Insert("GET", url, nil)
+		}
+
+		// Search
+		for _, url := range urls {
+			route.Search(url)
+		}
+	}
 }
