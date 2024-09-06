@@ -34,6 +34,7 @@ func (r *response) Write(b []byte) (int, error) {
 			r.SetStatus(http.StatusOK)
 		}
 		r.WriteHeader(r.Status)
+		r.isCommitted = true
 	}
 
 	n, err := r.writer.Write(b)
