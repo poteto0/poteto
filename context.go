@@ -1,6 +1,9 @@
 package poteto
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 type Context interface {
 	JSON(code int, value any) error
@@ -8,13 +11,13 @@ type Context interface {
 	WriteHeader(code int)
 	SetPath(path string)
 	GetResponse() *response
+	JsonSerialize(value any) error
 }
 
 type context struct {
-	response       Response
-	request        *http.Request
-	path           string
-	jsonSerializer JsonSerializer
+	response Response
+	request  *http.Request
+	path     string
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) Context {
@@ -27,7 +30,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) Context {
 
 func (ctx *context) JSON(code int, value any) error {
 	ctx.response.SetStatus(code)
-	return ctx.jsonSerializer.Serialize(ctx, value)
+	return ctx.JsonSerialize(value)
 }
 
 func (ctx *context) SetPath(path string) {
@@ -40,4 +43,9 @@ func (ctx *context) WriteHeader(code int) {
 
 func (ctx *context) GetResponse() *response {
 	return ctx.response.(*response)
+}
+
+func (ctx *context) JsonSerialize(value any) error {
+	encoder := json.NewEncoder(ctx.GetResponse())
+	return encoder.Encode(value)
 }
