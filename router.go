@@ -3,11 +3,11 @@ package poteto
 import "errors"
 
 type Router interface {
-	add(method, path string, handler func(ctx Context)) error
-	GET(path string, handler func(ctx Context)) error
-	POST(path string, handler func(ctx Context)) error
-	PUT(path string, handler func(ctx Context)) error
-	DELETE(path string, handler func(ctx Context)) error
+	add(method, path string, handler HandlerFunc) error
+	GET(path string, handler HandlerFunc) error
+	POST(path string, handler HandlerFunc) error
+	PUT(path string, handler HandlerFunc) error
+	DELETE(path string, handler HandlerFunc) error
 
 	GetRoutesByMethod(method string) *route
 }
@@ -27,7 +27,7 @@ func NewRouter(methods []string) Router {
 	}
 }
 
-func (r *router) add(method, path string, handler func(ctx Context)) error {
+func (r *router) add(method, path string, handler HandlerFunc) error {
 	routes := r.GetRoutesByMethod(method)
 
 	if that_route := routes.Search(path); that_route != nil {
@@ -38,19 +38,19 @@ func (r *router) add(method, path string, handler func(ctx Context)) error {
 	return nil
 }
 
-func (r *router) GET(path string, handler func(ctx Context)) error {
+func (r *router) GET(path string, handler HandlerFunc) error {
 	return r.add("GET", path, handler)
 }
 
-func (r *router) POST(path string, handler func(ctx Context)) error {
+func (r *router) POST(path string, handler HandlerFunc) error {
 	return r.add("POST", path, handler)
 }
 
-func (r *router) PUT(path string, handler func(ctx Context)) error {
+func (r *router) PUT(path string, handler HandlerFunc) error {
 	return r.add("PUT", path, handler)
 }
 
-func (r *router) DELETE(path string, handler func(ctx Context)) error {
+func (r *router) DELETE(path string, handler HandlerFunc) error {
 	return r.add("DELETE", path, handler)
 }
 

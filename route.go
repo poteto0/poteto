@@ -6,16 +6,16 @@ import (
 
 type Route interface {
 	Search(path string) *route
-	Insert(method, path string, handler func(ctx Context))
+	Insert(method, path string, handler HandlerFunc)
 
-	GetHandler() func(ctx Context)
+	GetHandler() HandlerFunc
 }
 
 type route struct {
 	key      string
 	method   string
 	children map[string]Route
-	handler  func(ctx Context)
+	handler  HandlerFunc
 }
 
 func NewRoute() Route {
@@ -44,7 +44,7 @@ func (r *route) Search(path string) *route {
 	return currentRoute
 }
 
-func (r *route) Insert(method, path string, handler func(ctx Context)) {
+func (r *route) Insert(method, path string, handler HandlerFunc) {
 	currentRoute := r
 	params := strings.Split(path, "/")
 
@@ -65,6 +65,6 @@ func (r *route) Insert(method, path string, handler func(ctx Context)) {
 	currentRoute.handler = handler
 }
 
-func (r *route) GetHandler() func(ctx Context) {
+func (r *route) GetHandler() HandlerFunc {
 	return r.handler
 }
