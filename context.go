@@ -3,12 +3,15 @@ package poteto
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/poteto0/poteto/constant"
 )
 
 type Context interface {
 	JSON(code int, value any) error
 
 	WriteHeader(code int)
+	writeContentType(value string)
 	SetPath(path string)
 	GetResponse() *response
 	JsonSerialize(value any) error
@@ -29,6 +32,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) Context {
 }
 
 func (ctx *context) JSON(code int, value any) error {
+	ctx.writeContentType(constant.APPLICATION_JSON)
 	ctx.response.SetStatus(code)
 	return ctx.JsonSerialize(value)
 }
@@ -39,6 +43,14 @@ func (ctx *context) SetPath(path string) {
 
 func (ctx *context) WriteHeader(code int) {
 	ctx.response.WriteHeader(code)
+}
+
+func (ctx *context) writeContentType(value string) {
+	header := ctx.response.Header()
+
+	if header.Get(constant.HEADER_CONTENT_TYPE) == "" {
+		header.Set(constant.HEADER_CONTENT_TYPE, value)
+	}
 }
 
 func (ctx *context) GetResponse() *response {

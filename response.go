@@ -1,12 +1,16 @@
 package poteto
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 type Response interface {
 	WriteHeader(code int)
 	Write(b []byte) (int, error)
 
 	SetStatus(code int)
+	Header() http.Header
 }
 
 type response struct {
@@ -22,10 +26,13 @@ func NewResponse(w http.ResponseWriter) Response {
 
 func (r *response) WriteHeader(code int) {
 	if r.isCommitted {
+		fmt.Println("response has already committed")
 		return
 	}
 
 	r.Status = code
+	r.writer.WriteHeader(r.Status)
+	r.isCommitted = true
 }
 
 func (r *response) Write(b []byte) (int, error) {
@@ -45,4 +52,8 @@ func (r *response) Write(b []byte) (int, error) {
 
 func (r *response) SetStatus(code int) {
 	r.Status = code
+}
+
+func (r *response) Header() http.Header {
+	return r.writer.Header()
 }

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/poteto0/poteto/constant"
 )
 
 type TestVal struct {
@@ -39,6 +41,10 @@ func TestJSON(t *testing.T) {
 			context.JSON(it.code, it.val)
 			if body := w.Body.String(); body[0:27] != it.expected[0:27] {
 				t.Errorf("FATAL: context json")
+			}
+
+			if header := w.Header(); header[constant.HEADER_CONTENT_TYPE][0] != constant.APPLICATION_JSON {
+				t.Errorf("FATAL: wrong content-type")
 			}
 		})
 	}
