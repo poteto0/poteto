@@ -14,7 +14,10 @@ type Context interface {
 	writeContentType(value string)
 	SetPath(path string)
 	GetResponse() *response
+	GetRequest() *http.Request
+	GetRequestHeaderValue(key string) string
 	JsonSerialize(value any) error
+	NoContent() error
 }
 
 type context struct {
@@ -57,7 +60,20 @@ func (ctx *context) GetResponse() *response {
 	return ctx.response.(*response)
 }
 
+func (ctx *context) GetRequest() *http.Request {
+	return ctx.request
+}
+
+func (ctx *context) GetRequestHeaderValue(key string) string {
+	return ctx.request.Header.Get(key)
+}
+
 func (ctx *context) JsonSerialize(value any) error {
 	encoder := json.NewEncoder(ctx.GetResponse())
 	return encoder.Encode(value)
+}
+
+func (c *context) NoContent() error {
+	c.response.WriteHeader(http.StatusNoContent)
+	return nil
 }
