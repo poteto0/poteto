@@ -17,7 +17,7 @@ import (
 
 func main() {
 	p := poteto.New()
-	p.Router.GET("/users", UserHandler)
+	p.GET("/users", UserHandler)
 	p.Run(":8000")
 }
 
