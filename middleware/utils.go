@@ -1,7 +1,20 @@
 package middleware
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
+// EX: https://example.com:* => ^https://example\.com:.*$
+func wrapRegExp(target string) string {
+	pattern := regexp.QuoteMeta(target) // .をescapeする
+	pattern = strings.ReplaceAll(pattern, "\\*", ".*")
+	pattern = strings.ReplaceAll(pattern, "\\?", ".")
+	pattern = "^" + pattern + "$"
+	return pattern
+}
+
+// http vs https
 func matchScheme(domain, pattern string) bool {
 	didx := strings.Index(domain, ":")
 	pidx := strings.Index(pattern, ":")

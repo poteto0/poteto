@@ -22,4 +22,4 @@ jobs:
         with:
           go-version: "1.21.x"
       - name: Run Test
-        run: go test -cover -bench . -benchmem
+        run: go test ./... -cover -bench . -benchmem

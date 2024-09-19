@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"regexp"
-	"strings"
 
 	"github.com/poteto0/poteto"
 	"github.com/poteto0/poteto/constant"
@@ -30,10 +28,7 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 
 	allowOriginPatterns := []string{}
 	for _, origin := range config.AllowOrigins {
-		pattern := regexp.QuoteMeta(origin)
-		pattern = strings.ReplaceAll(pattern, "\\*", ".*")
-		pattern = strings.ReplaceAll(pattern, "\\?", ".")
-		pattern = "^" + pattern + "$"
+		pattern := wrapRegExp(origin)
 		allowOriginPatterns = append(allowOriginPatterns, pattern)
 	}
 
@@ -64,6 +59,7 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 				return ctx.NoContent()
 			}
 
+			// allowed method
 			if matchMethod(req.Method, config.AllowMethods) {
 				return next(ctx)
 			}
