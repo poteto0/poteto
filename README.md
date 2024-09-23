@@ -3,7 +3,7 @@
 Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.2.2
+go get github.com/poteto0/poteto@v0.3.2
 ```
 
 ```go:main.go
@@ -17,6 +17,7 @@ import (
 
 func main() {
 	p := poteto.New()
+
 	p.GET("/users", UserHandler)
 	p.Run(":8000")
 }
