@@ -2,7 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
+
+	"github.com/poteto0/poteto/utils"
 )
 
 func TestWrapRegExp(t *testing.T) {
@@ -20,6 +23,31 @@ func TestWrapRegExp(t *testing.T) {
 			result := wrapRegExp(it.target)
 			if result != it.expected {
 				t.Errorf("Not matched")
+			}
+		})
+	}
+}
+
+func TestMatchSubDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		domain   string
+		pattern  string
+		expected bool
+	}{
+		{"test same url", "http://hello.world.com.test", "http://hello.world.com.test", false},
+		{"test http & https return false", "http://hello.world.com.test", "https://hello.world.com.*", false},
+		{"test not :// type return false", "hello.world.com.test", "hello.world.com.test", false},
+		{"test wild card pattern return true", "http://hello.world.com.test", "http://hello.world.com.*", true},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			result := matchSubdomain(it.domain, it.pattern)
+			if result != it.expected {
+				t.Errorf("Not matched")
+				t.Errorf(fmt.Sprintf("expected: %t", it.expected))
+				t.Errorf(fmt.Sprintf("actual: %t", result))
 			}
 		})
 	}
@@ -43,6 +71,39 @@ func TestMatchScheme(t *testing.T) {
 		t.Run((it.name), func(t *testing.T) {
 			result := matchScheme(it.domain, it.pattern)
 
+			if result != it.expected {
+				t.Errorf("Not matched")
+				t.Errorf(fmt.Sprintf("expected: %t", it.expected))
+				t.Errorf(fmt.Sprintf("actual: %t", result))
+			}
+		})
+	}
+}
+
+func TestreverseStringArray(t *testing.T) {
+	targets := []string{"!!", "world", "hello"}
+	expected := []string{"hello", "world", "!!"}
+
+	result := reverseStringArray(targets)
+	if !utils.SliceUtils(result, expected) {
+		t.Errorf("Not matched")
+	}
+}
+
+func TestMatchMethod(t *testing.T) {
+	tests := []struct {
+		name         string
+		target       string
+		allowMethods []string
+		expected     bool
+	}{
+		{"test including method return true", http.MethodGet, []string{http.MethodGet}, true},
+		{"test not including method return false", http.MethodPost, []string{http.MethodGet}, false},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			result := matchMethod(it.target, it.allowMethods)
 			if result != it.expected {
 				t.Errorf("Not matched")
 				t.Errorf(fmt.Sprintf("expected: %t", it.expected))
