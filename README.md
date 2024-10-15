@@ -3,7 +3,7 @@
 Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.4.0
+go get github.com/poteto0/poteto@v0.4.1
 ```
 
 ```go:main.go
@@ -17,6 +17,14 @@ import (
 
 func main() {
 	p := poteto.New()
+
+	// CORS
+	p.Register(middleware.CORSWithConfig(
+		middleware.CORSConfig{
+			AllowOrigins: []string{"*"},
+			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		},
+	))
 
 	p.GET("/users", UserHandler)
 	p.Run(":8000")
