@@ -11,15 +11,19 @@ type Poteto interface {
 	POST(path string, handler HandlerFunc) error
 	PUT(path string, handler HandlerFunc) error
 	DELETE(path string, handler HandlerFunc) error
+	Register(middlewares ...MiddlewareFunc)
+	applyMiddleware(handler HandlerFunc) HandlerFunc
 }
 
 type poteto struct {
-	router Router
+	router      Router
+	middlewares []MiddlewareFunc
 }
 
 func New() Poteto {
 	return &poteto{
-		router: NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		router:      NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		middlewares: []MiddlewareFunc{},
 	}
 }
 
@@ -36,7 +40,15 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx.SetPath(r.URL.Path)
+	handler = p.applyMiddleware(handler)
 	handler(ctx)
+}
+
+func (p *poteto) applyMiddleware(handler HandlerFunc) HandlerFunc {
+	for _, middleware := range p.middlewares {
+		handler = middleware(handler)
+	}
+	return handler
 }
 
 func (p *poteto) Run(addr string) {
@@ -59,4 +71,8 @@ func (p *poteto) PUT(path string, handler HandlerFunc) error {
 
 func (p *poteto) DELETE(path string, handler HandlerFunc) error {
 	return p.router.DELETE(path, handler)
+}
+
+func (p *poteto) Register(middlewares ...MiddlewareFunc) {
+	p.middlewares = append(p.middlewares, middlewares...)
 }

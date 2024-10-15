@@ -3,7 +3,7 @@
 Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.3.2
+go get github.com/poteto0/poteto@v0.4.0
 ```
 
 ```go:main.go
