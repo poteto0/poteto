@@ -64,6 +64,7 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 
 			// allowed method
 			if matchMethod(req.Method, config.AllowMethods) {
+				res.Header().Set(constant.HEADER_ACCESS_CONTROL_ORIGIN, allowOrigin)
 				return next(ctx)
 			}
 
