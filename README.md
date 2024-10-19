@@ -3,7 +3,7 @@
 Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.5.4
+go get github.com/poteto0/poteto@v0.6.0
 ```
 
 ```go:main.go
@@ -25,6 +25,8 @@ func main() {
 			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 		},
 	))
+
+	e.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
 
 	p.GET("/users", UserHandler)
 	p.Get("/users/:id", UserIdHandler)
