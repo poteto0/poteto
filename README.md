@@ -3,7 +3,7 @@
 Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.4.1
+go get github.com/poteto0/poteto@v0.5.3
 ```
 
 ```go:main.go
@@ -27,6 +27,7 @@ func main() {
 	))
 
 	p.GET("/users", UserHandler)
+	p.Get("/users/:id", UserIdHandler)
 	p.Run(":8000")
 }
 
@@ -37,6 +38,13 @@ type User struct {
 func UserHandler(ctx poteto.Context) error {
 	user := User{
 		Name: "user",
+	}
+	return ctx.JSON(http.StatusOK, user)
+}
+
+func UserIdHandler(ctx poteto.Context) error {
+	user := User{
+		Name: ctx.PathParam("id")
 	}
 	return ctx.JSON(http.StatusOK, user)
 }
