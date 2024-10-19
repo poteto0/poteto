@@ -2,13 +2,12 @@
 
 ## middleware list
 
-| name           |
-| -------------- |
-| CORSWithConfig |
+| name   | summary              |
+| ------ | -------------------- |
+| CORS   | CORS Policy          |
+| Camara | Some Security Header |
 
 ## use middleware
-
-TODO: 目標
 
 ```go
 package main
