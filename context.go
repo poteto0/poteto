@@ -30,9 +30,10 @@ type context struct {
 
 func NewContext(w http.ResponseWriter, r *http.Request) Context {
 	return &context{
-		response: NewResponse(w),
-		request:  r,
-		path:     "",
+		response:   NewResponse(w),
+		request:    r,
+		path:       "",
+		httpParams: NewHttpParam(),
 	}
 }
 
