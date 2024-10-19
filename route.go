@@ -43,8 +43,8 @@ func (r *route) Search(path string) *route {
 			currentRoute = nextRoute.(*route)
 		} else {
 			// last path includes url param ex: /users/:id
-			if i == len(params)-1 && currentRoute.childParamKey != "" {
-				if nextRoute, ok = currentRoute.children[param]; ok {
+			if chParam := currentRoute.childParamKey; i == len(params)-1 && chParam != "" {
+				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
 				}
 			} else {
