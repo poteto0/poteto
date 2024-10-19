@@ -26,6 +26,8 @@ func main() {
 		},
 	))
 
+	e.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
+
 	p.GET("/users", UserHandler)
 	p.Get("/users/:id", UserIdHandler)
 	p.Run(":8000")

@@ -59,7 +59,7 @@ func CamaraWithConfig(config CamaraConfig) poteto.MiddlewareFunc {
 
 			// * Fishing
 			// Cannot open in Server
-			res.Header().Set(constant.X_DOWNLOAD_OPTION, config.XFrameOption)
+			res.Header().Set(constant.X_DOWNLOAD_OPTION, config.XDownloadOption)
 
 			// * Click Jacking
 			// X-Frame-Option: Cannot use in iframe except Same Origin
