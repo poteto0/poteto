@@ -30,7 +30,7 @@ func NewRouter(methods []string) Router {
 func (r *router) add(method, path string, handler HandlerFunc) error {
 	routes := r.GetRoutesByMethod(method)
 
-	if that_route := routes.Search(path); that_route != nil {
+	if that_route, _ := routes.Search(path); that_route != nil {
 		return errors.New("[" + method + "] " + path + " is already used")
 	}
 

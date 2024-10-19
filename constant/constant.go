@@ -7,4 +7,6 @@ const (
 	HEADER_ORIGIN                string = "Origin"
 	HEADER_VARY                  string = "vary"
 	MAX_DOMAIN_LENGTH            int    = 255
+	PARAM_PREFIX                 string = ":"
+	PARAM_TYPE_PATH              string = "path"
 )
