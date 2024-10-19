@@ -2,6 +2,8 @@ package poteto
 
 import (
 	"net/http"
+
+	"github.com/poteto0/poteto/constant"
 )
 
 type Poteto interface {
@@ -31,7 +33,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := NewContext(w, r)
 	routes := p.router.GetRoutesByMethod(r.Method)
 
-	targetRoute := routes.Search(r.URL.Path)
+	targetRoute, httpParam := routes.Search(r.URL.Path)
 	handler := targetRoute.GetHandler()
 
 	if targetRoute == nil || handler == nil {
@@ -40,6 +42,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx.SetPath(r.URL.Path)
+	ctx.SetPathParam(constant.PARAM_TYPE_PATH, httpParam)
 	handler = p.applyMiddleware(handler)
 	handler(ctx)
 }

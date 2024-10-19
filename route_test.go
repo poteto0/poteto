@@ -47,7 +47,7 @@ func TestInsertAndSearch(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(tt *testing.T) {
-			got := route.Search(it.arg)
+			got, _ := route.Search(it.arg)
 
 			key := ""
 			if got != nil {

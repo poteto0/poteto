@@ -7,7 +7,7 @@ import (
 )
 
 type Route interface {
-	Search(path string) *route
+	Search(path string) (*route, map[string]any)
 	Insert(method, path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
@@ -30,9 +30,10 @@ func NewRoute() Route {
 	}
 }
 
-func (r *route) Search(path string) *route {
+func (r *route) Search(path string) (*route, map[string]any) {
 	currentRoute := r
 	params := strings.Split(path, "/")
+	httpParam := map[string]any{}
 
 	for i, param := range params {
 		if param == "" {
@@ -46,13 +47,14 @@ func (r *route) Search(path string) *route {
 			if chParam := currentRoute.childParamKey; i == len(params)-1 && chParam != "" {
 				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
+					httpParam[chParam] = param
 				}
 			} else {
-				return nil
+				return nil, map[string]any{}
 			}
 		}
 	}
-	return currentRoute
+	return currentRoute, httpParam
 }
 
 func (r *route) Insert(method, path string, handler HandlerFunc) {

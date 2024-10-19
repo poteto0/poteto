@@ -11,7 +11,8 @@ type Context interface {
 	JSON(code int, value any) error
 
 	WriteHeader(code int)
-	writeContentType(value string)
+	SetPathParam(paramType string, param map[string]any)
+	PathParam(param string) any
 	SetPath(path string)
 	GetResponse() *response
 	GetRequest() *http.Request
@@ -21,9 +22,10 @@ type Context interface {
 }
 
 type context struct {
-	response Response
-	request  *http.Request
-	path     string
+	response  Response
+	request   *http.Request
+	path      string
+	pathParam map[string]any
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) Context {
@@ -42,6 +44,17 @@ func (ctx *context) JSON(code int, value any) error {
 
 func (ctx *context) SetPath(path string) {
 	ctx.path = path
+}
+
+func (ctx *context) SetPathParam(paramType string, param map[string]any) {
+	ctx.pathParam = param
+}
+
+func (ctx *context) PathParam(param string) any {
+	if val := ctx.pathParam[param]; val != nil {
+		return val
+	}
+	return nil
 }
 
 func (ctx *context) WriteHeader(code int) {
