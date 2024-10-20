@@ -1,8 +1,10 @@
 package poteto
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -55,6 +57,10 @@ func (p *poteto) applyMiddleware(handler HandlerFunc) HandlerFunc {
 }
 
 func (p *poteto) Run(addr string) {
+	// Print Banner
+	coloredBanner := color.HiGreenString(Banner)
+	fmt.Println(coloredBanner)
+
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
 	}
