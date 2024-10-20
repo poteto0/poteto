@@ -1,6 +1,8 @@
 # Poteto
 
-Simple Web Framework of GoLang
+![](https://github.com/user-attachments/assets/7e503083-0af0-4b95-8277-46dfb8166cb9)
+
+## Simple Web Framework of GoLang
 
 ```sh
 go get github.com/poteto0/poteto@v0.7.2
