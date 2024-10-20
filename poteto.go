@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/fatih/color"
@@ -31,9 +32,6 @@ func New() Poteto {
 }
 
 func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Print Banner
-	color.HiGreen(Banner)
-
 	ctx := NewContext(w, r)
 	routes := p.router.GetRoutesByMethod(r.Method)
 
@@ -59,6 +57,10 @@ func (p *poteto) applyMiddleware(handler HandlerFunc) HandlerFunc {
 }
 
 func (p *poteto) Run(addr string) {
+	// Print Banner
+	coloredBanner := color.HiGreenString(Banner)
+	fmt.Println(coloredBanner)
+
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
 	}
