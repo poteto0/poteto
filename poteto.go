@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/poteto0/poteto/constant"
@@ -30,6 +31,9 @@ func New() Poteto {
 }
 
 func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Print Banner
+	fmt.Println(Banner)
+
 	ctx := NewContext(w, r)
 	routes := p.router.GetRoutesByMethod(r.Method)
 
