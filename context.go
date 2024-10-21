@@ -2,6 +2,7 @@ package poteto
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -51,8 +52,20 @@ func (ctx *context) SetPath(path string) {
 }
 
 func (ctx *context) SetQueryParam(queryParams url.Values) {
+	if len(queryParams) > constant.MAX_QUERY_PARAM_LENGTH {
+		fmt.Println("too many query params")
+		return
+	}
+
 	for key, value := range queryParams {
-		paramUnit := ParamUnit{key, value}
+		var paramUnit ParamUnit
+
+		if len(value) == 1 { // not array
+			paramUnit = ParamUnit{key, value[0]}
+		} else {
+			paramUnit = ParamUnit{key, value}
+		}
+
 		ctx.SetParam(constant.PARAM_TYPE_QUERY, paramUnit)
 	}
 }
