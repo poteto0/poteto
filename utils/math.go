@@ -1,6 +1,6 @@
 package utils
 
-func SliceUtils[T comparable](as, bs []T) bool {
+func SliceEqual[T comparable](as, bs []T) bool {
 	if len(as) != len(bs) {
 		return false
 	}

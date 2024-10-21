@@ -1,9 +1,11 @@
 package constant
 
 const (
-	MAX_DOMAIN_LENGTH int    = 255
-	PARAM_PREFIX      string = ":"
-	PARAM_TYPE_PATH   string = "path"
+	MAX_DOMAIN_LENGTH      int    = 255
+	PARAM_PREFIX           string = ":"
+	PARAM_TYPE_PATH        string = "path"
+	PARAM_TYPE_QUERY       string = "query"
+	MAX_QUERY_PARAM_LENGTH int    = 32
 )
 
 // Header

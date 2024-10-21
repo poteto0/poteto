@@ -26,6 +26,7 @@ func NewHttpParam() HttpParam {
 	}
 
 	httpParam.params[constant.PARAM_TYPE_PATH] = make(map[string]any)
+	httpParam.params[constant.PARAM_TYPE_QUERY] = make(map[string]any)
 	return httpParam
 }
 

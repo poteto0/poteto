@@ -2,7 +2,9 @@ package poteto
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/poteto0/poteto/constant"
 )
@@ -11,8 +13,10 @@ type Context interface {
 	JSON(code int, value any) error
 
 	WriteHeader(code int)
-	SetPathParam(paramType string, paramUnit ParamUnit)
+	SetQueryParam(queryParams url.Values)
+	SetParam(paramType string, paramUnit ParamUnit)
 	PathParam(key string) any
+	QueryParam(key string) any
 	SetPath(path string)
 	GetResponse() *response
 	GetRequest() *http.Request
@@ -47,13 +51,39 @@ func (ctx *context) SetPath(path string) {
 	ctx.path = path
 }
 
-func (ctx *context) SetPathParam(paramType string, paramUnit ParamUnit) {
-	ctx.httpParams.AddParam(constant.PARAM_TYPE_PATH, paramUnit)
+func (ctx *context) SetQueryParam(queryParams url.Values) {
+	if len(queryParams) > constant.MAX_QUERY_PARAM_LENGTH {
+		fmt.Println("too many query params")
+		return
+	}
+
+	for key, value := range queryParams {
+		var paramUnit ParamUnit
+
+		if len(value) == 1 { // not array
+			paramUnit = ParamUnit{key, value[0]}
+		} else {
+			paramUnit = ParamUnit{key, value}
+		}
+
+		ctx.SetParam(constant.PARAM_TYPE_QUERY, paramUnit)
+	}
+}
+
+func (ctx *context) SetParam(paramType string, paramUnit ParamUnit) {
+	ctx.httpParams.AddParam(paramType, paramUnit)
 }
 
 func (ctx *context) PathParam(key string) any {
 	key = constant.PARAM_PREFIX + key
 	if val := ctx.httpParams.GetParam(constant.PARAM_TYPE_PATH, key); val != nil {
+		return val
+	}
+	return nil
+}
+
+func (ctx *context) QueryParam(key string) any {
+	if val := ctx.httpParams.GetParam(constant.PARAM_TYPE_QUERY, key); val != nil {
 		return val
 	}
 	return nil
