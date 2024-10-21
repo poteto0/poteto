@@ -49,3 +49,24 @@ func TestJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestQueryParam(t *testing.T) {
+	url := "https://example.com?hello=world"
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", url, nil)
+	ctx := NewContext(w, req).(*context)
+
+	queryParams := req.URL.Query()
+	ctx.SetQueryParam(queryParams)
+
+	queryParam1 := ctx.QueryParam("hello")
+	if queryParam1 != "world" {
+		t.Errorf("Cannot Get Query Param")
+	}
+
+	queryParam2 := ctx.QueryParam("unknown")
+	if queryParam2 != nil {
+		t.Errorf("Cannot Get nil If Unknown key")
+	}
+}

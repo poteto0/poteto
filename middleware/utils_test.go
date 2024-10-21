@@ -85,7 +85,7 @@ func TestreverseStringArray(t *testing.T) {
 	expected := []string{"hello", "world", "!!"}
 
 	result := reverseStringArray(targets)
-	if !utils.SliceUtils(result, expected) {
+	if !utils.SliceEqual(result, expected) {
 		t.Errorf("Not matched")
 	}
 }
