@@ -4,6 +4,7 @@ const (
 	MAX_DOMAIN_LENGTH int    = 255
 	PARAM_PREFIX      string = ":"
 	PARAM_TYPE_PATH   string = "path"
+	PARAM_TYPE_QUERY  string = "query"
 )
 
 // Header

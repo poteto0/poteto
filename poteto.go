@@ -35,6 +35,9 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := NewContext(w, r)
 	routes := p.router.GetRoutesByMethod(r.Method)
 
+	queryParams := r.URL.Query()
+	ctx.SetQueryParam(queryParams)
+
 	targetRoute, httpParam := routes.Search(r.URL.Path)
 	handler := targetRoute.GetHandler()
 
@@ -44,7 +47,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx.SetPath(r.URL.Path)
-	ctx.SetPathParam(constant.PARAM_TYPE_PATH, httpParam)
+	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
 	handler = p.applyMiddleware(handler)
 	handler(ctx)
 }
