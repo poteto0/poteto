@@ -80,7 +80,7 @@ func TestMatchScheme(t *testing.T) {
 	}
 }
 
-func TestreverseStringArray(t *testing.T) {
+func TestReverseStringArray(t *testing.T) {
 	targets := []string{"!!", "world", "hello"}
 	expected := []string{"hello", "world", "!!"}
 
