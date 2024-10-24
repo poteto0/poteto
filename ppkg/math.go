@@ -1,4 +1,4 @@
-package utils
+package ppkg
 
 func SliceEqual[T comparable](as, bs []T) bool {
 	if len(as) != len(bs) {

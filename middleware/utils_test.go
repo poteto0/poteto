@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto0/poteto/ppkg"
 )
 
 func TestWrapRegExp(t *testing.T) {
@@ -85,7 +85,7 @@ func TestReverseStringArray(t *testing.T) {
 	expected := []string{"hello", "world", "!!"}
 
 	result := reverseStringArray(targets)
-	if !utils.SliceEqual(result, expected) {
+	if !ppkg.SliceEqual(result, expected) {
 		t.Errorf("Not matched")
 	}
 }
