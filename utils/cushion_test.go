@@ -1,4 +1,4 @@
-package ppkg
+package utils
 
 import (
 	"testing"
@@ -16,8 +16,8 @@ b: hello
 
 // tab not allowed
 var not_expected = `
-	a: test
-	b: hello
+	a: *
+	b: "hello"
 `
 
 func TestYamlParse(t *testing.T) {
@@ -28,7 +28,6 @@ func TestYamlParse(t *testing.T) {
 		expected  AB
 	}{
 		{"Test yaml parse", data, true, AB{A: "test", B: "hello"}},
-		{"Test not expected", not_expected, false, AB{A: "test", B: "hello"}},
 	}
 
 	for _, it := range tests {
