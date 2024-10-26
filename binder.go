@@ -23,8 +23,8 @@ func (*binder) Bind(ctx Context, object any) error {
 	}
 
 	base, _, _ := strings.Cut(
-		req.Header.Get(constant.HEADER_CONTENT_TYPE),
-		";")
+		req.Header.Get(constant.HEADER_CONTENT_TYPE), ";",
+	)
 	mediaType := strings.TrimSpace(base)
 
 	switch mediaType {
