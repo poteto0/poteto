@@ -2,6 +2,7 @@ package poteto
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -11,17 +12,18 @@ import (
 
 type Context interface {
 	JSON(code int, value any) error
-
 	WriteHeader(code int)
 	SetQueryParam(queryParams url.Values)
 	SetParam(paramType string, paramUnit ParamUnit)
 	PathParam(key string) any
 	QueryParam(key string) any
+	Bind(object any) error
 	SetPath(path string)
 	GetResponse() *response
 	GetRequest() *http.Request
 	GetRequestHeaderValue(key string) string
 	JsonSerialize(value any) error
+	JsonDeserialize(object any) error
 	NoContent() error
 }
 
@@ -30,6 +32,9 @@ type context struct {
 	request    *http.Request
 	path       string
 	httpParams HttpParam
+
+	// Method
+	binder Binder
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) Context {
@@ -38,6 +43,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) Context {
 		request:    r,
 		path:       "",
 		httpParams: NewHttpParam(),
+		binder:     NewBinder(),
 	}
 }
 
@@ -89,6 +95,11 @@ func (ctx *context) QueryParam(key string) any {
 	return nil
 }
 
+func (ctx *context) Bind(object any) error {
+	err := ctx.binder.Bind(ctx, object)
+	return err
+}
+
 func (ctx *context) WriteHeader(code int) {
 	ctx.response.WriteHeader(code)
 }
@@ -116,6 +127,17 @@ func (ctx *context) GetRequestHeaderValue(key string) string {
 func (ctx *context) JsonSerialize(value any) error {
 	encoder := json.NewEncoder(ctx.GetResponse())
 	return encoder.Encode(value)
+}
+
+func (ctx *context) JsonDeserialize(object any) error {
+	decoder := json.NewDecoder(ctx.GetRequest().Body)
+	err := decoder.Decode(object)
+	if _, ok := err.(*json.UnmarshalTypeError); ok {
+		return errors.New("error")
+	} else if _, ok := err.(*json.SyntaxError); ok {
+		return errors.New("error")
+	}
+	return err
 }
 
 func (c *context) NoContent() error {
