@@ -20,8 +20,9 @@ type Poteto interface {
 }
 
 type poteto struct {
-	router      Router
-	middlewares []MiddlewareFunc
+	router       Router
+	middlewares  []MiddlewareFunc
+	errorHandler httpErrorHandler
 }
 
 func New() Poteto {
@@ -49,7 +50,9 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx.SetPath(r.URL.Path)
 	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
 	handler = p.applyMiddleware(handler)
-	handler(ctx)
+	if err := handler(ctx); err != nil {
+		p.errorHandler.HandleHttpError(err, ctx)
+	}
 }
 
 func (p *poteto) applyMiddleware(handler HandlerFunc) HandlerFunc {
