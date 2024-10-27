@@ -12,13 +12,13 @@ func TestError(t *testing.T) {
 		isHaveInternal bool
 		expected       string
 	}{
-		{"Test w/o internal", false, "code=400, message=BadRequest"},
-		{"Test w internal", true, "code=400, message=BadRequest, internal=internalError"},
+		{"Test w/o internal", false, "code=400, message=Bad Request"},
+		{"Test w internal", true, "code=400, message=Bad Request, internal=internalError"},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			httpError := NewHTTPError(http.StatusBadRequest, "BadRequest")
+			httpError := NewHttpError(http.StatusBadRequest)
 			if it.isHaveInternal {
 				httpError.SetInternalError(errors.New("internalError"))
 			}
@@ -35,7 +35,7 @@ func TestError(t *testing.T) {
 func TestUnwrap(t *testing.T) {
 	internalError := errors.New("internalError")
 
-	httpError := NewHTTPError(http.StatusBadRequest, "BadRequest")
+	httpError := NewHttpError(http.StatusBadRequest, "BadRequest")
 	httpError.SetInternalError(internalError)
 
 	result := httpError.Unwrap()
