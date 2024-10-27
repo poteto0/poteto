@@ -17,7 +17,7 @@ type httpError struct {
 	Code          int   `json:"code"`
 }
 
-func NewHttpError(code int, messages ...any) HttpError {
+func NewHttpError(code int, messages ...any) *httpError {
 	httpErr := &httpError{Code: code, Message: http.StatusText(code)}
 	if len(messages) > 0 {
 		httpErr.Message = messages[0]

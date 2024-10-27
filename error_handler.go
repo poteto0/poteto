@@ -17,7 +17,7 @@ func (heh *httpErrorHandler) HandleHttpError(err error, ctx Context) {
 
 	httpErr, ok := err.(*httpError)
 	if !ok { // Not Handled
-		httpErr = NewHttpError(http.StatusInternalServerError).(*httpError)
+		httpErr = NewHttpError(http.StatusInternalServerError)
 	}
 	// Unwrap wrapped error
 	if httpErr.InternalError != nil {
@@ -27,7 +27,6 @@ func (heh *httpErrorHandler) HandleHttpError(err error, ctx Context) {
 	}
 
 	message := httpErr.Message
-
 	switch m := httpErr.Message.(type) {
 	case string:
 		message = map[string]string{"message": m}
