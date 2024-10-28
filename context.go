@@ -21,7 +21,6 @@ type Context interface {
 	SetPath(path string)
 	GetResponse() *response
 	GetRequest() *http.Request
-	GetRequestHeaderValue(key string) string
 	JsonSerialize(value any) error
 	JsonDeserialize(object any) error
 	NoContent() error
@@ -118,10 +117,6 @@ func (ctx *context) GetResponse() *response {
 
 func (ctx *context) GetRequest() *http.Request {
 	return ctx.request
-}
-
-func (ctx *context) GetRequestHeaderValue(key string) string {
-	return ctx.request.Header.Get(key)
 }
 
 func (ctx *context) JsonSerialize(value any) error {

@@ -70,3 +70,45 @@ func TestQueryParam(t *testing.T) {
 		t.Errorf("Cannot Get nil If Unknown key")
 	}
 }
+
+func TestPathParam(t *testing.T) {
+	url := "https://example.com/users/1"
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", url, nil)
+	ctx := NewContext(w, req).(*context)
+
+	ctx.SetParam(constant.PARAM_TYPE_PATH, ParamUnit{key: ":id", value: "1"})
+
+	tests := []struct {
+		name     string
+		key      string
+		expected any
+	}{
+		{"Can get PathParam", "id", "1"},
+		{"If unexpected key", "unexpected", nil},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			param := ctx.PathParam(it.key)
+
+			if param != it.expected {
+				t.Errorf("Unmatched")
+			}
+		})
+
+	}
+}
+
+func TestSetPath(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "http://example.com", nil)
+	ctx := NewContext(w, req).(*context)
+
+	expected := "http://expected.com"
+	ctx.SetPath(expected)
+	if ctx.path != expected {
+		t.Errorf("Not Matched")
+	}
+}
