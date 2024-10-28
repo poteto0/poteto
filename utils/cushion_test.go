@@ -23,31 +23,52 @@ var not_expected = `
 func TestYamlParse(t *testing.T) {
 	tests := []struct {
 		name      string
-		yaml_file string
+		yaml_file any
 		worked    bool
 		expected  AB
 	}{
-		{"Test yaml parse", data, true, AB{A: "test", B: "hello"}},
+		{"Test string yaml", data, true, AB{A: "test", B: "hello"}},
+		{"Test []byte yaml", []byte(data), true, AB{A: "test", B: "hello"}},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
 			var ab AB
 
-			if err := YamlParse(it.yaml_file, &ab); err != nil {
-				if it.worked {
-					t.Errorf("Not expected Error")
+			switch asserted := any(it.yaml_file).(type) {
+			case string:
+				if err := YamlParse(asserted, &ab); err != nil {
+					if it.worked {
+						t.Errorf("Not expected Error")
+					}
+					return
 				}
-				return
-			}
 
-			if !it.worked {
-				t.Errorf("Not occurred error")
-				return
-			}
+				if !it.worked {
+					t.Errorf("Not occurred error")
+					return
+				}
 
-			if it.expected.A != ab.A || it.expected.B != ab.B {
-				t.Errorf("Not matched")
+				if it.expected.A != ab.A || it.expected.B != ab.B {
+					t.Errorf("Not matched")
+				}
+
+			case []byte:
+				if err := YamlParse(asserted, &ab); err != nil {
+					if it.worked {
+						t.Errorf("Not expected Error")
+					}
+					return
+				}
+
+				if !it.worked {
+					t.Errorf("Not occurred error")
+					return
+				}
+
+				if it.expected.A != ab.A || it.expected.B != ab.B {
+					t.Errorf("Not matched")
+				}
 			}
 		})
 	}
