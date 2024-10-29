@@ -64,6 +64,7 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 	group := p.Combine("/tests")
 	group.Register(SampleMiddleware2)
 	p.GET("/tests", getAllUserForTest)
+	p.GET("/tests/:id", getAllUserForTestById)
 
 	tests := []struct {
 		name          string
@@ -85,6 +86,14 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 			"Test MiddlewareGroup",
 			"GET",
 			"/tests",
+			true,
+			"Hello2",
+			"world2",
+		},
+		{
+			"Test parent Middleware",
+			"GET",
+			"/tests/1",
 			true,
 			"Hello2",
 			"world2",
