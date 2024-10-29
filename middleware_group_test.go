@@ -3,9 +3,7 @@ package poteto
 import "testing"
 
 func TestInsertAndSearchMG(t *testing.T) {
-	mg := middlewareGroup{
-		children: make(map[string]MiddlewareGroup),
-	}
+	mg := NewMiddlewareGroup()
 
 	mg.Insert("/users", nil)
 

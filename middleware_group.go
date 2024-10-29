@@ -13,13 +13,21 @@ import (
 
 type MiddlewareGroup interface {
 	Search(pattern string) *middlewareGroup
-	Insert(pattern string, middlewares ...MiddlewareFunc)
+	Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
+	ApplyMiddleware(handler HandlerFunc) HandlerFunc
+	Register(middlewares ...MiddlewareFunc)
 }
 
 type middlewareGroup struct {
 	children    map[string]MiddlewareGroup
 	middlewares []MiddlewareFunc
 	key         string
+}
+
+func NewMiddlewareGroup() MiddlewareGroup {
+	return &middlewareGroup{
+		children: make(map[string]MiddlewareGroup),
+	}
 }
 
 func (mg *middlewareGroup) Search(pattern string) *middlewareGroup {
@@ -43,7 +51,7 @@ func (mg *middlewareGroup) Search(pattern string) *middlewareGroup {
 	return currentNode
 }
 
-func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc) {
+func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup {
 	currentNode := mg
 	patterns := strings.Split(pattern, "/")
 
@@ -61,9 +69,17 @@ func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc)
 		}
 		currentNode = currentNode.children[p].(*middlewareGroup)
 	}
-	currentNode.register(middlewares...)
+	currentNode.Register(middlewares...)
+	return currentNode
 }
 
-func (mg *middlewareGroup) register(middlewares ...MiddlewareFunc) {
+func (mg *middlewareGroup) Register(middlewares ...MiddlewareFunc) {
 	mg.middlewares = append(mg.middlewares, middlewares...)
+}
+
+func (mg *middlewareGroup) ApplyMiddleware(handler HandlerFunc) HandlerFunc {
+	for _, middleware := range mg.middlewares {
+		handler = middleware(handler)
+	}
+	return handler
 }
