@@ -5,7 +5,7 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.10.0
+go get github.com/poteto0/poteto@v0.12.0
 ```
 
 ```go:main.go
@@ -28,7 +28,11 @@ func main() {
 		},
 	))
 
-	e.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
+	p.GET("/example", UserHandler)
+
+	// Group of Middleware
+	userGroup := p.Combine("/users")
+	userGroup.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
 
 	p.GET("/users", UserHandler)
 	p.Get("/users/:id", UserIdHandler)
