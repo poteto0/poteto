@@ -16,19 +16,23 @@ type Poteto interface {
 	PUT(path string, handler HandlerFunc) error
 	DELETE(path string, handler HandlerFunc) error
 	Register(middlewares ...MiddlewareFunc)
-	applyMiddleware(handler HandlerFunc) HandlerFunc
+	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
+	applyMiddleware(mg MiddlewareGroup, handler HandlerFunc) HandlerFunc
 }
 
 type poteto struct {
-	router       Router
-	middlewares  []MiddlewareFunc
-	errorHandler httpErrorHandler
+	router          Router
+	middlewares     []MiddlewareFunc
+	errorHandler    HttpErrorHandler
+	middlewareGroup MiddlewareGroup
 }
 
 func New() Poteto {
 	return &poteto{
-		router:      NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
-		middlewares: []MiddlewareFunc{},
+		router:          NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		middlewares:     []MiddlewareFunc{},
+		errorHandler:    &httpErrorHandler{},
+		middlewareGroup: NewMiddlewareGroup(),
 	}
 }
 
@@ -49,17 +53,17 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ctx.SetPath(r.URL.Path)
 	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
-	handler = p.applyMiddleware(handler)
+
+	// Search middleware
+	mg := p.middlewareGroup.Search(r.URL.Path)
+	handler = p.applyMiddleware(mg, handler)
 	if err := handler(ctx); err != nil {
 		p.errorHandler.HandleHttpError(err, ctx)
 	}
 }
 
-func (p *poteto) applyMiddleware(handler HandlerFunc) HandlerFunc {
-	for _, middleware := range p.middlewares {
-		handler = middleware(handler)
-	}
-	return handler
+func (p *poteto) applyMiddleware(mg MiddlewareGroup, handler HandlerFunc) HandlerFunc {
+	return mg.ApplyMiddleware(handler)
 }
 
 func (p *poteto) Run(addr string) {
@@ -89,5 +93,9 @@ func (p *poteto) DELETE(path string, handler HandlerFunc) error {
 }
 
 func (p *poteto) Register(middlewares ...MiddlewareFunc) {
-	p.middlewares = append(p.middlewares, middlewares...)
+	p.middlewareGroup.Insert("", middlewares...)
+}
+
+func (p *poteto) Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup {
+	return p.middlewareGroup.Insert(pattern, middlewares...)
 }
