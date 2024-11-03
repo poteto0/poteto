@@ -22,7 +22,6 @@ type Poteto interface {
 
 type poteto struct {
 	router          Router
-	middlewares     []MiddlewareFunc
 	errorHandler    HttpErrorHandler
 	middlewareGroup MiddlewareGroup
 }
@@ -30,7 +29,6 @@ type poteto struct {
 func New() Poteto {
 	return &poteto{
 		router:          NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
-		middlewares:     []MiddlewareFunc{},
 		errorHandler:    &httpErrorHandler{},
 		middlewareGroup: NewMiddlewareGroup(),
 	}
