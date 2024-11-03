@@ -91,6 +91,14 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 			"world2",
 		},
 		{
+			"Test if MiddlewareGroup includes all middleware",
+			"GET",
+			"/tests",
+			true,
+			"Hello",
+			"world",
+		},
+		{
 			"Test parent Middleware",
 			"GET",
 			"/tests/1",
@@ -115,7 +123,6 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 
 			p.ServeHTTP(w, req)
 			header := w.Header()
-
 			if it.worked {
 				if header[it.expectedKey][0] != it.expectedValue {
 					t.Errorf("Unmatched")

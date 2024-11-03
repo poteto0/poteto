@@ -12,9 +12,8 @@ import (
  */
 
 type MiddlewareGroup interface {
-	Search(pattern string) *middlewareGroup
+	SearchMiddlewares(pattern string) []MiddlewareFunc
 	Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
-	ApplyMiddleware(handler HandlerFunc) HandlerFunc
 	Register(middlewares ...MiddlewareFunc)
 }
 
@@ -30,8 +29,10 @@ func NewMiddlewareGroup() MiddlewareGroup {
 	}
 }
 
-func (mg *middlewareGroup) Search(pattern string) *middlewareGroup {
+func (mg *middlewareGroup) SearchMiddlewares(pattern string) []MiddlewareFunc {
+	middlewares := []MiddlewareFunc{}
 	currentNode := mg
+	middlewares = append(middlewares, mg.middlewares...)
 	patterns := strings.Split(pattern, "/")
 
 	for _, p := range patterns {
@@ -41,6 +42,7 @@ func (mg *middlewareGroup) Search(pattern string) *middlewareGroup {
 
 		if nextNode, ok := currentNode.children[p]; ok {
 			currentNode = nextNode.(*middlewareGroup)
+			middlewares = append(middlewares, currentNode.middlewares...)
 		} else {
 			// if found ever
 			// You got Middleware Group
@@ -48,7 +50,7 @@ func (mg *middlewareGroup) Search(pattern string) *middlewareGroup {
 		}
 	}
 
-	return currentNode
+	return middlewares
 }
 
 func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup {
@@ -75,11 +77,4 @@ func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc)
 
 func (mg *middlewareGroup) Register(middlewares ...MiddlewareFunc) {
 	mg.middlewares = append(mg.middlewares, middlewares...)
-}
-
-func (mg *middlewareGroup) ApplyMiddleware(handler HandlerFunc) HandlerFunc {
-	for _, middleware := range mg.middlewares {
-		handler = middleware(handler)
-	}
-	return handler
 }
