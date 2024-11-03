@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,11 +32,11 @@ var DefaultJWSConfig = &potetoJWSConfig{
 	},
 }
 
-func NewJWSConfig(key any, contextKey string) poteto.MiddlewareFunc {
+func NewPotetoJWSConfig(contextKey string, signKey any) PotetoJWSConfig {
 	cfg := DefaultJWSConfig
 	cfg.ContextKey = contextKey
-	cfg.SignKey = key
-	return JWSWithConfig(cfg)
+	cfg.SignKey = signKey
+	return cfg
 }
 
 func (cfg *potetoJWSConfig) KeyFunc(token *jwt.Token) (any, error) {
@@ -69,11 +70,14 @@ func JWSWithConfig(cfg PotetoJWSConfig) poteto.MiddlewareFunc {
 
 	return func(next poteto.HandlerFunc) poteto.HandlerFunc {
 		return func(ctx poteto.Context) error {
-			authValue := extractBearer(ctx)
+			authValue, err := extractBearer(ctx)
+			if err != nil {
+				return poteto.NewHttpError(http.StatusBadRequest, err)
+			}
 
 			token, err := cfg.ParseToken(ctx, authValue)
 			if err != nil {
-				return err
+				return poteto.NewHttpError(http.StatusUnauthorized, err)
 			}
 
 			ctx.Set(config.ContextKey, token)
@@ -82,8 +86,12 @@ func JWSWithConfig(cfg PotetoJWSConfig) poteto.MiddlewareFunc {
 	}
 }
 
-func extractBearer(ctx poteto.Context) string {
+func extractBearer(ctx poteto.Context) (string, error) {
 	authHeader := ExtractFromHeader(ctx, constant.HEADER_AUTHORIZATION)
-	target := constant.AUTH_SCHEME + constant.PARAM_PREFIX
-	return strings.Split(authHeader, target)[1]
+	target := constant.AUTH_SCHEME
+	bearers := strings.Split(authHeader, target)
+	if len(bearers) <= 1 {
+		return "", errors.New("Not included bearer token")
+	}
+	return strings.Trim(bearers[1], " "), nil
 }
