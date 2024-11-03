@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/poteto0/poteto"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -86,4 +87,9 @@ func matchMethod(method string, allowMethods []string) bool {
 	}
 
 	return false
+}
+
+func ExtractFromHeader(ctx poteto.Context, key string) string {
+	token := ctx.GetRequest().Header.Get(key)
+	return token
 }

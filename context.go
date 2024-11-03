@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/poteto0/poteto/constant"
 )
@@ -24,6 +25,7 @@ type Context interface {
 	JsonSerialize(value any) error
 	JsonDeserialize(object any) error
 	NoContent() error
+	Set(key string, val any)
 }
 
 type context struct {
@@ -31,6 +33,8 @@ type context struct {
 	request    *http.Request
 	path       string
 	httpParams HttpParam
+	store      map[string]any
+	lock       sync.RWMutex
 
 	// Method
 	binder Binder
@@ -138,4 +142,14 @@ func (ctx *context) JsonDeserialize(object any) error {
 func (c *context) NoContent() error {
 	c.response.WriteHeader(http.StatusNoContent)
 	return nil
+}
+
+func (ctx *context) Set(key string, val any) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+
+	if ctx.store == nil {
+		ctx.store = make(map[string]any)
+	}
+	ctx.store[key] = val
 }

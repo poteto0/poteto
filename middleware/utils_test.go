@@ -3,8 +3,10 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/poteto0/poteto"
 	"github.com/poteto0/poteto/utils"
 )
 
@@ -110,5 +112,17 @@ func TestMatchMethod(t *testing.T) {
 				t.Errorf(fmt.Sprintf("actual: %t", result))
 			}
 		})
+	}
+}
+
+func TestExtractFromHeader(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set("hello", "world")
+	ctx := poteto.NewContext(w, req)
+
+	result := ExtractFromHeader(ctx, "hello")
+	if result != "world" {
+		t.Errorf("unmatched")
 	}
 }
