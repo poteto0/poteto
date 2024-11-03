@@ -117,8 +117,8 @@ func TestMatchMethod(t *testing.T) {
 
 func TestExtractFromHeader(t *testing.T) {
 	w := httptest.NewRecorder()
-	w.Header().Set("hello", "world")
 	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set("hello", "world")
 	ctx := poteto.NewContext(w, req)
 
 	result := ExtractFromHeader(ctx, "hello")
