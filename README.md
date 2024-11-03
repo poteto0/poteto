@@ -5,7 +5,7 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.12.0
+go get github.com/poteto0/poteto@v0.13.1
 ```
 
 ```go:main.go
@@ -15,6 +15,7 @@ import (
 	"net/http"
 
 	"github.com/poteto0/poteto"
+	"github.com/poteto0/poteto/middleware"
 )
 
 func main() {
@@ -40,7 +41,7 @@ func main() {
 }
 
 type User struct {
-	Name string `json:"string"`
+	Name any `json:"name"`
 }
 
 func UserHandler(ctx poteto.Context) error {
