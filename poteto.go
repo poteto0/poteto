@@ -17,7 +17,6 @@ type Poteto interface {
 	DELETE(path string, handler HandlerFunc) error
 	Register(middlewares ...MiddlewareFunc)
 	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
-	applyMiddleware(mg MiddlewareGroup, handler HandlerFunc) HandlerFunc
 }
 
 type poteto struct {
@@ -53,15 +52,18 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
 
 	// Search middleware
-	mg := p.middlewareGroup.Search(r.URL.Path)
-	handler = p.applyMiddleware(mg, handler)
+	middlewares := p.middlewareGroup.SearchMiddlewares(r.URL.Path)
+	handler = p.applyMiddleware(middlewares, handler)
 	if err := handler(ctx); err != nil {
 		p.errorHandler.HandleHttpError(err, ctx)
 	}
 }
 
-func (p *poteto) applyMiddleware(mg MiddlewareGroup, handler HandlerFunc) HandlerFunc {
-	return mg.ApplyMiddleware(handler)
+func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFunc) HandlerFunc {
+	for _, middleware := range middlewares {
+		handler = middleware(handler)
+	}
+	return handler
 }
 
 func (p *poteto) Run(addr string) {
