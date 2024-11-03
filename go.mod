@@ -5,6 +5,7 @@ go 1.21.8
 require (
 	github.com/fatih/color v1.18.0
 	github.com/goccy/go-yaml v1.12.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 )
 
 require (

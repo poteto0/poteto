@@ -6,6 +6,8 @@ const (
 	PARAM_TYPE_PATH        string = "path"
 	PARAM_TYPE_QUERY       string = "query"
 	MAX_QUERY_PARAM_LENGTH int    = 32
+	ALGORITHM_HS256               = "HS256"
+	AUTH_SCHEME                   = "Bearer"
 )
 
 // Header
@@ -21,4 +23,5 @@ const (
 	X_DOWNLOAD_OPTION            string = "X-Download-Options"
 	X_CONTENT_TYPE_OPTION        string = "X-Content-Type-Options"
 	REFERRER_POLICY              string = "Referrer-Policy"
+	HEADER_AUTHORIZATION         string = "Authorization"
 )
