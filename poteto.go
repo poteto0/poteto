@@ -16,20 +16,20 @@ type Poteto interface {
 	PUT(path string, handler HandlerFunc) error
 	DELETE(path string, handler HandlerFunc) error
 	Register(middlewares ...MiddlewareFunc)
-	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
+	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree
 }
 
 type poteto struct {
-	router          Router
-	errorHandler    HttpErrorHandler
-	middlewareGroup MiddlewareGroup
+	router         Router
+	errorHandler   HttpErrorHandler
+	middlewareTree MiddlewareTree
 }
 
 func New() Poteto {
 	return &poteto{
-		router:          NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
-		errorHandler:    &httpErrorHandler{},
-		middlewareGroup: NewMiddlewareGroup(),
+		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		errorHandler:   &httpErrorHandler{},
+		middlewareTree: NewMiddlewareTree(),
 	}
 }
 
@@ -52,7 +52,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
 
 	// Search middleware
-	middlewares := p.middlewareGroup.SearchMiddlewares(r.URL.Path)
+	middlewares := p.middlewareTree.SearchMiddlewares(r.URL.Path)
 	handler = p.applyMiddleware(middlewares, handler)
 	if err := handler(ctx); err != nil {
 		p.errorHandler.HandleHttpError(err, ctx)
@@ -93,9 +93,9 @@ func (p *poteto) DELETE(path string, handler HandlerFunc) error {
 }
 
 func (p *poteto) Register(middlewares ...MiddlewareFunc) {
-	p.middlewareGroup.Insert("", middlewares...)
+	p.middlewareTree.Insert("", middlewares...)
 }
 
-func (p *poteto) Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup {
-	return p.middlewareGroup.Insert(pattern, middlewares...)
+func (p *poteto) Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
+	return p.middlewareTree.Insert(pattern, middlewares...)
 }

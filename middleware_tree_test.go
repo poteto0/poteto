@@ -4,7 +4,7 @@ import "testing"
 
 // TODO: TEST
 func TestInsertAndSearchMG(t *testing.T) {
-	mg := NewMiddlewareGroup()
+	mg := NewMiddlewareTree()
 
 	mg.Insert("/users", nil)
 	/*
