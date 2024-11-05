@@ -68,7 +68,8 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 				return next(ctx)
 			}
 
-			return ctx.NoContent()
+			// just pass not allow origin header
+			return next(ctx)
 		}
 	}
 }

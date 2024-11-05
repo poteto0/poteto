@@ -4,7 +4,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/poteto0/poteto"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -32,6 +31,7 @@ func matchSubdomain(domain, pattern string) bool {
 
 	// more fast on opp
 	domAuth := domain[didx+3:] // after [://]
+
 	// avoid too long
 	if len(domAuth) > constant.MAX_DOMAIN_LENGTH {
 		return false
@@ -87,9 +87,4 @@ func matchMethod(method string, allowMethods []string) bool {
 	}
 
 	return false
-}
-
-func ExtractFromHeader(ctx poteto.Context, key string) string {
-	token := ctx.GetRequest().Header.Get(key)
-	return token
 }

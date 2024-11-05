@@ -87,7 +87,7 @@ func JWSWithConfig(cfg PotetoJWSConfig) poteto.MiddlewareFunc {
 }
 
 func extractBearer(ctx poteto.Context) (string, error) {
-	authHeader := ExtractFromHeader(ctx, constant.HEADER_AUTHORIZATION)
+	authHeader := ctx.GetRequest().Header.Get(constant.HEADER_AUTHORIZATION)
 	target := constant.AUTH_SCHEME
 	bearers := strings.Split(authHeader, target)
 	if len(bearers) <= 1 {

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/poteto0/poteto"
+	"github.com/poteto0/poteto/constant"
 )
 
 type TestVal struct {
@@ -15,32 +16,81 @@ type TestVal struct {
 }
 
 func TestCORSWithConfigByDefault(t *testing.T) {
-	config := CORSConfig{
-		AllowOrigins: []string{},
-		AllowMethods: []string{},
+
+	tests := []struct {
+		name     string
+		method   string
+		url      string
+		origin   string
+		aOrigins []string
+		aMethods []string
+		expected string
+	}{
+		{
+			"Test Default allow all",
+			"GET",
+			"https://example.com/test",
+			"https://example.com",
+			[]string{},
+			[]string{},
+			"https://example.com",
+		},
+		{
+			"Test Allowed origin",
+			"GET",
+			"https://example.com/test",
+			"https://example.com",
+			[]string{"https://example.com"},
+			[]string{},
+			"https://example.com",
+		},
+		{
+			"Test Not Allowed origin",
+			"GET",
+			"https://example.com/test",
+			"https://example.com",
+			[]string{"https://unexpected.com"},
+			[]string{},
+			"",
+		},
+		{
+			"Test Allowed origin",
+			"POST",
+			"https://example.com/test",
+			"https://example.com",
+			[]string{"https://example.com"},
+			[]string{"GET"},
+			"",
+		},
 	}
 
-	t.Run("allow all origins", func(t *testing.T) {
-		cors := CORSWithConfig(config)
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			config := CORSConfig{
+				AllowOrigins: it.aOrigins,
+				AllowMethods: it.aMethods,
+			}
+			cors := CORSWithConfig(config)
 
-		w := httptest.NewRecorder()
-		req := httptest.NewRequest("GET", "https://example.com/test", nil)
-		context := poteto.NewContext(w, req)
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(it.method, it.url, nil)
+			req.Header.Set(constant.HEADER_ORIGIN, it.origin)
+			context := poteto.NewContext(w, req)
 
-		handler := func(ctx poteto.Context) error {
-			return ctx.JSON(http.StatusOK, TestVal{Name: "test", Val: "val"})
-		}
+			handler := func(ctx poteto.Context) error {
+				return ctx.JSON(http.StatusOK, TestVal{Name: "test", Val: "val"})
+			}
 
-		cors_handler := cors(handler)
-		cors_handler(context)
-		result := w.Body.String()
-		expected := `{"name":"test","val":"val"}`
-		if result[0:27] != expected[0:27] {
-			t.Errorf("Wrong result")
-			t.Errorf(fmt.Sprintf("expected: %s", expected))
-			t.Errorf(fmt.Sprintf("actual: %s", result))
-		}
-	})
+			cors_handler := cors(handler)
+			cors_handler(context)
+			result := w.Header().Get(constant.HEADER_ACCESS_CONTROL_ORIGIN)
+			if result != it.expected {
+				t.Errorf("Unmatched")
+				t.Errorf(fmt.Sprintf("result: %s", result))
+				t.Errorf(fmt.Sprintf("expected: %s", it.expected))
+			}
+		})
+	}
 }
 
 func TestGetAllowSubDomain(t *testing.T) {
