@@ -11,25 +11,25 @@ import (
  * Refer, if once found.
  */
 
-type MiddlewareGroup interface {
+type MiddlewareTree interface {
 	SearchMiddlewares(pattern string) []MiddlewareFunc
-	Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup
+	Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree
 	Register(middlewares ...MiddlewareFunc)
 }
 
-type middlewareGroup struct {
-	children    map[string]MiddlewareGroup
+type middlewareTree struct {
+	children    map[string]MiddlewareTree
 	middlewares []MiddlewareFunc
 	key         string
 }
 
-func NewMiddlewareGroup() MiddlewareGroup {
-	return &middlewareGroup{
-		children: make(map[string]MiddlewareGroup),
+func NewMiddlewareTree() MiddlewareTree {
+	return &middlewareTree{
+		children: make(map[string]MiddlewareTree),
 	}
 }
 
-func (mg *middlewareGroup) SearchMiddlewares(pattern string) []MiddlewareFunc {
+func (mg *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	middlewares := []MiddlewareFunc{}
 	currentNode := mg
 	middlewares = append(middlewares, mg.middlewares...)
@@ -41,11 +41,11 @@ func (mg *middlewareGroup) SearchMiddlewares(pattern string) []MiddlewareFunc {
 		}
 
 		if nextNode, ok := currentNode.children[p]; ok {
-			currentNode = nextNode.(*middlewareGroup)
+			currentNode = nextNode.(*middlewareTree)
 			middlewares = append(middlewares, currentNode.middlewares...)
 		} else {
 			// if found ever
-			// You got Middleware Group
+			// You got Middleware Tree
 			break
 		}
 	}
@@ -53,7 +53,7 @@ func (mg *middlewareGroup) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	return middlewares
 }
 
-func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareGroup {
+func (mg *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
 	currentNode := mg
 	patterns := strings.Split(pattern, "/")
 
@@ -63,18 +63,18 @@ func (mg *middlewareGroup) Insert(pattern string, middlewares ...MiddlewareFunc)
 		}
 
 		if _, ok := currentNode.children[p]; !ok {
-			currentNode.children[p] = &middlewareGroup{
-				children:    make(map[string]MiddlewareGroup),
+			currentNode.children[p] = &middlewareTree{
+				children:    make(map[string]MiddlewareTree),
 				middlewares: []MiddlewareFunc{},
 				key:         p,
 			}
 		}
-		currentNode = currentNode.children[p].(*middlewareGroup)
+		currentNode = currentNode.children[p].(*middlewareTree)
 	}
 	currentNode.Register(middlewares...)
 	return currentNode
 }
 
-func (mg *middlewareGroup) Register(middlewares ...MiddlewareFunc) {
+func (mg *middlewareTree) Register(middlewares ...MiddlewareFunc) {
 	mg.middlewares = append(mg.middlewares, middlewares...)
 }

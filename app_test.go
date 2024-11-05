@@ -83,7 +83,7 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 			"world",
 		},
 		{
-			"Test MiddlewareGroup",
+			"Test MiddlewareTree",
 			"GET",
 			"/tests",
 			true,
@@ -91,7 +91,7 @@ func TestServeHTTPWithMiddleware(t *testing.T) {
 			"world2",
 		},
 		{
-			"Test if MiddlewareGroup includes all middleware",
+			"Test if MiddlewareTree includes all middleware",
 			"GET",
 			"/tests",
 			true,
