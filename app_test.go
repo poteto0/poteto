@@ -58,11 +58,11 @@ func TestServeHTTP(t *testing.T) {
 
 func TestServeHTTPWithMiddleware(t *testing.T) {
 	p := New()
-	p.Register(SampleMiddleware)
+	p.Register(sampleMiddleware)
 	p.GET("/users", getAllUserForTest)
 
 	group := p.Combine("/tests")
-	group.Register(SampleMiddleware2)
+	group.Register(sampleMiddleware2)
 	p.GET("/tests", getAllUserForTest)
 	p.GET("/tests/:id", getAllUserForTestById)
 
@@ -154,7 +154,7 @@ func getAllUserForTestById(ctx Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
-func SampleMiddleware(next HandlerFunc) HandlerFunc {
+func sampleMiddleware(next HandlerFunc) HandlerFunc {
 	return func(ctx Context) error {
 		res := ctx.GetResponse()
 
@@ -164,7 +164,7 @@ func SampleMiddleware(next HandlerFunc) HandlerFunc {
 	}
 }
 
-func SampleMiddleware2(next HandlerFunc) HandlerFunc {
+func sampleMiddleware2(next HandlerFunc) HandlerFunc {
 	return func(ctx Context) error {
 		res := ctx.GetResponse()
 
