@@ -3,8 +3,10 @@ package poteto
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 
 	"github.com/goccy/go-json"
@@ -26,6 +28,7 @@ type Context interface {
 	JsonDeserialize(object any) error
 	NoContent() error
 	Set(key string, val any)
+	GetRemoteIP() (string, error)
 }
 
 type context struct {
@@ -152,4 +155,16 @@ func (ctx *context) Set(key string, val any) {
 		ctx.store = make(map[string]any)
 	}
 	ctx.store[key] = val
+}
+
+func (ctx *context) GetRemoteIP() (string, error) {
+	ip, _, err := net.SplitHostPort(
+		strings.TrimSpace(ctx.GetRequest().RemoteAddr),
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	return ip, nil
 }
