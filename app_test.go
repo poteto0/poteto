@@ -3,6 +3,7 @@ package poteto
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -53,6 +54,20 @@ func TestServeHTTP(t *testing.T) {
 				t.Errorf("Unmatched")
 			}
 		})
+	}
+}
+
+func BenchmarkServeHTTP(b *testing.B) {
+	p := New()
+	p.GET("/users/:id", getAllUserForTestById)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/users/1", strings.NewReader(userJSON))
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		p.ServeHTTP(w, req)
 	}
 }
 
