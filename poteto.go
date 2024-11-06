@@ -61,6 +61,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFunc) HandlerFunc {
 	for _, middleware := range middlewares {
+		fmt.Println("ループなう")
 		handler = middleware(handler)
 	}
 	return handler
