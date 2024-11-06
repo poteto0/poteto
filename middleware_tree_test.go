@@ -25,5 +25,4 @@ func TestInsertAndSearchMiddlewares(t *testing.T) {
 			}
 		})
 	}
-
 }
