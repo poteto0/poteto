@@ -26,6 +26,11 @@ type user struct {
 	Name string `json:"string"`
 }
 
+type testVal struct {
+	Name string `json:"name"`
+	Val  string `json:"val"`
+}
+
 func getAllUserForTest(ctx Context) error {
 	user := user{
 		Name: "user",
@@ -39,3 +44,7 @@ func getAllUserForTestById(ctx Context) error {
 	}
 	return ctx.JSON(http.StatusOK, user)
 }
+
+const (
+	userJSON = `{"name":"poteto"}`
+)
