@@ -9,16 +9,6 @@ import (
 	"github.com/poteto0/poteto/constant"
 )
 
-type TestVal struct {
-	Name string `json:"name"`
-	Val  string `json:"val"`
-}
-
-type TestExpected struct {
-	Code int   `json:"code"`
-	Val  error `json:"val"`
-}
-
 func TestJSON(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/test", nil)
@@ -27,12 +17,12 @@ func TestJSON(t *testing.T) {
 	tests := []struct {
 		name     string
 		code     int
-		val      TestVal
+		val      testVal
 		expected string
 	}{
 		{"status ok & can serialize",
 			http.StatusOK,
-			TestVal{Name: "test", Val: "val"},
+			testVal{Name: "test", Val: "val"},
 			`{"name":"test","val":"val"}`,
 		},
 	}
@@ -125,6 +115,6 @@ func BenchmarkJSON(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		ctx.JSON(http.StatusOK, &testUser)
+		ctx.JSON(http.StatusOK, testUser)
 	}
 }

@@ -68,3 +68,20 @@ func TestBind(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkBind(b *testing.B) {
+	binder := NewBinder()
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "https://example.com", bytes.NewBufferString(string(userJSON)))
+	req.Header.Set(constant.HEADER_CONTENT_TYPE, constant.APPLICATION_JSON)
+	ctx := NewContext(w, req).(*context)
+
+	testUser := user{}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		binder.Bind(ctx, &testUser)
+	}
+}
