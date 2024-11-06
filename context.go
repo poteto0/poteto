@@ -1,13 +1,13 @@
 package poteto
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
 
+	"github.com/goccy/go-json"
 	"github.com/poteto0/poteto/constant"
 )
 

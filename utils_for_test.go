@@ -39,3 +39,7 @@ func getAllUserForTestById(ctx Context) error {
 	}
 	return ctx.JSON(http.StatusOK, user)
 }
+
+const (
+	userJSON = `{"name":"poteto"}`
+)
