@@ -118,3 +118,13 @@ func BenchmarkJSON(b *testing.B) {
 		ctx.JSON(http.StatusOK, testUser)
 	}
 }
+
+func TestRemoteIP(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
+	ctx := NewContext(w, req).(*context)
+
+	if _, err := ctx.GetRemoteIP(); err != nil {
+		t.Errorf("Error occurred")
+	}
+}
