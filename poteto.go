@@ -3,6 +3,7 @@ package poteto
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
@@ -23,6 +24,7 @@ type poteto struct {
 	router         Router
 	errorHandler   HttpErrorHandler
 	middlewareTree MiddlewareTree
+	cache          sync.Pool
 }
 
 func New() Poteto {
@@ -33,8 +35,18 @@ func New() Poteto {
 	}
 }
 
+func (p *poteto) initializeContext(w http.ResponseWriter, r *http.Request) *context {
+	if ctx, ok := p.cache.Get().(*context); ok {
+		ctx.Reset(w, r)
+		return ctx
+	}
+	return NewContext(w, r).(*context)
+}
+
 func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := NewContext(w, r)
+	// get from cache & reset context
+	ctx := p.initializeContext(w, r)
+
 	routes := p.router.GetRoutesByMethod(r.Method)
 
 	targetRoute, httpParam := routes.Search(r.URL.Path)
@@ -55,6 +67,9 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := handler(ctx); err != nil {
 		p.errorHandler.HandleHttpError(err, ctx)
 	}
+
+	// cached context
+	p.cache.Put(ctx)
 }
 
 func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFunc) HandlerFunc {
