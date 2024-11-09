@@ -24,4 +24,6 @@ const (
 	X_CONTENT_TYPE_OPTION        string = "X-Content-Type-Options"
 	REFERRER_POLICY              string = "Referrer-Policy"
 	HEADER_AUTHORIZATION         string = "Authorization"
+	HEADER_CONTENT_LENGTH        string = "Content-Length"
+	HEADER_X_REQUEST_ID          string = "X-Request-Id"
 )
