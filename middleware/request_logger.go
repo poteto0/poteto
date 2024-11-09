@@ -10,8 +10,8 @@ import (
 
 // Example for Logrus (https://github.com/sirupsen/logrus)
 // log := logrus.New()
-// config := middleware.DefaultRequestLoggerConfig
-// config.LogHandleFunc = func(ctx poteto.Context, rlv middleware.RequestLoggerValues) error {
+// logConfig := middleware.DefaultRequestLoggerConfig
+// logConfig.LogHandleFunc = func(ctx poteto.Context, rlv middleware.RequestLoggerValues) error {
 //   if rlv.Error == nil {
 //     log.WithFields(logrus.Fields{
 //       "method":    rlv.Method,
@@ -27,7 +27,7 @@ import (
 //   }
 //   return nil
 // }
-// p.Use(middleware.RequestLoggerWithConfig(config))
+// p.Register(middleware.RequestLoggerWithConfig(logConfig))
 
 type LogHandlerFunc func(ctx poteto.Context, rlv RequestLoggerValues) error
 
