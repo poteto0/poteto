@@ -6,6 +6,7 @@
 
 ```sh
 go get github.com/poteto0/poteto@v0.15.1
+go mod tidy
 ```
 
 ```go:main.go
