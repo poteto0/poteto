@@ -29,6 +29,7 @@ type Context interface {
 	NoContent() error
 	Set(key string, val any)
 	GetRemoteIP() (string, error)
+	Reset(w http.ResponseWriter, r *http.Request)
 }
 
 type context struct {
@@ -167,4 +168,12 @@ func (ctx *context) GetRemoteIP() (string, error) {
 	}
 
 	return ip, nil
+}
+
+// using same binder
+func (ctx *context) Reset(w http.ResponseWriter, r *http.Request) {
+	ctx.request = r
+	ctx.response = NewResponse(w)
+	ctx.httpParams = NewHttpParam()
+	ctx.store = make(map[string]any)
 }
