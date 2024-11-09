@@ -21,6 +21,7 @@ type Context interface {
 	PathParam(key string) any
 	QueryParam(key string) any
 	Bind(object any) error
+	GetPath() string
 	SetPath(path string)
 	GetResponse() *response
 	GetRequest() *http.Request
@@ -58,6 +59,10 @@ func (ctx *context) JSON(code int, value any) error {
 	ctx.writeContentType(constant.APPLICATION_JSON)
 	ctx.response.SetStatus(code)
 	return ctx.JsonSerialize(value)
+}
+
+func (ctx *context) GetPath() string {
+	return ctx.path
 }
 
 func (ctx *context) SetPath(path string) {
