@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 	"sync"
 
 	"github.com/goccy/go-json"
@@ -30,12 +29,15 @@ type Context interface {
 	NoContent() error
 	Set(key string, val any)
 	GetRemoteIP() (string, error)
+	RegisterTrustIPRange(ranges *net.IPNet)
+	GetIPFromXFFHeader() (string, error)
 	Reset(w http.ResponseWriter, r *http.Request)
 }
 
 type context struct {
 	response   Response
 	request    *http.Request
+	ipHandler  IPHandler
 	path       string
 	httpParams HttpParam
 	store      map[string]any
@@ -49,6 +51,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) Context {
 	return &context{
 		response:   NewResponse(w),
 		request:    r,
+		ipHandler:  &ipHandler{isTrustPrivateIp: true},
 		path:       "",
 		httpParams: NewHttpParam(),
 		binder:     NewBinder(),
@@ -164,15 +167,15 @@ func (ctx *context) Set(key string, val any) {
 }
 
 func (ctx *context) GetRemoteIP() (string, error) {
-	ip, _, err := net.SplitHostPort(
-		strings.TrimSpace(ctx.GetRequest().RemoteAddr),
-	)
+	return ctx.ipHandler.GetRemoteIP(ctx)
+}
 
-	if err != nil {
-		return "", err
-	}
+func (ctx *context) RegisterTrustIPRange(ranges *net.IPNet) {
+	ctx.ipHandler.RegisterTrustIPRange(ranges)
+}
 
-	return ip, nil
+func (ctx *context) GetIPFromXFFHeader() (string, error) {
+	return ctx.ipHandler.GetIPFromXFFHeader(ctx)
 }
 
 // using same binder
