@@ -80,9 +80,11 @@ func (ctx *context) SetQueryParam(queryParams url.Values) {
 	}
 
 	for key, value := range queryParams {
-		var paramUnit ParamUnit
+		if len(value) == 0 {
+			continue
+		}
 
-		paramUnit = ParamUnit{key, utils.StrArrayToStr(value)}
+		paramUnit := ParamUnit{key, utils.StrArrayToStr(value)}
 
 		ctx.SetParam(constant.PARAM_TYPE_QUERY, paramUnit)
 	}
