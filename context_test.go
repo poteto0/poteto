@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -126,5 +127,21 @@ func TestRemoteIP(t *testing.T) {
 
 	if _, err := ctx.GetRemoteIP(); err != nil {
 		t.Errorf("Error occurred")
+	}
+}
+
+func TestGetIPFromXFFHeaderByContext(t *testing.T) {
+	iph := &ipHandler{}
+	_, ipnet, _ := net.ParseCIDR("10.0.0.0/24")
+	iph.RegisterTrustIPRange(ipnet)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set(constant.HEADER_X_FORWARDED_FOR, "11.0.0.1, 12.0.0.1, 10.0.0.2, 10.0.0.1")
+	ctx := NewContext(w, req).(*context)
+
+	ipString, _ := ctx.GetIPFromXFFHeader()
+	if ipString != "12.0.0.1" {
+		t.Errorf("Not matched")
 	}
 }
