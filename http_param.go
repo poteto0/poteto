@@ -6,32 +6,36 @@ import (
 
 type ParamUnit struct {
 	key   string
-	value any
+	value string
 }
 
 type httpParam struct {
-	params map[string]map[string]any
+	params map[string]map[string]string
 }
 
 type HttpParam interface {
-	GetParam(paramType, key string) any
+	GetParam(paramType, key string) (string, bool)
 	AddParam(paramType string, paramUnit ParamUnit)
 }
 
 func NewHttpParam() HttpParam {
-	params := make(map[string]map[string]any, 4)
+	params := make(map[string]map[string]string, 4)
 
 	httpParam := &httpParam{
 		params: params,
 	}
 
-	httpParam.params[constant.PARAM_TYPE_PATH] = make(map[string]any)
-	httpParam.params[constant.PARAM_TYPE_QUERY] = make(map[string]any)
+	httpParam.params[constant.PARAM_TYPE_PATH] = make(map[string]string)
+	httpParam.params[constant.PARAM_TYPE_QUERY] = make(map[string]string)
 	return httpParam
 }
 
-func (hp *httpParam) GetParam(paramType, key string) any {
-	return hp.params[paramType][key]
+func (hp *httpParam) GetParam(paramType, key string) (string, bool) {
+	val := hp.params[paramType][key]
+	if val != "" {
+		return val, true
+	}
+	return "", false
 }
 
 func (hp *httpParam) AddParam(paramType string, paramUnit ParamUnit) {

@@ -13,3 +13,15 @@ func SliceEqual[T comparable](as, bs []T) bool {
 
 	return true
 }
+
+// EX:) []string{"hello", "world"} -> hello,world
+func StrArrayToStr(targets []string) string {
+	var val_str string
+	for i, target := range targets {
+		val_str += target
+		if i != len(targets)-1 {
+			val_str += ","
+		}
+	}
+	return val_str
+}
