@@ -24,3 +24,24 @@ func TestSliceEqual(t *testing.T) {
 		})
 	}
 }
+
+func TestStrArrayToStr(t *testing.T) {
+	tests := []struct {
+		name     string
+		targets  []string
+		expected string
+	}{
+		{"Test 1 len array", []string{"hello"}, "hello"},
+		{"Test multi len array", []string{"hello", "world", "!!"}, "hello,world,!!"},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			result := StrArrayToStr(it.targets)
+
+			if result != it.expected {
+				t.Errorf("Unmatched")
+			}
+		})
+	}
+}

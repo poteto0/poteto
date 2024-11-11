@@ -12,8 +12,28 @@ func TestAddAndGetParam(t *testing.T) {
 	pu := ParamUnit{"key", "value"}
 	hp.AddParam(constant.PARAM_TYPE_PATH, pu)
 
-	value := hp.GetParam(constant.PARAM_TYPE_PATH, "key")
-	if value != "value" {
-		t.Errorf("Don't Work")
+	tests := []struct {
+		name         string
+		key          string
+		expected_val string
+		expected_ok  bool
+	}{
+		{"test ok case", "key", "value", true},
+		{"test unexpected", "unexpected", "", false},
 	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			value, ok := hp.GetParam(constant.PARAM_TYPE_PATH, it.key)
+
+			if value != it.expected_val {
+				t.Errorf("Don't Work")
+			}
+
+			if ok != it.expected_ok {
+				t.Errorf("Unmatched")
+			}
+		})
+	}
+
 }

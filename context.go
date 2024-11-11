@@ -10,6 +10,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/poteto0/poteto/constant"
+	"github.com/poteto0/poteto/utils"
 )
 
 type Context interface {
@@ -17,8 +18,8 @@ type Context interface {
 	WriteHeader(code int)
 	SetQueryParam(queryParams url.Values)
 	SetParam(paramType string, paramUnit ParamUnit)
-	PathParam(key string) any
-	QueryParam(key string) any
+	PathParam(key string) (string, bool)
+	QueryParam(key string) (string, bool)
 	Bind(object any) error
 	GetPath() string
 	SetPath(path string)
@@ -81,11 +82,7 @@ func (ctx *context) SetQueryParam(queryParams url.Values) {
 	for key, value := range queryParams {
 		var paramUnit ParamUnit
 
-		if len(value) == 1 { // not array
-			paramUnit = ParamUnit{key, value[0]}
-		} else {
-			paramUnit = ParamUnit{key, value}
-		}
+		paramUnit = ParamUnit{key, utils.StrArrayToStr(value)}
 
 		ctx.SetParam(constant.PARAM_TYPE_QUERY, paramUnit)
 	}
@@ -95,19 +92,13 @@ func (ctx *context) SetParam(paramType string, paramUnit ParamUnit) {
 	ctx.httpParams.AddParam(paramType, paramUnit)
 }
 
-func (ctx *context) PathParam(key string) any {
+func (ctx *context) PathParam(key string) (string, bool) {
 	key = constant.PARAM_PREFIX + key
-	if val := ctx.httpParams.GetParam(constant.PARAM_TYPE_PATH, key); val != nil {
-		return val
-	}
-	return nil
+	return ctx.httpParams.GetParam(constant.PARAM_TYPE_PATH, key)
 }
 
-func (ctx *context) QueryParam(key string) any {
-	if val := ctx.httpParams.GetParam(constant.PARAM_TYPE_QUERY, key); val != nil {
-		return val
-	}
-	return nil
+func (ctx *context) QueryParam(key string) (string, bool) {
+	return ctx.httpParams.GetParam(constant.PARAM_TYPE_QUERY, key)
 }
 
 func (ctx *context) Bind(object any) error {

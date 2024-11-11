@@ -52,13 +52,13 @@ func TestQueryParam(t *testing.T) {
 	queryParams := req.URL.Query()
 	ctx.SetQueryParam(queryParams)
 
-	queryParam1 := ctx.QueryParam("hello")
+	queryParam1, _ := ctx.QueryParam("hello")
 	if queryParam1 != "world" {
 		t.Errorf("Cannot Get Query Param")
 	}
 
-	queryParam2 := ctx.QueryParam("unknown")
-	if queryParam2 != nil {
+	queryParam2, _ := ctx.QueryParam("unknown")
+	if queryParam2 != "" {
 		t.Errorf("Cannot Get nil If Unknown key")
 	}
 }
@@ -73,20 +73,25 @@ func TestPathParam(t *testing.T) {
 	ctx.SetParam(constant.PARAM_TYPE_PATH, ParamUnit{key: ":id", value: "1"})
 
 	tests := []struct {
-		name     string
-		key      string
-		expected any
+		name        string
+		key         string
+		expected    string
+		expected_ok bool
 	}{
-		{"Can get PathParam", "id", "1"},
-		{"If unexpected key", "unexpected", nil},
+		{"Can get PathParam", "id", "1", true},
+		{"If unexpected key", "unexpected", "", false},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			param := ctx.PathParam(it.key)
+			param, ok := ctx.PathParam(it.key)
 
 			if param != it.expected {
 				t.Errorf("Unmatched")
+			}
+
+			if ok != it.expected_ok {
+				t.Errorf("unmatched")
 			}
 		})
 
