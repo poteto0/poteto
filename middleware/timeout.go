@@ -41,16 +41,17 @@ func TimeoutWithConfig(config TimeoutConfig) poteto.MiddlewareFunc {
 
 			done := make(chan struct{})
 			go func() {
-				// in case of panic
 				defer func() {
-					if err := recover(); err != nil {
-						result = fmt.Errorf("%v", err)
+					// in case of panic
+					if r := recover(); r != nil {
+						result = fmt.Errorf("%v", r)
 					}
+
+					close(done)
 				}()
 
 				// do
 				result = next(ctx)
-				close(done)
 			}()
 
 			select {

@@ -16,7 +16,6 @@ type TestVal struct {
 }
 
 func TestCORSWithConfigByDefault(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		method   string

@@ -14,14 +14,14 @@ type Response interface {
 }
 
 type response struct {
-	writer      http.ResponseWriter
+	Writer      http.ResponseWriter
 	Status      int
 	Size        int64
 	IsCommitted bool
 }
 
 func NewResponse(w http.ResponseWriter) Response {
-	return &response{writer: w}
+	return &response{Writer: w}
 }
 
 func (r *response) WriteHeader(code int) {
@@ -31,7 +31,7 @@ func (r *response) WriteHeader(code int) {
 	}
 
 	r.Status = code
-	r.writer.WriteHeader(r.Status)
+	r.Writer.WriteHeader(r.Status)
 	r.IsCommitted = true
 }
 
@@ -44,7 +44,7 @@ func (r *response) Write(b []byte) (int, error) {
 		r.IsCommitted = true
 	}
 
-	n, err := r.writer.Write(b)
+	n, err := r.Writer.Write(b)
 	r.Size += int64(n)
 
 	return n, err
@@ -55,5 +55,5 @@ func (r *response) SetStatus(code int) {
 }
 
 func (r *response) Header() http.Header {
-	return r.writer.Header()
+	return r.Writer.Header()
 }
