@@ -17,7 +17,7 @@ type response struct {
 	writer      http.ResponseWriter
 	Status      int
 	Size        int64
-	isCommitted bool
+	IsCommitted bool
 }
 
 func NewResponse(w http.ResponseWriter) Response {
@@ -25,23 +25,23 @@ func NewResponse(w http.ResponseWriter) Response {
 }
 
 func (r *response) WriteHeader(code int) {
-	if r.isCommitted {
+	if r.IsCommitted {
 		fmt.Println("response has already committed")
 		return
 	}
 
 	r.Status = code
 	r.writer.WriteHeader(r.Status)
-	r.isCommitted = true
+	r.IsCommitted = true
 }
 
 func (r *response) Write(b []byte) (int, error) {
-	if !r.isCommitted {
+	if !r.IsCommitted {
 		if r.Status == 0 {
 			r.SetStatus(http.StatusOK)
 		}
 		r.WriteHeader(r.Status)
-		r.isCommitted = true
+		r.IsCommitted = true
 	}
 
 	n, err := r.writer.Write(b)
