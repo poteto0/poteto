@@ -11,7 +11,7 @@ type HttpErrorHandler interface {
 type httpErrorHandler struct{}
 
 func (heh *httpErrorHandler) HandleHttpError(err error, ctx Context) {
-	if ctx.GetResponse().isCommitted {
+	if ctx.GetResponse().IsCommitted {
 		return
 	}
 
