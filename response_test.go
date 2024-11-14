@@ -22,7 +22,7 @@ func TestWrite(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		isCommitted bool
+		IsCommitted bool
 		b           []byte
 		expected    int
 	}{
@@ -31,7 +31,7 @@ func TestWrite(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			resp.isCommitted = it.isCommitted
+			resp.IsCommitted = it.IsCommitted
 			n, _ := resp.Write(it.b)
 			if n != it.expected {
 				t.Errorf("FATAL write response")
