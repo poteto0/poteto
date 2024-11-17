@@ -1,6 +1,8 @@
 package poteto
 
 import (
+	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -103,4 +105,20 @@ func BenchmarkInsertAndSearch(b *testing.B) {
 			route.Search(url)
 		}
 	}
+}
+
+func TestCollisionDetection(t *testing.T) {
+	route := NewRoute().(*route)
+
+	route.Insert("GET", "/users/test", getAllUserForTest)
+	route.Insert("GET", "/users/test", getAllUserForTestById)
+
+	r, _ := route.Search("/users/test")
+	if getFunctionName(r.handler) != getFunctionName(getAllUserForTest) {
+		t.Errorf("Unmatched")
+	}
+}
+
+func getFunctionName(handler any) string {
+	return runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
 }
