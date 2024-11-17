@@ -2,6 +2,10 @@
 
 ## 0.17.x
 
+### 0.17.1
+
+- warning handler collision detect
+
 ### 0.17.0
 
 - timeout middleware
