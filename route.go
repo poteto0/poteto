@@ -1,9 +1,12 @@
 package poteto
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
+	"github.com/poteto0/poteto/utils"
 )
 
 type Route interface {
@@ -81,6 +84,13 @@ func (r *route) Insert(method, path string, handler HandlerFunc) {
 		}
 		currentRoute = currentRoute.children[param].(*route)
 	}
+
+	if currentRoute.handler != nil {
+		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s", utils.StrArrayToStr(params)))
+		fmt.Println(coloredWarn)
+		return
+	}
+
 	currentRoute.handler = handler
 }
 
