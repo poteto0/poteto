@@ -3,6 +3,7 @@ package poteto
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -84,9 +85,15 @@ func (p *poteto) Run(addr string) {
 	coloredBanner := color.HiGreenString(Banner)
 	fmt.Println(coloredBanner)
 
+	if !strings.Contains(addr, constant.PARAM_PREFIX) {
+		addr = constant.PARAM_PREFIX + addr
+	}
+
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
 	}
+
+	fmt.Println("serve at http://localhost:", addr)
 }
 
 func (p *poteto) GET(path string, handler HandlerFunc) error {

@@ -2,6 +2,7 @@ package poteto
 
 import (
 	"testing"
+	"time"
 )
 
 func TestAddRouteToPoteto(t *testing.T) {
@@ -42,6 +43,38 @@ func TestAddRouteToPoteto(t *testing.T) {
 				if err != nil {
 					t.Errorf("FATAL: fail new route")
 				}
+			}
+		})
+	}
+}
+
+func TestRun(t *testing.T) {
+	p := New()
+
+	tests := []struct {
+		name  string
+		port1 string
+		port2 string
+	}{
+		//{"Test :8080", ":8080", ""},
+		{"Test 8080", "8080", ""},
+		//{"Test collision panic", ":8080", ":8080"},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			done := make(chan struct{})
+			go func() {
+				p.Run(it.port1)
+				if it.port2 != "" {
+					p.Run(it.port2)
+				}
+				close(done)
+			}()
+
+			select {
+			case <-time.After(1 * time.Second):
+				return
 			}
 		})
 	}
