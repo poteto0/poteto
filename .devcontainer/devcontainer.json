@@ -1,0 +1,15 @@
+{
+  "name": "Go",
+  "dockerFile": "./Dockerfile",
+  "customizations": {
+    "vscode": {
+      "extensions": ["golang.go"],
+      "settings": {
+        "editor.formatOnSave": true,
+        "[go]": {
+          "editor.defaultFormatter": "golang.go"
+        }
+      }
+    }
+  }
+}
