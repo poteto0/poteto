@@ -1,10 +1,17 @@
 {
   "name": "Go",
   "dockerFile": "./Dockerfile",
+  "postCreateCommand": "./scripts/postCreate.sh",
   "customizations": {
     "vscode": {
-      "extensions": ["golang.go"],
+      "extensions": [
+        "golang.go",
+        "christian-kohler.path-intellisense",
+        "streetsidesoftware.code-spell-checker",
+        "oderwat.indent-rainbow"
+      ],
       "settings": {
+        "editor.tabSize": 2,
         "editor.formatOnSave": true,
         "[go]": {
           "editor.defaultFormatter": "golang.go"
