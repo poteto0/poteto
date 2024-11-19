@@ -5,7 +5,7 @@
 ### 0.18.0
 
 - `Poteto` has SetLogger
-- You can call logger.XXX() from context
+- You can call ctx.Logger().XXX() from context
 
 ## 0.17.x
 
