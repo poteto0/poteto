@@ -19,12 +19,14 @@ type Poteto interface {
 	DELETE(path string, handler HandlerFunc) error
 	Register(middlewares ...MiddlewareFunc)
 	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree
+	SetLogger(logger any)
 }
 
 type poteto struct {
 	router         Router
 	errorHandler   HttpErrorHandler
 	middlewareTree MiddlewareTree
+	logger         any
 	cache          sync.Pool
 }
 
@@ -41,7 +43,12 @@ func (p *poteto) initializeContext(w http.ResponseWriter, r *http.Request) *cont
 		ctx.Reset(w, r)
 		return ctx
 	}
-	return NewContext(w, r).(*context)
+
+	newCtx := NewContext(w, r).(*context)
+	if p.logger != nil {
+		newCtx.SetLogger(p.logger)
+	}
+	return newCtx
 }
 
 func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -118,4 +125,8 @@ func (p *poteto) Register(middlewares ...MiddlewareFunc) {
 
 func (p *poteto) Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
 	return p.middlewareTree.Insert(pattern, middlewares...)
+}
+
+func (p *poteto) SetLogger(logger any) {
+	p.logger = logger
 }

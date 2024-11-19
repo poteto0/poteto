@@ -79,3 +79,19 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
+func TestSetLogger(t *testing.T) {
+	p := New().(*poteto)
+	logger := func(msg string) {
+		return
+	}
+
+	if p.logger != nil {
+		t.Error("Unmatched")
+	}
+
+	p.SetLogger(logger)
+	if p.logger == nil {
+		t.Errorf("Unmatched")
+	}
+}

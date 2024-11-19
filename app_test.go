@@ -11,6 +11,10 @@ func TestServeHTTP(t *testing.T) {
 	p := New()
 	p.GET("/users", getAllUserForTest)
 	p.GET("/users/:id", getAllUserForTestById)
+	logger := func(msg string) {
+		return
+	}
+	p.SetLogger(logger)
 
 	tests := []struct {
 		name         string

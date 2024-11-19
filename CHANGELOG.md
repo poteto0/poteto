@@ -1,5 +1,12 @@
 # 0.x.x
 
+## 0.18.x
+
+### 0.18.0
+
+- `Poteto` has SetLogger
+- You can call ctx.Logger().XXX() from context
+
 ## 0.17.x
 
 ## 0.17.2

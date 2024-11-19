@@ -33,6 +33,8 @@ type Context interface {
 	RegisterTrustIPRange(ranges *net.IPNet)
 	GetIPFromXFFHeader() (string, error)
 	Reset(w http.ResponseWriter, r *http.Request)
+	SetLogger(logger any)
+	Logger() any
 }
 
 type context struct {
@@ -42,6 +44,7 @@ type context struct {
 	path       string
 	httpParams HttpParam
 	store      map[string]any
+	logger     any
 	lock       sync.RWMutex
 
 	// Method
@@ -177,4 +180,12 @@ func (ctx *context) Reset(w http.ResponseWriter, r *http.Request) {
 	ctx.response = NewResponse(w)
 	ctx.httpParams = NewHttpParam()
 	ctx.store = make(map[string]any)
+}
+
+func (ctx *context) SetLogger(logger any) {
+	ctx.logger = logger
+}
+
+func (ctx *context) Logger() any {
+	return ctx.logger
 }
