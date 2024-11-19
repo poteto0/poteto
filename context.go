@@ -34,6 +34,7 @@ type Context interface {
 	GetIPFromXFFHeader() (string, error)
 	Reset(w http.ResponseWriter, r *http.Request)
 	SetLogger(logger any)
+	Logger() any
 }
 
 type context struct {
@@ -183,4 +184,8 @@ func (ctx *context) Reset(w http.ResponseWriter, r *http.Request) {
 
 func (ctx *context) SetLogger(logger any) {
 	ctx.logger = logger
+}
+
+func (ctx *context) Logger() any {
+	return ctx.logger
 }
