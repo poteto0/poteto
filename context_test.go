@@ -150,3 +150,18 @@ func TestGetIPFromXFFHeaderByContext(t *testing.T) {
 		t.Errorf("Not matched")
 	}
 }
+
+func TestGetLogger(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
+	ctx := NewContext(w, req).(*context)
+
+	logger := func(msg string) {
+		return
+	}
+	ctx.SetLogger(logger)
+
+	if ctx.Logger() == nil {
+		t.Errorf("Unmatched")
+	}
+}
