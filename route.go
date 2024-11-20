@@ -1,7 +1,9 @@
 package poteto
 
 import (
+	"bytes"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -11,14 +13,13 @@ import (
 
 type Route interface {
 	Search(path string) (*route, ParamUnit)
-	Insert(method, path string, handler HandlerFunc)
+	Insert(path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
 }
 
 type route struct {
 	key           string
-	method        string
 	children      map[string]Route
 	childParamKey string
 	handler       HandlerFunc
@@ -27,7 +28,6 @@ type route struct {
 func NewRoute() Route {
 	return &route{
 		key:           "",
-		method:        "",
 		children:      make(map[string]Route),
 		childParamKey: "",
 	}
@@ -36,6 +36,7 @@ func NewRoute() Route {
 func (r *route) Search(path string) (*route, ParamUnit) {
 	currentRoute := r
 	params := strings.Split(path, "/")
+	last := len(params) - 1
 	var httpParam ParamUnit
 
 	for i, param := range params {
@@ -47,7 +48,7 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 			currentRoute = nextRoute.(*route)
 		} else {
 			// last path includes url param ex: /users/:id
-			if chParam := currentRoute.childParamKey; i == len(params)-1 && chParam != "" {
+			if chParam := currentRoute.childParamKey; i == last && chParam != "" {
 				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
 					httpParam = ParamUnit{key: chParam, value: param}
@@ -60,9 +61,10 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 	return currentRoute, httpParam
 }
 
-func (r *route) Insert(method, path string, handler HandlerFunc) {
+func (r *route) Insert(path string, handler HandlerFunc) {
 	currentRoute := r
 	params := strings.Split(path, "/")
+	last := len(params) - 1
 
 	for i, param := range params {
 		if param == "" {
@@ -72,13 +74,12 @@ func (r *route) Insert(method, path string, handler HandlerFunc) {
 		if nextRoute := currentRoute.children[param]; nextRoute == nil {
 
 			// last path includes url param ex: /users/:id
-			if i == len(params)-1 && hasParamPrefix(param) {
+			if i == last && hasParamPrefix(param) {
 				currentRoute.childParamKey = param
 			}
 
 			currentRoute.children[param] = &route{
 				key:      param,
-				method:   method,
 				children: make(map[string]Route),
 			}
 		}
@@ -86,8 +87,9 @@ func (r *route) Insert(method, path string, handler HandlerFunc) {
 	}
 
 	if currentRoute.handler != nil {
-		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s", utils.StrArrayToStr(params)))
-		fmt.Println(coloredWarn)
+		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", utils.StrArrayToStr(params)))
+		buf := bytes.NewBuffer([]byte(coloredWarn))
+		buf.WriteTo(os.Stdout)
 		return
 	}
 

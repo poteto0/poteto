@@ -34,7 +34,7 @@ func (r *router) add(method, path string, handler HandlerFunc) error {
 		return errors.New("[" + method + "] " + path + " is already used")
 	}
 
-	routes.Insert(method, path, handler)
+	routes.Insert(path, handler)
 	return nil
 }
 
