@@ -16,15 +16,24 @@ type ret struct {
 func TestTimeout(t *testing.T) {
 	timeoutConfig := DefaultTimeoutConfig
 	timeoutConfig.Limit = time.Millisecond * 300
-	timeout := TimeoutWithConfig(timeoutConfig)
 
 	tests := []struct {
 		name     string
+		config   TimeoutConfig
 		handler  poteto.HandlerFunc
 		expected string
 	}{
 		{
 			"Test done case",
+			timeoutConfig,
+			func(ctx poteto.Context) error {
+				return ctx.JSON(http.StatusOK, ret{Name: "test"})
+			},
+			`{"name":"test"}`,
+		},
+		{
+			"Test done case if not config",
+			TimeoutConfig{},
 			func(ctx poteto.Context) error {
 				return ctx.JSON(http.StatusOK, ret{Name: "test"})
 			},
@@ -32,6 +41,7 @@ func TestTimeout(t *testing.T) {
 		},
 		{
 			"Test timeout case",
+			timeoutConfig,
 			func(ctx poteto.Context) error {
 				time.Sleep(500 * time.Millisecond)
 				return ctx.JSON(http.StatusOK, ret{Name: "test"})
@@ -42,6 +52,8 @@ func TestTimeout(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
+			timeout := TimeoutWithConfig(it.config)
+
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "https://example.com/test", nil)
 			ctx := poteto.NewContext(w, req)
