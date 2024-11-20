@@ -27,10 +27,10 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 		config.AllowMethods = DefaultCORSConfig.AllowMethods
 	}
 
-	allowOriginPatterns := []string{}
-	for _, origin := range config.AllowOrigins {
+	allowOriginPatterns := make([]string, len(config.AllowOrigins))
+	for i, origin := range config.AllowOrigins {
 		pattern := wrapRegExp(origin)
-		allowOriginPatterns = append(allowOriginPatterns, pattern)
+		allowOriginPatterns[i] = pattern
 	}
 
 	return func(next poteto.HandlerFunc) poteto.HandlerFunc {

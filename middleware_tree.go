@@ -30,11 +30,12 @@ func NewMiddlewareTree() MiddlewareTree {
 }
 
 func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
-	middlewares := []MiddlewareFunc{}
 	currentNode := mt
-	middlewares = append(middlewares, mt.middlewares...)
-	patterns := strings.Split(pattern, "/")
 
+	// faster
+	middlewares := mt.middlewares
+
+	patterns := strings.Split(pattern, "/")
 	for _, p := range patterns {
 		if p == "" {
 			continue
