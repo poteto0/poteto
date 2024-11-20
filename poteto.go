@@ -96,7 +96,7 @@ func (p *poteto) Run(addr string) {
 		addr = constant.PARAM_PREFIX + addr
 	}
 
-	fmt.Println("serve at http://localhost:", addr)
+	fmt.Println("serve at http://localhost", addr)
 
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
