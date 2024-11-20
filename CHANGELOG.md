@@ -2,6 +2,11 @@
 
 ## 0.18.x
 
+### 0.18.1
+
+- Fix bug of first msg
+- optimize bit
+
 ### 0.18.0
 
 - `Poteto` has SetLogger
