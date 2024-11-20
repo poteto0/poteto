@@ -1,8 +1,9 @@
 package poteto
 
 import (
-	"fmt"
+	"bytes"
 	"net/http"
+	"os"
 )
 
 type Response interface {
@@ -26,7 +27,8 @@ func NewResponse(w http.ResponseWriter) Response {
 
 func (r *response) WriteHeader(code int) {
 	if r.IsCommitted {
-		fmt.Println("response has already committed")
+		buf := bytes.NewBuffer([]byte("response has already committed\n"))
+		buf.WriteTo(os.Stdout)
 		return
 	}
 

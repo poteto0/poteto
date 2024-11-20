@@ -1,8 +1,9 @@
 package poteto
 
 import (
-	"fmt"
+	"bytes"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -89,14 +90,18 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 
 func (p *poteto) Run(addr string) {
 	// Print Banner
+	buf := &bytes.Buffer{}
 	coloredBanner := color.HiGreenString(Banner)
-	fmt.Println(coloredBanner)
+	buf.WriteString(coloredBanner)
+	buf.WriteTo(os.Stdout)
 
 	if !strings.Contains(addr, constant.PARAM_PREFIX) {
 		addr = constant.PARAM_PREFIX + addr
 	}
 
-	fmt.Println("serve at http://localhost", addr)
+	msg := "serve at http://localhost:" + addr + "\n"
+	buf.WriteString(msg)
+	buf.WriteTo(os.Stdout)
 
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
