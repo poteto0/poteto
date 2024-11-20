@@ -1,10 +1,12 @@
 package poteto
 
 import (
+	"bytes"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/poteto0/poteto/constant"
@@ -21,7 +23,8 @@ func TestJSON(t *testing.T) {
 		val      testVal
 		expected string
 	}{
-		{"status ok & can serialize",
+		{
+			"status ok & can serialize",
 			http.StatusOK,
 			testVal{Name: "test", Val: "val"},
 			`{"name":"test","val":"val"}`,
@@ -43,23 +46,59 @@ func TestJSON(t *testing.T) {
 }
 
 func TestQueryParam(t *testing.T) {
-	url := "https://example.com?hello=world"
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", url, nil)
-	ctx := NewContext(w, req).(*context)
-
-	queryParams := req.URL.Query()
-	ctx.SetQueryParam(queryParams)
-
-	queryParam1, _ := ctx.QueryParam("hello")
-	if queryParam1 != "world" {
-		t.Errorf("Cannot Get Query Param")
+	tests := []struct {
+		name      string
+		url       string
+		key1      string
+		expected1 string
+		key2      string
+		expected2 string
+	}{
+		{
+			"Test valid case",
+			"https://example.com?hello=world",
+			"hello",
+			"world",
+			"unknown",
+			"",
+		},
+		{
+			"Test nothing param case",
+			"https://example.com?hello",
+			"hello",
+			"",
+			"unknown",
+			"",
+		},
+		{
+			"too many param case",
+			"https://example.com?a=a&b=b&c=c&d=d&e=e&f=f#g=g&h=h&i=i&j=j&k=k&l=l&m=m&n=n&o=o&p=p&q=q&r=r&s=s&t=t&u=u&v=v&w=w&x=x&y=y&z=z&a1=a1&b1=b1&c1=c1&d1=d1&e1=e1&f1=f1&g1=g1&h1=h1",
+			"a",
+			"",
+			"unknown",
+			"",
+		},
 	}
 
-	queryParam2, _ := ctx.QueryParam("unknown")
-	if queryParam2 != "" {
-		t.Errorf("Cannot Get nil If Unknown key")
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", it.url, nil)
+			ctx := NewContext(w, req).(*context)
+
+			queryParams := req.URL.Query()
+			ctx.SetQueryParam(queryParams)
+
+			queryParam1, _ := ctx.QueryParam(it.key1)
+			if queryParam1 != it.expected1 {
+				t.Errorf("Cannot Get Query Param")
+			}
+
+			queryParam2, _ := ctx.QueryParam(it.key2)
+			if queryParam2 != it.expected2 {
+				t.Errorf("Cannot Get nil If Unknown key")
+			}
+		})
 	}
 }
 
@@ -164,4 +203,104 @@ func TestGetLogger(t *testing.T) {
 	if ctx.Logger() == nil {
 		t.Errorf("Unmatched")
 	}
+}
+
+func TestBindOnContext(t *testing.T) {
+	type User struct {
+		Name string `json:"name"`
+		Mail string `json:"mail"`
+	}
+
+	tests := []struct {
+		name     string
+		body     []byte
+		worked   bool
+		expected User
+	}{
+		{
+			"Test Normal Case",
+			[]byte(`{"name":"test", "mail":"example"}`),
+			true,
+			User{Name: "test", Mail: "example"},
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			user := User{}
+
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "https://example.com", bytes.NewBufferString(string(it.body)))
+			req.Header.Set(constant.HEADER_CONTENT_TYPE, constant.APPLICATION_JSON)
+			ctx := NewContext(w, req).(*context)
+
+			err := ctx.Bind(&user)
+			if err != nil {
+				if it.worked {
+					t.Errorf("unexpected error")
+				}
+				return
+			}
+
+			if !it.worked {
+				t.Errorf("unexpected not error")
+				return
+			}
+
+			if it.expected.Name != user.Name {
+				t.Errorf("Unmatched")
+			}
+
+			if it.expected.Mail != user.Mail {
+				t.Errorf("Unmatched")
+			}
+		})
+	}
+}
+
+func TestNoContent(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	ctx := NewContext(w, req).(*context)
+
+	ctx.NoContent()
+
+	if w.Result().Status != "204 No Content" {
+		t.Errorf("Unmatched")
+	}
+}
+
+func TestSet(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	ctx := NewContext(w, req).(*context)
+
+	tests := []struct {
+		key   string
+		value string
+	}{
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+		{"key", "value"},
+	}
+
+	var wg sync.WaitGroup
+	for _, test := range tests {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx.Set(test.key, test.value)
+		}()
+	}
+
+	wg.Wait()
 }
