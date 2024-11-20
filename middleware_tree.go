@@ -29,10 +29,10 @@ func NewMiddlewareTree() MiddlewareTree {
 	}
 }
 
-func (mg *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
+func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	middlewares := []MiddlewareFunc{}
-	currentNode := mg
-	middlewares = append(middlewares, mg.middlewares...)
+	currentNode := mt
+	middlewares = append(middlewares, mt.middlewares...)
 	patterns := strings.Split(pattern, "/")
 
 	for _, p := range patterns {
@@ -53,8 +53,8 @@ func (mg *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	return middlewares
 }
 
-func (mg *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
-	currentNode := mg
+func (mt *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
+	currentNode := mt
 	patterns := strings.Split(pattern, "/")
 
 	for _, p := range patterns {
@@ -75,6 +75,6 @@ func (mg *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) 
 	return currentNode
 }
 
-func (mg *middlewareTree) Register(middlewares ...MiddlewareFunc) {
-	mg.middlewares = append(mg.middlewares, middlewares...)
+func (mt *middlewareTree) Register(middlewares ...MiddlewareFunc) {
+	mt.middlewares = append(mt.middlewares, middlewares...)
 }
