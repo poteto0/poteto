@@ -36,6 +36,7 @@ func NewRoute() Route {
 func (r *route) Search(path string) (*route, ParamUnit) {
 	currentRoute := r
 	params := strings.Split(path, "/")
+	last := len(params) - 1
 	var httpParam ParamUnit
 
 	for i, param := range params {
@@ -47,7 +48,7 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 			currentRoute = nextRoute.(*route)
 		} else {
 			// last path includes url param ex: /users/:id
-			if chParam := currentRoute.childParamKey; i == len(params)-1 && chParam != "" {
+			if chParam := currentRoute.childParamKey; i == last && chParam != "" {
 				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
 					httpParam = ParamUnit{key: chParam, value: param}
@@ -63,6 +64,7 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 func (r *route) Insert(path string, handler HandlerFunc) {
 	currentRoute := r
 	params := strings.Split(path, "/")
+	last := len(params) - 1
 
 	for i, param := range params {
 		if param == "" {
@@ -72,7 +74,7 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 		if nextRoute := currentRoute.children[param]; nextRoute == nil {
 
 			// last path includes url param ex: /users/:id
-			if i == len(params)-1 && hasParamPrefix(param) {
+			if i == last && hasParamPrefix(param) {
 				currentRoute.childParamKey = param
 			}
 
