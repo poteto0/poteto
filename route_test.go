@@ -10,7 +10,6 @@ func TestNewRoute(t *testing.T) {
 	// Arrange
 	want := &route{
 		key:      "",
-		method:   "",
 		children: make(map[string]Route),
 	}
 
@@ -18,10 +17,6 @@ func TestNewRoute(t *testing.T) {
 
 	if got.key != want.key {
 		t.Errorf("Cannot initialize Route: key")
-	}
-
-	if got.method != want.method {
-		t.Errorf("Cannot initialize Route: method")
 	}
 
 	if len(got.children) != 0 {
@@ -34,8 +29,8 @@ func TestInsertAndSearch(t *testing.T) {
 
 	route := NewRoute().(*route)
 
-	route.Insert("GET", url, nil)
-	route.Insert("GET", "/users/:id", nil)
+	route.Insert(url, nil)
+	route.Insert("/users/:id", nil)
 
 	tests := []struct {
 		name string
@@ -97,7 +92,7 @@ func BenchmarkInsertAndSearch(b *testing.B) {
 		// Insert
 		route := NewRoute().(*route)
 		for _, url := range urls {
-			route.Insert("GET", url, nil)
+			route.Insert(url, nil)
 		}
 
 		// Search
@@ -110,8 +105,8 @@ func BenchmarkInsertAndSearch(b *testing.B) {
 func TestCollisionDetection(t *testing.T) {
 	route := NewRoute().(*route)
 
-	route.Insert("GET", "/users/test", getAllUserForTest)
-	route.Insert("GET", "/users/test", getAllUserForTestById)
+	route.Insert("/users/test", getAllUserForTest)
+	route.Insert("/users/test", getAllUserForTestById)
 
 	r, _ := route.Search("/users/test")
 	if getFunctionName(r.handler) != getFunctionName(getAllUserForTest) {

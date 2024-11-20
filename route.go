@@ -13,14 +13,13 @@ import (
 
 type Route interface {
 	Search(path string) (*route, ParamUnit)
-	Insert(method, path string, handler HandlerFunc)
+	Insert(path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
 }
 
 type route struct {
 	key           string
-	method        string
 	children      map[string]Route
 	childParamKey string
 	handler       HandlerFunc
@@ -29,7 +28,6 @@ type route struct {
 func NewRoute() Route {
 	return &route{
 		key:           "",
-		method:        "",
 		children:      make(map[string]Route),
 		childParamKey: "",
 	}
@@ -62,7 +60,7 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 	return currentRoute, httpParam
 }
 
-func (r *route) Insert(method, path string, handler HandlerFunc) {
+func (r *route) Insert(path string, handler HandlerFunc) {
 	currentRoute := r
 	params := strings.Split(path, "/")
 
@@ -80,7 +78,6 @@ func (r *route) Insert(method, path string, handler HandlerFunc) {
 
 			currentRoute.children[param] = &route{
 				key:      param,
-				method:   method,
 				children: make(map[string]Route),
 			}
 		}
