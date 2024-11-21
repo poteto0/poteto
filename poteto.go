@@ -56,6 +56,11 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get from cache & reset context
 	ctx := p.initializeContext(w, r)
 
+	// Get And SetRequestId
+	reqId := ctx.RequestId()
+	ctx.Set(constant.STORE_REQUEST_ID, reqId)
+	ctx.GetResponse().Header().Set(constant.HEADER_X_REQUEST_ID, reqId)
+
 	routes := p.router.GetRoutesByMethod(r.Method)
 
 	targetRoute, httpParam := routes.Search(r.URL.Path)
