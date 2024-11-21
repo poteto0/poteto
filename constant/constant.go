@@ -10,6 +10,10 @@ const (
 	AUTH_SCHEME                   = "Bearer"
 )
 
+const (
+	STORE_REQUEST_ID string = "requestId"
+)
+
 // Header
 const (
 	HEADER_ACCESS_CONTROL_ORIGIN string = "Access-Control-Allow-Origin"

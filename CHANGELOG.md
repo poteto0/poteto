@@ -1,5 +1,14 @@
 # 0.x.x
 
+## 0.19.x
+
+### 0.19.0
+
+- `Context.Get(key)` get value by key from store.
+- `Context.RequestId()` get requestId from Header or store or generate uuid@v4
+- `Poteto.ServeHTTP(r, w)` call requestId and set to Header.
+  - It may be to become middle ware
+
 ## 0.18.x
 
 ### 0.18.1

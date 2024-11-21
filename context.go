@@ -10,6 +10,8 @@ import (
 	"sync"
 
 	"github.com/goccy/go-json"
+	"github.com/google/uuid"
+	"github.com/harakeishi/gats"
 	"github.com/poteto0/poteto/constant"
 	"github.com/poteto0/poteto/utils"
 )
@@ -30,6 +32,12 @@ type Context interface {
 	JsonDeserialize(object any) error
 	NoContent() error
 	Set(key string, val any)
+	Get(key string) (any, bool)
+
+	// set request id to store
+	// and return value
+	RequestId() string
+
 	GetRemoteIP() (string, error)
 	RegisterTrustIPRange(ranges *net.IPNet)
 	GetIPFromXFFHeader() (string, error)
@@ -162,6 +170,34 @@ func (ctx *context) Set(key string, val any) {
 		ctx.store = make(map[string]any)
 	}
 	ctx.store[key] = val
+}
+
+func (ctx *context) Get(key string) (any, bool) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+
+	val, ok := ctx.store[key]
+	return val, ok
+}
+
+func (ctx *context) RequestId() string {
+	// get from store
+	val, ok := ctx.Get(constant.STORE_REQUEST_ID)
+	if id, err := gats.ToString(val); ok && err == nil {
+		return id
+	}
+
+	// get from header
+	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id != "" {
+		return id
+	}
+
+	// generate uuid@V4
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return ""
+	}
+	return uuid.String()
 }
 
 func (ctx *context) GetRemoteIP() (string, error) {
