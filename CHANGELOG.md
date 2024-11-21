@@ -5,6 +5,8 @@
 ### 0.19.0
 
 - `Context.Get(key)` get value by key from store.
+- `Context.RequestId()` get requestId from Header or store or generate uuid@v4
+- `Poteto.ServeHTTP(r, w)` call requestId and set to Header.
 
 ## 0.18.x
 
