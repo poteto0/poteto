@@ -110,11 +110,7 @@ func RequestLoggerWithConfig(config RequestLoggerConfig) poteto.MiddlewareFunc {
 			}
 
 			if config.HasRequestID {
-				id := req.Header.Get(constant.HEADER_X_REQUEST_ID)
-				if id == "" {
-					id = res.Header().Get(constant.HEADER_X_REQUEST_ID)
-				}
-				rlv.RequestId = id
+				rlv.RequestId = ctx.RequestId()
 			}
 
 			if config.HasUserAgent {
