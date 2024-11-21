@@ -270,7 +270,7 @@ func TestNoContent(t *testing.T) {
 	}
 }
 
-func TestSet(t *testing.T) {
+func TestSetAndGet(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/test", nil)
 	ctx := NewContext(w, req).(*context)
@@ -299,6 +299,11 @@ func TestSet(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			ctx.Set(test.key, test.value)
+
+			val, ok := ctx.Get(test.key)
+			if !ok || val != test.value {
+				t.Errorf("Unmatched")
+			}
 		}()
 	}
 

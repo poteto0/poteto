@@ -30,6 +30,7 @@ type Context interface {
 	JsonDeserialize(object any) error
 	NoContent() error
 	Set(key string, val any)
+	Get(key string) (any, bool)
 	GetRemoteIP() (string, error)
 	RegisterTrustIPRange(ranges *net.IPNet)
 	GetIPFromXFFHeader() (string, error)
@@ -162,6 +163,14 @@ func (ctx *context) Set(key string, val any) {
 		ctx.store = make(map[string]any)
 	}
 	ctx.store[key] = val
+}
+
+func (ctx *context) Get(key string) (any, bool) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+
+	val, ok := ctx.store[key]
+	return val, ok
 }
 
 func (ctx *context) GetRemoteIP() (string, error) {
