@@ -309,3 +309,62 @@ func TestSetAndGet(t *testing.T) {
 
 	wg.Wait()
 }
+
+func TestRequestId(t *testing.T) {
+	tests := []struct {
+		name     string
+		header   string
+		stored   string
+		expected string
+	}{
+		{
+			"Test from ReqHeader",
+			"uuid",
+			"",
+			"uuid",
+		},
+		{
+			"Test from stored",
+			"",
+			"uuid",
+			"uuid",
+		},
+		{
+			"Test random case",
+			"",
+			"",
+			"uuid",
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/test", nil)
+
+			if it.header != "" {
+				req.Header.Set(constant.HEADER_X_REQUEST_ID, it.header)
+			}
+
+			ctx := NewContext(w, req).(*context)
+
+			if it.stored != "" {
+				ctx.Set(constant.STORE_REQUEST_ID, it.stored)
+			}
+
+			requestId := ctx.RequestId()
+			if requestId != it.expected {
+				if it.header != "" || it.stored != "" {
+					t.Errorf("Unmatched")
+				}
+			}
+
+			// random case
+			if it.header == "" && it.stored == "" {
+				if requestId == it.expected {
+					t.Errorf("Unmatched")
+				}
+			}
+		})
+	}
+}
