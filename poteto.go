@@ -56,7 +56,8 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get from cache & reset context
 	ctx := p.initializeContext(w, r)
 
-	// Get And SetRequestId
+	// get and SetRequestId
+	// slow -> should be middleware?
 	reqId := ctx.RequestId()
 	ctx.Set(constant.STORE_REQUEST_ID, reqId)
 	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id == "" {

@@ -181,14 +181,14 @@ func (ctx *context) Get(key string) (any, bool) {
 }
 
 func (ctx *context) RequestId() string {
-	// if header has X-Request-ID
-	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id != "" {
+	// get from store
+	val, ok := ctx.Get(constant.STORE_REQUEST_ID)
+	if id, err := gats.ToString(val); ok && err == nil {
 		return id
 	}
 
-	// if store has requestId
-	val, ok := ctx.Get(constant.STORE_REQUEST_ID)
-	if id, err := gats.ToString(val); ok && err == nil {
+	// get from header
+	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id != "" {
 		return id
 	}
 
@@ -197,10 +197,7 @@ func (ctx *context) RequestId() string {
 	if err != nil {
 		return ""
 	}
-	if id, err := gats.ToString(uuid); err == nil {
-		return id
-	}
-	return ""
+	return uuid.String()
 }
 
 func (ctx *context) GetRemoteIP() (string, error) {
