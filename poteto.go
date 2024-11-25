@@ -11,6 +11,8 @@ import (
 )
 
 type Poteto interface {
+	// If requested, call this
+	// you can make WithRequestIdOption false: you can faster request
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	Run(addr string)
 	GET(path string, handler HandlerFunc) error
@@ -28,6 +30,7 @@ type poteto struct {
 	middlewareTree MiddlewareTree
 	logger         any
 	cache          sync.Pool
+	option         PotetoOption
 }
 
 func New() Poteto {
@@ -35,6 +38,16 @@ func New() Poteto {
 		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
 		errorHandler:   &httpErrorHandler{},
 		middlewareTree: NewMiddlewareTree(),
+		option:         DefaultPotetoOption,
+	}
+}
+
+func NewWithOption(option PotetoOption) Poteto {
+	return &poteto{
+		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		errorHandler:   &httpErrorHandler{},
+		middlewareTree: NewMiddlewareTree(),
+		option:         option,
 	}
 }
 
@@ -55,12 +68,13 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get from cache & reset context
 	ctx := p.initializeContext(w, r)
 
-	// get and SetRequestId
-	// slow -> should be middleware?
-	reqId := ctx.RequestId()
-	ctx.Set(constant.STORE_REQUEST_ID, reqId)
-	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id == "" {
-		ctx.GetResponse().Header().Set(constant.HEADER_X_REQUEST_ID, reqId)
+	// default get & set RequestId
+	if p.option.WithRequestId {
+		reqId := ctx.RequestId()
+		ctx.Set(constant.STORE_REQUEST_ID, reqId)
+		if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id == "" {
+			ctx.GetResponse().Header().Set(constant.HEADER_X_REQUEST_ID, reqId)
+		}
 	}
 
 	routes := p.router.GetRoutesByMethod(r.Method)

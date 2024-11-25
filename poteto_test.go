@@ -80,6 +80,41 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestRunWithRequestOptionIdFalse(t *testing.T) {
+	option := PotetoOption{
+		WithRequestId: false,
+	}
+	p := NewWithOption(option)
+
+	tests := []struct {
+		name  string
+		port1 string
+		port2 string
+	}{
+		//{"Test :8080", ":8080", ""},
+		{"Test 8081", "8081", ""},
+		//{"Test collision panic", ":8080", ":8080"},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			done := make(chan struct{})
+			go func() {
+				p.Run(it.port1)
+				if it.port2 != "" {
+					p.Run(it.port2)
+				}
+				close(done)
+			}()
+
+			select {
+			case <-time.After(1 * time.Second):
+				return
+			}
+		})
+	}
+}
+
 func TestSetLogger(t *testing.T) {
 	p := New().(*poteto)
 	logger := func(msg string) {
