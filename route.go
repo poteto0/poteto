@@ -1,9 +1,7 @@
 package poteto
 
 import (
-	"bytes"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -88,8 +86,7 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 
 	if currentRoute.handler != nil {
 		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", utils.StrArrayToStr(params)))
-		buf := bytes.NewBuffer([]byte(coloredWarn))
-		buf.WriteTo(os.Stdout)
+		utils.PotetoPrint(coloredWarn)
 		return
 	}
 

@@ -1,14 +1,13 @@
 package poteto
 
 import (
-	"bytes"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 
 	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
+	"github.com/poteto0/poteto/utils"
 )
 
 type Poteto interface {
@@ -98,18 +97,14 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 
 func (p *poteto) Run(addr string) {
 	// Print Banner
-	buf := &bytes.Buffer{}
 	coloredBanner := color.HiGreenString(Banner)
-	buf.WriteString(coloredBanner)
-	buf.WriteTo(os.Stdout)
+	utils.PotetoPrint(coloredBanner)
 
 	if !strings.Contains(addr, constant.PARAM_PREFIX) {
 		addr = constant.PARAM_PREFIX + addr
 	}
 
-	msg := "serve at http://localhost:" + addr + "\n"
-	buf.WriteString(msg)
-	buf.WriteTo(os.Stdout)
+	utils.PotetoPrint("serve at http://localhost" + addr + "\n")
 
 	if err := http.ListenAndServe(addr, p); err != nil {
 		panic(err)
