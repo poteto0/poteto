@@ -2,6 +2,13 @@
 
 ## 0.19.x
 
+### 0.19.1
+
+- `PotetoOption`: you can make WithRequestId false
+  Because it is slowly With RequestId. If you don't need this, you can make app faster
+- fix bug
+- refactor something of private func
+
 ### 0.19.0
 
 - `Context.Get(key)` get value by key from store.

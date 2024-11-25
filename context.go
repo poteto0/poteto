@@ -1,12 +1,10 @@
 package poteto
 
 import (
-	"bytes"
 	"errors"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 
 	"github.com/goccy/go-json"
@@ -87,8 +85,7 @@ func (ctx *context) SetPath(path string) {
 
 func (ctx *context) SetQueryParam(queryParams url.Values) {
 	if len(queryParams) > constant.MAX_QUERY_PARAM_LENGTH {
-		buf := bytes.NewBuffer([]byte("too many query params should be < 32\n"))
-		buf.WriteTo(os.Stdout)
+		utils.PotetoPrint("too many query params should be < 32\n")
 		return
 	}
 

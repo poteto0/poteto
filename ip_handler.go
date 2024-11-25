@@ -1,13 +1,11 @@
 package poteto
 
 import (
-	"bytes"
-	"fmt"
 	"net"
-	"os"
 	"strings"
 
 	"github.com/poteto0/poteto/constant"
+	"github.com/poteto0/poteto/utils"
 )
 
 type ipHandler struct {
@@ -79,8 +77,7 @@ func (iph *ipHandler) GetRemoteIP(ctx Context) (string, error) {
 	)
 
 	if err != nil {
-		buf := bytes.NewBuffer([]byte(fmt.Sprintf("Error in GetRemoteIP: %v \n", err)))
-		buf.WriteTo(os.Stdout)
+		utils.PotetoPrint("Error in GetRemoteIP: %v \n")
 		return "", err
 	}
 

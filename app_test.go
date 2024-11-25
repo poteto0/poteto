@@ -75,6 +75,23 @@ func BenchmarkServeHTTP(b *testing.B) {
 	}
 }
 
+func BenchmarkServeHTTPWORequestId(b *testing.B) {
+	option := PotetoOption{
+		WithRequestId: false,
+	}
+	p := NewWithOption(option)
+	p.GET("/users/:id", getAllUserForTestById)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/users/1", strings.NewReader(userJSON))
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		p.ServeHTTP(w, req)
+	}
+}
+
 func TestServeHTTPWithMiddleware(t *testing.T) {
 	p := New()
 	p.Register(sampleMiddleware)
