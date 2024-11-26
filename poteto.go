@@ -3,8 +3,9 @@ package poteto
 import (
 	"net"
 	"net/http"
-	"strings"
 	"sync"
+
+	stdContext "context"
 
 	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
@@ -15,8 +16,8 @@ type Poteto interface {
 	// If requested, call this
 	// you can make WithRequestIdOption false: you can faster request
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
-	Run(addr string)
-	Start(addr string) error // TODO: make run
+	Run(addr string) error
+	Stop(ctx stdContext.Context) error
 	setupServer() error
 	GET(path string, handler HandlerFunc) error
 	POST(path string, handler HandlerFunc) error
@@ -115,7 +116,7 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 	return handler
 }
 
-func (p *poteto) Start(addr string) error {
+func (p *poteto) Run(addr string) error {
 	p.startupMutex.Lock()
 	defer p.startupMutex.Unlock()
 
@@ -148,18 +149,18 @@ func (p *poteto) setupServer() error {
 	return nil
 }
 
-func (p *poteto) Run(addr string) {
-	// Print Banner
-	coloredBanner := color.HiGreenString(Banner)
-	utils.PotetoPrint(coloredBanner)
+// Shutdown stops the server gracefully.
+// It internally calls `http.Server#Shutdown()`.
+func (p *poteto) Stop(ctx stdContext.Context) error {
+	p.startupMutex.Lock()
+	defer p.startupMutex.Unlock()
 
-	if !strings.Contains(addr, constant.PARAM_PREFIX) {
-		addr = constant.PARAM_PREFIX + addr
+	if err := p.Server.Shutdown(ctx); err != nil {
+		return err
 	}
 
-	if err := http.ListenAndServe(addr, p); err != nil {
-		panic(err)
-	}
+	p.startupMutex.Unlock()
+	return nil
 }
 
 func (p *poteto) GET(path string, handler HandlerFunc) error {

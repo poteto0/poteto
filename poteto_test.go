@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	stdContext "context"
 	"testing"
 	"time"
 )
@@ -56,15 +57,20 @@ func TestRun(t *testing.T) {
 		port1 string
 		port2 string
 	}{
-		//{"Test :8080", ":8080", ""},
+		{"Test :8080", ":8080", ""},
 		{"Test 8080", "8080", ""},
-		//{"Test collision panic", ":8080", ":8080"},
+		{"Test collision panic", ":8080", ":8080"},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
 			done := make(chan struct{})
 			go func() {
+				defer func() {
+					if err := p.Stop(stdContext.Background()); err != nil {
+						t.Errorf("Unmatched")
+					}
+				}()
 				p.Run(it.port1)
 				if it.port2 != "" {
 					p.Run(it.port2)
