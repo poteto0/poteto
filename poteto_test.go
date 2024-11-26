@@ -69,12 +69,21 @@ func TestRunAndStop(t *testing.T) {
 				errChan <- p.Run(it.port1)
 			}()
 
+			errChan2 := make(chan error)
+			if it.port2 != "" {
+				go func() {
+					errChan2 <- p.Run(it.port2)
+				}()
+			}
+
 			select {
 			case <-time.After(500 * time.Millisecond):
 				if err := p.Stop(stdContext.Background()); err != nil {
 					t.Errorf("Unmatched")
 				}
 			case <-errChan:
+				return
+			case <-errChan2:
 				return
 			}
 		})
