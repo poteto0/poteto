@@ -1,5 +1,13 @@
 # 0.x.x
 
+## 0.20.x
+
+### 0.20.0
+
+- CHANGE: `Poteto.Run()` internal call http.Server#Serve instead of http.ListenAndServe
+  You can use your protocol such as udp
+- CHANGE: `Poteto.Stop(stdContext)` stop server
+
 ## 0.19.x
 
 ### 0.19.1
