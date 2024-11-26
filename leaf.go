@@ -5,19 +5,19 @@ type leaf struct {
 	basePath string
 }
 
-func NewLeaf(poteto Poteto, basePath string) Leaf {
-	return &leaf{
-		poteto:   poteto,
-		basePath: basePath,
-	}
-}
-
 type Leaf interface {
 	Register(middlewares ...MiddlewareFunc) *middlewareTree
 	GET(addPath string, handler HandlerFunc) error
 	POST(addPath string, handler HandlerFunc) error
 	PUT(addPath string, handler HandlerFunc) error
 	DELETE(addPath string, handler HandlerFunc) error
+}
+
+func NewLeaf(poteto Poteto, basePath string) Leaf {
+	return &leaf{
+		poteto:   poteto,
+		basePath: basePath,
+	}
 }
 
 // internal call Poteto.Combine w/ bp
