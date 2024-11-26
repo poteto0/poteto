@@ -118,15 +118,15 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 
 func (p *poteto) Run(addr string) error {
 	p.startupMutex.Lock()
-	defer p.startupMutex.Unlock()
 
 	if err := p.setupServer(); err != nil {
+		p.startupMutex.Unlock()
 		return err
 	}
 
 	utils.PotetoPrint("server is available at http://localhost" + addr + "\n")
 
-	p.startupMutex.Unlock() // Unlock before serve
+	p.startupMutex.Unlock()
 	return p.Server.Serve(p.Listener)
 }
 
@@ -153,9 +153,9 @@ func (p *poteto) setupServer() error {
 // It internally calls `http.Server#Shutdown()`.
 func (p *poteto) Stop(ctx stdContext.Context) error {
 	p.startupMutex.Lock()
-	defer p.startupMutex.Unlock()
 
 	if err := p.Server.Shutdown(ctx); err != nil {
+		p.startupMutex.Unlock()
 		return err
 	}
 

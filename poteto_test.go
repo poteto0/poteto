@@ -49,7 +49,7 @@ func TestAddRouteToPoteto(t *testing.T) {
 	}
 }
 
-func TestRun(t *testing.T) {
+func TestRunAndStop(t *testing.T) {
 	p := New()
 
 	tests := []struct {
@@ -64,22 +64,17 @@ func TestRun(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			done := make(chan struct{})
+			errChan := make(chan error)
 			go func() {
-				defer func() {
-					if err := p.Stop(stdContext.Background()); err != nil {
-						t.Errorf("Unmatched")
-					}
-				}()
-				p.Run(it.port1)
-				if it.port2 != "" {
-					p.Run(it.port2)
-				}
-				close(done)
+				errChan <- p.Run(it.port1)
 			}()
 
 			select {
-			case <-time.After(1 * time.Second):
+			case <-time.After(500 * time.Millisecond):
+				if err := p.Stop(stdContext.Background()); err != nil {
+					t.Errorf("Unmatched")
+				}
+			case <-errChan:
 				return
 			}
 		})
