@@ -1,9 +1,12 @@
 package poteto
 
 import (
+	"net"
 	"net/http"
 	"strings"
 	"sync"
+
+	stdContext "context"
 
 	"github.com/fatih/color"
 	"github.com/poteto0/poteto/constant"
@@ -14,7 +17,9 @@ type Poteto interface {
 	// If requested, call this
 	// you can make WithRequestIdOption false: you can faster request
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
-	Run(addr string)
+	Run(addr string) error
+	Stop(ctx stdContext.Context) error
+	setupServer() error
 	GET(path string, handler HandlerFunc) error
 	POST(path string, handler HandlerFunc) error
 	PUT(path string, handler HandlerFunc) error
@@ -31,6 +36,9 @@ type poteto struct {
 	logger         any
 	cache          sync.Pool
 	option         PotetoOption
+	startupMutex   sync.RWMutex
+	Server         http.Server
+	Listener       net.Listener
 }
 
 func New() Poteto {
@@ -109,20 +117,55 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 	return handler
 }
 
-func (p *poteto) Run(addr string) {
-	// Print Banner
-	coloredBanner := color.HiGreenString(Banner)
-	utils.PotetoPrint(coloredBanner)
+func (p *poteto) Run(addr string) error {
+	p.startupMutex.Lock()
 
 	if !strings.Contains(addr, constant.PARAM_PREFIX) {
 		addr = constant.PARAM_PREFIX + addr
 	}
 
+	if err := p.setupServer(); err != nil {
+		p.startupMutex.Unlock()
+		return err
+	}
+
 	utils.PotetoPrint("server is available at http://localhost" + addr + "\n")
 
-	if err := http.ListenAndServe(addr, p); err != nil {
-		panic(err)
+	p.startupMutex.Unlock()
+	return p.Server.Serve(p.Listener)
+}
+
+func (p *poteto) setupServer() error {
+	// Print Banner
+	coloredBanner := color.HiGreenString(Banner)
+	utils.PotetoPrint(coloredBanner)
+
+	// setup Server
+	p.Server.Handler = p
+	if p.Listener == nil {
+		ln, err := net.Listen(p.option.ListenerNetwork, p.Server.Addr)
+		if err != nil {
+			return err
+		}
+
+		p.Listener = ln
 	}
+
+	return nil
+}
+
+// Shutdown stops the server gracefully.
+// It internally calls `http.Server#Shutdown()`.
+func (p *poteto) Stop(ctx stdContext.Context) error {
+	p.startupMutex.Lock()
+
+	if err := p.Server.Shutdown(ctx); err != nil {
+		p.startupMutex.Unlock()
+		return err
+	}
+
+	p.startupMutex.Unlock()
+	return nil
 }
 
 func (p *poteto) GET(path string, handler HandlerFunc) error {

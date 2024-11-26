@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	stdContext "context"
 	"testing"
 	"time"
 )
@@ -48,7 +49,7 @@ func TestAddRouteToPoteto(t *testing.T) {
 	}
 }
 
-func TestRun(t *testing.T) {
+func TestRunAndStop(t *testing.T) {
 	p := New()
 
 	tests := []struct {
@@ -56,24 +57,33 @@ func TestRun(t *testing.T) {
 		port1 string
 		port2 string
 	}{
-		//{"Test :8080", ":8080", ""},
+		{"Test :8080", ":8080", ""},
 		{"Test 8080", "8080", ""},
-		//{"Test collision panic", ":8080", ":8080"},
+		{"Test collision panic", ":8080", ":8080"},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			done := make(chan struct{})
+			errChan := make(chan error)
 			go func() {
-				p.Run(it.port1)
-				if it.port2 != "" {
-					p.Run(it.port2)
-				}
-				close(done)
+				errChan <- p.Run(it.port1)
 			}()
 
+			errChan2 := make(chan error)
+			if it.port2 != "" {
+				go func() {
+					errChan2 <- p.Run(it.port2)
+				}()
+			}
+
 			select {
-			case <-time.After(1 * time.Second):
+			case <-time.After(500 * time.Millisecond):
+				if err := p.Stop(stdContext.Background()); err != nil {
+					t.Errorf("Unmatched")
+				}
+			case <-errChan:
+				return
+			case <-errChan2:
 				return
 			}
 		})
