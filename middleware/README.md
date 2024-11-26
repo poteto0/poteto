@@ -1,11 +1,17 @@
 # Middleware
 
+Perhaps the wiki is the most up-to-date.
+https://github.com/poteto0/poteto/wiki/Middleware
+
 ## middleware list
 
-| name   | summary              |
-| ------ | -------------------- |
-| CORS   | CORS Policy          |
-| Camara | Some Security Header |
+| name          | summary               |
+| ------------- | --------------------- |
+| CORS          | CORS Policy           |
+| Camara        | Some Security Header  |
+| JWS           | Secure JWT            |
+| Timeout       | Timeout               |
+| RequestLogger | Log config on Request |
 
 ## use middleware
 
