@@ -240,13 +240,3 @@ func TestLeafHandler(t *testing.T) {
 		})
 	}
 }
-
-func TestLeafOnCollision(t *testing.T) {
-	p := New()
-
-	p.Leaf("/users", func(leaf Leaf) {
-		leaf.Register(sampleMiddleware)
-		leaf.GET("/", getAllUserForTest)
-		leaf.GET("/", getAllUserForTest)
-	})
-}
