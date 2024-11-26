@@ -1,5 +1,16 @@
 package poteto
 
+/*
+* Leaf Make Router Great
+p.Leaf("/users", func(leaf Leaf) {
+	leaf.Register(sampleMiddleware)
+	leaf.GET("/", getAllUserForTest)
+	leaf.POST("/create", getAllUserForTest)
+	leaf.PUT("/change", getAllUserForTest)
+	leaf.DELETE("/delete", getAllUserForTest)
+})
+*/
+
 type leaf struct {
 	poteto   Poteto
 	basePath string
