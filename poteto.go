@@ -3,6 +3,7 @@ package poteto
 import (
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	stdContext "context"
@@ -118,6 +119,10 @@ func (p *poteto) applyMiddleware(middlewares []MiddlewareFunc, handler HandlerFu
 
 func (p *poteto) Run(addr string) error {
 	p.startupMutex.Lock()
+
+	if !strings.Contains(addr, constant.PARAM_PREFIX) {
+		addr = constant.PARAM_PREFIX + addr
+	}
 
 	if err := p.setupServer(); err != nil {
 		p.startupMutex.Unlock()
