@@ -31,4 +31,5 @@ const (
 	HEADER_CONTENT_LENGTH        string = "Content-Length"
 	HEADER_X_REQUEST_ID          string = "X-Request-Id"
 	HEADER_X_FORWARDED_FOR       string = "X-Forwarded-For"
+	HEADER_X_REAL_IP             string = "X-Real-Ip"
 )

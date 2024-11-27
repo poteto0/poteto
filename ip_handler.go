@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"errors"
 	"net"
 	"strings"
 
@@ -19,6 +20,7 @@ type IPHandler interface {
 	CanTrust(ip net.IP) bool
 	GetIPFromXFFHeader(ctx Context) (string, error)
 	GetRemoteIP(ctx Context) (string, error)
+	RealIP(ctx Context) (string, error)
 }
 
 func (iph *ipHandler) SetIsTrustPrivateIP(flag bool) {
@@ -48,7 +50,7 @@ func (iph *ipHandler) GetIPFromXFFHeader(ctx Context) (string, error) {
 	reqHeader := ctx.GetRequest().Header
 	xffs := reqHeader[constant.HEADER_X_FORWARDED_FOR]
 	if len(xffs) == 0 {
-		return iph.GetRemoteIP(ctx)
+		return "", errors.New("XFF not found")
 	}
 
 	ips := strings.Split(strings.Join(xffs, ","), ",")
@@ -60,7 +62,7 @@ func (iph *ipHandler) GetIPFromXFFHeader(ctx Context) (string, error) {
 		ip := net.ParseIP(ips[i])
 
 		if ip == nil {
-			return iph.GetRemoteIP(ctx)
+			return "", errors.New("XFF not found")
 		}
 
 		// return first not trusted ip
@@ -71,6 +73,7 @@ func (iph *ipHandler) GetIPFromXFFHeader(ctx Context) (string, error) {
 	return strings.TrimSpace(ips[0]), nil
 }
 
+// get remoteAddr
 func (iph *ipHandler) GetRemoteIP(ctx Context) (string, error) {
 	ip, _, err := net.SplitHostPort(
 		strings.TrimSpace(ctx.GetRequest().RemoteAddr),
@@ -82,4 +85,21 @@ func (iph *ipHandler) GetRemoteIP(ctx Context) (string, error) {
 	}
 
 	return ip, nil
+}
+
+func (iph *ipHandler) RealIP(ctx Context) (string, error) {
+	// 1. Get from XFF
+	if ip, err := iph.GetIPFromXFFHeader(ctx); ip != "" {
+		return ip, err
+	}
+
+	// 2. Get from RealIP
+	if ip := ctx.GetRequest().Header.Get(constant.HEADER_X_REAL_IP); ip != "" {
+		ip = strings.TrimPrefix(ip, "[")
+		ip = strings.TrimSuffix(ip, "]")
+		return ip, nil
+	}
+
+	// 3. Get from GetRemoteIp
+	return iph.GetRemoteIP(ctx)
 }
