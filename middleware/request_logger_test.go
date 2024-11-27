@@ -11,32 +11,45 @@ import (
 func TestRequestLogger(t *testing.T) {
 	p := poteto.New()
 
-	logConfig := DefaultRequestLoggerConfig
-	var result RequestLoggerValues
-	logConfig.LogHandleFunc = func(ctx poteto.Context, values RequestLoggerValues) error {
-		result = values
-		return nil
-	}
-	p.Register(RequestLoggerWithConfig(logConfig))
-
-	p.GET("/test", func(ctx poteto.Context) error {
-		return ctx.JSON(http.StatusTeapot, nil)
-	})
-
-	req := httptest.NewRequest(http.MethodGet, "/test", nil)
-	rec := httptest.NewRecorder()
-
-	p.ServeHTTP(rec, req)
-
-	if http.StatusTeapot != rec.Code {
-		t.Errorf("Not go through logger")
+	tests := []struct {
+		name     string
+		config   RequestLoggerConfig
+		expected bool
+	}{
+		{"Test default config", DefaultRequestLoggerConfig, true},
+		{"Test empty config", RequestLoggerConfig{}, false},
 	}
 
-	if result.Status != http.StatusTeapot {
-		t.Errorf("Not matched")
-	}
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			logConfig := it.config
+			var result RequestLoggerValues
+			logConfig.LogHandleFunc = func(ctx poteto.Context, values RequestLoggerValues) error {
+				result = values
+				return nil
+			}
+			p.Register(RequestLoggerWithConfig(logConfig))
 
-	if result.Method != "GET" {
-		t.Errorf("Not matched")
+			p.GET("/test", func(ctx poteto.Context) error {
+				return ctx.JSON(http.StatusTeapot, nil)
+			})
+
+			req := httptest.NewRequest(http.MethodGet, "/test", nil)
+			rec := httptest.NewRecorder()
+
+			p.ServeHTTP(rec, req)
+
+			if http.StatusTeapot != rec.Code {
+				t.Errorf("Not go through logger")
+			}
+
+			if (result.Status != http.StatusTeapot) == it.expected {
+				t.Errorf("Not matched")
+			}
+
+			if (result.Method != "GET") == it.expected {
+				t.Errorf("Not matched")
+			}
+		})
 	}
 }
