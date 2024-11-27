@@ -5,9 +5,42 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.23.0
+go get github.com/poteto0/poteto@v0.23.1
 go mod tidy
 ```
+
+## Example App For Poteto
+
+https://github.com/poteto0/poteto-sample-api/tree/main
+
+## Feature
+
+### Leaf router & middlewareTree
+
+```go
+func main() {
+	p := poteto.New()
+
+	// Leaf >= 0.21.0
+	p.Leaf("/users", func(userApi poteto.Leaf) {
+		userApi.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
+		userApi.GET("/", controller.UserHandler)
+		userApi.GET("/:name", controller.UserIdHandler)
+	})
+
+	p.Run(":8000")
+}
+```
+
+### Get RequestId Easily
+
+```go
+func handler(ctx poteto.Context) error {
+	requestId := ctx.RequestId()
+}
+```
+
+## How to use
 
 ```go:main.go
 package main
@@ -34,7 +67,7 @@ func main() {
 	p.Leaf("/users", func(userApi poteto.Leaf) {
 		userApi.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
 		userApi.GET("/", controller.UserHandler)
-		userApi.GET("/:id", controller.UserIdHandler)
+		userApi.GET("/:name", controller.UserIdHandler)
 	})
 
 	p.Run(":8000")
