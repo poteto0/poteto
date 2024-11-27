@@ -1,5 +1,13 @@
 # 0.x.x
 
+## 0.22.x
+
+### 0.22.0
+
+- FEATURE: `Context.RealIP()` return realIp
+- CHANGE: `Context.GetIPFromXFFHeader()` return just X-Forwarded-For
+- DOCUMENT: update some document
+
 ## 0.21.x
 
 ### 0.21.0

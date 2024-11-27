@@ -39,6 +39,7 @@ type Context interface {
 	GetRemoteIP() (string, error)
 	RegisterTrustIPRange(ranges *net.IPNet)
 	GetIPFromXFFHeader() (string, error)
+	RealIP() (string, error)
 	Reset(w http.ResponseWriter, r *http.Request)
 	SetLogger(logger any)
 	Logger() any
@@ -207,6 +208,10 @@ func (ctx *context) RegisterTrustIPRange(ranges *net.IPNet) {
 
 func (ctx *context) GetIPFromXFFHeader() (string, error) {
 	return ctx.ipHandler.GetIPFromXFFHeader(ctx)
+}
+
+func (ctx *context) RealIP() (string, error) {
+	return ctx.ipHandler.RealIP(ctx)
 }
 
 // using same binder

@@ -38,6 +38,7 @@ type RequestLoggerConfig struct {
 	HasRequestID     bool
 	HasUserAgent     bool
 	HasRemoteIP      bool
+	HasRealIP        bool
 	HasHost          bool
 	HasContentLength bool
 	OpenHeaders      []string
@@ -55,6 +56,7 @@ var DefaultRequestLoggerConfig = RequestLoggerConfig{
 	HasRequestID:     true,
 	HasUserAgent:     true,
 	HasRemoteIP:      true,
+	HasRealIP:        true,
 	HasHost:          true,
 	HasContentLength: true,
 	OpenHeaders:      []string{},
@@ -71,6 +73,7 @@ type RequestLoggerValues struct {
 	RequestId     string
 	UserAgent     string
 	RemoteIP      string
+	RealIP        string
 	Host          string
 	ContentLength string
 	Headers       map[string][]string
@@ -119,6 +122,13 @@ func RequestLoggerWithConfig(config RequestLoggerConfig) poteto.MiddlewareFunc {
 
 			if config.HasRemoteIP {
 				rlv.RemoteIP, err = ctx.GetRemoteIP()
+				if err != nil {
+					panic(err)
+				}
+			}
+
+			if config.HasRealIP {
+				rlv.RealIP, err = ctx.RealIP()
 				if err != nil {
 					panic(err)
 				}
