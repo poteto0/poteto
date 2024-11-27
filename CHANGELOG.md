@@ -2,20 +2,24 @@
 
 ## 0.22.x
 
-### 0.22.0
+### 0.22.1
+
+- BUG: fix not allocated Server
+
+### 0.22.0: has critical bug
 
 - FEATURE: `Context.RealIP()` return realIp
 - CHANGE: `Context.GetIPFromXFFHeader()` return just X-Forwarded-For
 - DOCUMENT: update some document
 
-## 0.21.x
+## 0.21.x: has critical bug
 
 ### 0.21.0
 
 - FEATURE: `Poteto.Leaf(path, handler)` make router great
 - DOCUMENT: Update some document
 
-## 0.20.x
+## 0.20.x: has critical bug
 
 ### 0.20.0
 
