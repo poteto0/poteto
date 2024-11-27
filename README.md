@@ -52,8 +52,9 @@ func UserHandler(ctx poteto.Context) error {
 }
 
 func UserIdHandler(ctx poteto.Context) error {
+	name, _ := ctx.PathParam("name")
 	user := User{
-		Name: ctx.PathParam("id")
+		Name: name
 	}
 	return ctx.JSON(http.StatusOK, user)
 }
