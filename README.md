@@ -31,10 +31,10 @@ func main() {
 	))
 
 	// Leaf >= 0.21.0
-	p.Leaf("/users", func(userApi poteto.Leaf){
+	p.Leaf("/users", func(userApi poteto.Leaf) {
 		userApi.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
-		userApi.GET("/", UserHandler)
-		userApi.GET("/users/:id", UserIdHandler)
+		userApi.GET("/", controller.UserHandler)
+		userApi.GET("/:id", controller.UserIdHandler)
 	})
 
 	p.Run(":8000")
@@ -54,7 +54,7 @@ func UserHandler(ctx poteto.Context) error {
 func UserIdHandler(ctx poteto.Context) error {
 	name, _ := ctx.PathParam("name")
 	user := User{
-		Name: name
+		Name: name,
 	}
 	return ctx.JSON(http.StatusOK, user)
 }
