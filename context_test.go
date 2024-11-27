@@ -190,6 +190,51 @@ func TestGetIPFromXFFHeaderByContext(t *testing.T) {
 	}
 }
 
+func TestRealIP(t *testing.T) {
+	tests := []struct {
+		name        string
+		headerKey   string
+		headerValue string
+		expected    string
+	}{
+		{
+			"Get from Real Ip",
+			constant.HEADER_X_REAL_IP,
+			"11.0.0.1",
+			"11.0.0.1",
+		},
+		{
+			"Get from XFF",
+			constant.HEADER_X_FORWARDED_FOR,
+			"11.0.0.1",
+			"11.0.0.1",
+		},
+		{
+			"Get from RemoteAddr",
+			"",
+			"",
+			"192.0.2.1",
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/test", nil)
+			if it.headerKey != "" {
+				req.Header.Set(it.headerKey, it.headerValue)
+			}
+			ctx := NewContext(w, req).(*context)
+
+			ipString, _ := ctx.RealIP()
+			if ipString[0:8] != it.expected[0:8] {
+				t.Errorf(ipString)
+				t.Errorf("Not matched")
+			}
+		})
+	}
+}
+
 func TestGetLogger(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
