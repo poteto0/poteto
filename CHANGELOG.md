@@ -1,12 +1,12 @@
 # 0.x.x
 
-## 0.22.x
-
-### 0.22.1
+### 0.23.0
 
 - BUG: fix not allocated Server
 
-### 0.22.0: has critical bug
+## 0.22.x: has critical bug
+
+### 0.22.0
 
 - FEATURE: `Context.RealIP()` return realIp
 - CHANGE: `Context.GetIPFromXFFHeader()` return just X-Forwarded-For
