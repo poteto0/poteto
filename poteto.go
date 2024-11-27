@@ -27,6 +27,7 @@ type Poteto interface {
 	Register(middlewares ...MiddlewareFunc)
 	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree
 	SetLogger(logger any)
+	Leaf(basePath string, handler LeafHandler)
 }
 
 type poteto struct {
@@ -194,4 +195,13 @@ func (p *poteto) Combine(pattern string, middlewares ...MiddlewareFunc) *middlew
 
 func (p *poteto) SetLogger(logger any) {
 	p.logger = logger
+}
+
+// Leaf makes router group
+// You can make your router clear
+// with middlewares
+func (p *poteto) Leaf(basePath string, handler LeafHandler) {
+	leaf := NewLeaf(p, basePath)
+
+	handler(leaf)
 }

@@ -5,7 +5,7 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.20.0
+go get github.com/poteto0/poteto@v0.21.0
 go mod tidy
 ```
 
@@ -30,14 +30,13 @@ func main() {
 		},
 	))
 
-	p.GET("/example", UserHandler)
+	// Leaf >= 0.21.0
+	p.Leaf("/users", func(userApi poteto.Leaf){
+		userApi.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
+		userApi.GET("/", UserHandler)
+		userApi.GET("/users/:id", UserIdHandler)
+	})
 
-	// Group of Middleware
-	userGroup := p.Combine("/users")
-	userGroup.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
-
-	p.GET("/users", UserHandler)
-	p.Get("/users/:id", UserIdHandler)
 	p.Run(":8000")
 }
 
