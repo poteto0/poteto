@@ -1,5 +1,9 @@
 # 0.x.x
 
+### 0.23.1
+
+- DOCUMENT: add example app
+
 ### 0.23.0
 
 - BUG: fix not allocated Server
