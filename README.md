@@ -5,7 +5,7 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.22.1
+go get github.com/poteto0/poteto@v0.23.0
 go mod tidy
 ```
 
