@@ -125,6 +125,7 @@ func (p *poteto) Run(addr string) error {
 		addr = constant.PARAM_PREFIX + addr
 	}
 
+	p.Server.Addr = addr
 	if err := p.setupServer(); err != nil {
 		p.startupMutex.Unlock()
 		return err
