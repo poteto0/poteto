@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -13,7 +14,12 @@ func TestLeaf(t *testing.T) {
 	leaf.GET("/", getAllUserForTest)
 	leaf.POST("/create", getAllUserForTest)
 	leaf.PUT("/change", getAllUserForTest)
+	leaf.PATCH("/patch", getAllUserForTest)
 	leaf.DELETE("/delete", getAllUserForTest)
+	leaf.HEAD("/head", getAllUserForTest)
+	leaf.OPTIONS("/options", getAllUserForTest)
+	leaf.TRACE("/trace", getAllUserForTest)
+	leaf.CONNECT("/connect", getAllUserForTest)
 
 	tests := []struct {
 		name          string
@@ -25,7 +31,7 @@ func TestLeaf(t *testing.T) {
 	}{
 		{
 			"Test Get",
-			"GET",
+			http.MethodGet,
 			"/users",
 			"Hello",
 			"world",
@@ -33,7 +39,7 @@ func TestLeaf(t *testing.T) {
 		},
 		{
 			"Test Post",
-			"POST",
+			http.MethodPost,
 			"/users/create",
 			"Hello",
 			"world",
@@ -41,16 +47,56 @@ func TestLeaf(t *testing.T) {
 		},
 		{
 			"Test Put",
-			"PUT",
+			http.MethodPut,
 			"/users/change",
 			"Hello",
 			"world",
 			`{"string":"user"}`,
 		},
 		{
+			"Test Patch",
+			http.MethodPatch,
+			"/users/patch",
+			"Hello",
+			"world",
+			`{"string":"user"}`,
+		},
+		{
 			"Test Delete",
-			"DELETE",
+			http.MethodDelete,
 			"/users/delete",
+			"Hello",
+			"world",
+			`{"string":"user"}`,
+		},
+		{
+			"Test Head",
+			http.MethodHead,
+			"/users/head",
+			"Hello",
+			"world",
+			`{"string":"user"}`,
+		},
+		{
+			"Test Options",
+			http.MethodOptions,
+			"/users/options",
+			"Hello",
+			"world",
+			`{"string":"user"}`,
+		},
+		{
+			"Test Trace",
+			http.MethodTrace,
+			"/users/trace",
+			"Hello",
+			"world",
+			`{"string":"user"}`,
+		},
+		{
+			"Test Connect",
+			http.MethodConnect,
+			"/users/connect",
 			"Hello",
 			"world",
 			`{"string":"user"}`,

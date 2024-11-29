@@ -5,7 +5,7 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.23.1
+go get github.com/poteto0/poteto@v0.23.2
 go mod tidy
 ```
 
@@ -67,7 +67,7 @@ func main() {
 	p.Leaf("/users", func(userApi poteto.Leaf) {
 		userApi.Register(middleware.CamaraWithConfig(middleware.DefaultCamaraConfig))
 		userApi.GET("/", controller.UserHandler)
-		userApi.GET("/:name", controller.UserIdHandler)
+		userApi.GET("/:name", controller.UserNameHandler)
 	})
 
 	p.Run(":8000")
@@ -84,7 +84,7 @@ func UserHandler(ctx poteto.Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
-func UserIdHandler(ctx poteto.Context) error {
+func UserNameHandler(ctx poteto.Context) error {
 	name, _ := ctx.PathParam("name")
 	user := User{
 		Name: name,

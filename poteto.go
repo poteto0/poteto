@@ -20,14 +20,20 @@ type Poteto interface {
 	Run(addr string) error
 	Stop(ctx stdContext.Context) error
 	setupServer() error
-	GET(path string, handler HandlerFunc) error
-	POST(path string, handler HandlerFunc) error
-	PUT(path string, handler HandlerFunc) error
-	DELETE(path string, handler HandlerFunc) error
 	Register(middlewares ...MiddlewareFunc)
 	Combine(pattern string, middlewares ...MiddlewareFunc) *middlewareTree
 	SetLogger(logger any)
 	Leaf(basePath string, handler LeafHandler)
+
+	GET(path string, handler HandlerFunc) error
+	POST(path string, handler HandlerFunc) error
+	PUT(path string, handler HandlerFunc) error
+	PATCH(path string, handler HandlerFunc) error
+	DELETE(path string, handler HandlerFunc) error
+	HEAD(path string, handler HandlerFunc) error
+	OPTIONS(path string, handler HandlerFunc) error
+	TRACE(path string, handler HandlerFunc) error
+	CONNECT(path string, handler HandlerFunc) error
 }
 
 type poteto struct {
@@ -44,7 +50,7 @@ type poteto struct {
 
 func New() Poteto {
 	return &poteto{
-		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		router:         NewRouter(),
 		errorHandler:   &httpErrorHandler{},
 		middlewareTree: NewMiddlewareTree(),
 		option:         DefaultPotetoOption,
@@ -53,7 +59,7 @@ func New() Poteto {
 
 func NewWithOption(option PotetoOption) Poteto {
 	return &poteto{
-		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		router:         NewRouter(),
 		errorHandler:   &httpErrorHandler{},
 		middlewareTree: NewMiddlewareTree(),
 		option:         option,
@@ -170,22 +176,6 @@ func (p *poteto) Stop(ctx stdContext.Context) error {
 	return nil
 }
 
-func (p *poteto) GET(path string, handler HandlerFunc) error {
-	return p.router.GET(path, handler)
-}
-
-func (p *poteto) POST(path string, handler HandlerFunc) error {
-	return p.router.POST(path, handler)
-}
-
-func (p *poteto) PUT(path string, handler HandlerFunc) error {
-	return p.router.PUT(path, handler)
-}
-
-func (p *poteto) DELETE(path string, handler HandlerFunc) error {
-	return p.router.DELETE(path, handler)
-}
-
 func (p *poteto) Register(middlewares ...MiddlewareFunc) {
 	p.middlewareTree.Insert("", middlewares...)
 }
@@ -205,4 +195,40 @@ func (p *poteto) Leaf(basePath string, handler LeafHandler) {
 	leaf := NewLeaf(p, basePath)
 
 	handler(leaf)
+}
+
+func (p *poteto) GET(path string, handler HandlerFunc) error {
+	return p.router.GET(path, handler)
+}
+
+func (p *poteto) POST(path string, handler HandlerFunc) error {
+	return p.router.POST(path, handler)
+}
+
+func (p *poteto) PATCH(path string, handler HandlerFunc) error {
+	return p.router.PATCH(path, handler)
+}
+
+func (p *poteto) PUT(path string, handler HandlerFunc) error {
+	return p.router.PUT(path, handler)
+}
+
+func (p *poteto) DELETE(path string, handler HandlerFunc) error {
+	return p.router.DELETE(path, handler)
+}
+
+func (p *poteto) HEAD(path string, handler HandlerFunc) error {
+	return p.router.HEAD(path, handler)
+}
+
+func (p *poteto) OPTIONS(path string, handler HandlerFunc) error {
+	return p.router.OPTIONS(path, handler)
+}
+
+func (p *poteto) TRACE(path string, handler HandlerFunc) error {
+	return p.router.TRACE(path, handler)
+}
+
+func (p *poteto) CONNECT(path string, handler HandlerFunc) error {
+	return p.router.CONNECT(path, handler)
 }
