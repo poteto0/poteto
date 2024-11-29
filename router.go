@@ -9,32 +9,47 @@ type Router interface {
 	add(method, path string, handler HandlerFunc) error
 	GET(path string, handler HandlerFunc) error
 	POST(path string, handler HandlerFunc) error
+	PATCH(path string, handler HandlerFunc) error
 	PUT(path string, handler HandlerFunc) error
 	DELETE(path string, handler HandlerFunc) error
+	HEAD(path string, handler HandlerFunc) error
+	OPTIONS(path string, handler HandlerFunc) error
+	TRACE(path string, handler HandlerFunc) error
+	CONNECT(path string, handler HandlerFunc) error
 
 	GetRoutesByMethod(method string) *route
 }
 
 type router struct {
-	routesGET    Route
-	routesPOST   Route
-	routesPUT    Route
-	routesDELETE Route
+	routesGET     Route
+	routesPOST    Route
+	routesPUT     Route
+	routesPATCH   Route
+	routesDELETE  Route
+	routesHEAD    Route
+	routesOPTIONS Route
+	routesTRACE   Route
+	routesCONNECT Route
 }
 
 func NewRouter() Router {
 	return &router{
-		routesGET:    NewRoute(),
-		routesPOST:   NewRoute(),
-		routesPUT:    NewRoute(),
-		routesDELETE: NewRoute(),
+		routesGET:     NewRoute(),
+		routesPOST:    NewRoute(),
+		routesPUT:     NewRoute(),
+		routesPATCH:   NewRoute(),
+		routesDELETE:  NewRoute(),
+		routesHEAD:    NewRoute(),
+		routesOPTIONS: NewRoute(),
+		routesTRACE:   NewRoute(),
+		routesCONNECT: NewRoute(),
 	}
 }
 
 func (r *router) add(method, path string, handler HandlerFunc) error {
 	routes := r.GetRoutesByMethod(method)
 	if routes == nil {
-		return errors.New("Unexpected method error: [GET, POST, PUT, DELETE]")
+		return errors.New("Unexpected method error")
 	}
 
 	if that_route, _ := routes.Search(path); that_route != nil {
@@ -57,7 +72,27 @@ func (r *router) PUT(path string, handler HandlerFunc) error {
 	return r.add(http.MethodPut, path, handler)
 }
 
+func (r *router) PATCH(path string, handler HandlerFunc) error {
+	return r.add(http.MethodPatch, path, handler)
+}
+
 func (r *router) DELETE(path string, handler HandlerFunc) error {
+	return r.add(http.MethodDelete, path, handler)
+}
+
+func (r *router) HEAD(path string, handler HandlerFunc) error {
+	return r.add(http.MethodDelete, path, handler)
+}
+
+func (r *router) OPTIONS(path string, handler HandlerFunc) error {
+	return r.add(http.MethodDelete, path, handler)
+}
+
+func (r *router) TRACE(path string, handler HandlerFunc) error {
+	return r.add(http.MethodDelete, path, handler)
+}
+
+func (r *router) CONNECT(path string, handler HandlerFunc) error {
 	return r.add(http.MethodDelete, path, handler)
 }
 
@@ -69,8 +104,18 @@ func (r *router) GetRoutesByMethod(method string) *route {
 		return r.routesPOST.(*route)
 	case http.MethodPut:
 		return r.routesPUT.(*route)
+	case http.MethodPatch:
+		return r.routesPATCH.(*route)
 	case http.MethodDelete:
 		return r.routesDELETE.(*route)
+	case http.MethodHead:
+		return r.routesHEAD.(*route)
+	case http.MethodOptions:
+		return r.routesOPTIONS.(*route)
+	case http.MethodTrace:
+		return r.routesTRACE.(*route)
+	case http.MethodConnect:
+		return r.routesCONNECT.(*route)
 	default:
 		return nil
 	}

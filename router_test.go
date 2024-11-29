@@ -20,6 +20,11 @@ func TestAdd(t *testing.T) {
 		{"success add new method already existed route", http.MethodPost, "/users/find", false},
 		{"success add new method already existed route", http.MethodPut, "/users/find", false},
 		{"success add new method already existed route", http.MethodDelete, "/users/find", false},
+		{"success add new method already existed route", http.MethodPatch, "/users/find", false},
+		{"success add new method already existed route", http.MethodHead, "/users/find", false},
+		{"success add new method already existed route", http.MethodOptions, "/users/find", false},
+		{"success add new method already existed route", http.MethodTrace, "/users/find", false},
+		{"success add new method already existed route", http.MethodConnect, "/users/find", false},
 		{"return nil unexpected method", "UNEXPECTED", "/users/find", true},
 	}
 
@@ -91,7 +96,12 @@ func BenchmarkInsertAndSearchRouter(b *testing.B) {
 			router.GET(url, nil)
 			router.POST(url, nil)
 			router.PUT(url, nil)
+			router.PATCH(url, nil)
 			router.DELETE(url, nil)
+			router.HEAD(url, nil)
+			router.OPTIONS(url, nil)
+			router.TRACE(url, nil)
+			router.CONNECT(url, nil)
 		}
 
 		// Search
@@ -102,8 +112,18 @@ func BenchmarkInsertAndSearchRouter(b *testing.B) {
 			routesPOST.Search(url)
 			routesPUT := router.GetRoutesByMethod(http.MethodPut)
 			routesPUT.Search(url)
+			routesPATCH := router.GetRoutesByMethod(http.MethodPatch)
+			routesPATCH.Search(url)
 			routesDELETE := router.GetRoutesByMethod(http.MethodDelete)
 			routesDELETE.Search(url)
+			routesHEAD := router.GetRoutesByMethod(http.MethodHead)
+			routesHEAD.Search(url)
+			routesOPTIONS := router.GetRoutesByMethod(http.MethodOptions)
+			routesOPTIONS.Search(url)
+			routesTRACE := router.GetRoutesByMethod(http.MethodTrace)
+			routesTRACE.Search(url)
+			routesCONNECT := router.GetRoutesByMethod(http.MethodConnect)
+			routesCONNECT.Search(url)
 		}
 	}
 }
