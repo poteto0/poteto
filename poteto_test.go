@@ -2,6 +2,7 @@ package poteto
 
 import (
 	stdContext "context"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -15,11 +16,16 @@ func TestAddRouteToPoteto(t *testing.T) {
 		path   string
 		want   bool
 	}{
-		{"success add new route", "GET", "/users/find", false},
-		{"fail add already existed route", "GET", "/users/find", true},
-		{"success add new method already existed route", "POST", "/users/find", false},
-		{"success add new method already existed route", "PUT", "/users/find", false},
-		{"success add new method already existed route", "DELETE", "/users/find", false},
+		{"success add new route", http.MethodGet, "/users/find", false},
+		{"fail add already existed route", http.MethodGet, "/users/find", true},
+		{"success add new method already existed route", http.MethodPost, "/users/find", false},
+		{"success add new method already existed route", http.MethodPut, "/users/find", false},
+		{"success add new method already existed route", http.MethodPatch, "/users/find", false},
+		{"success add new method already existed route", http.MethodDelete, "/users/find", false},
+		{"success add new method already existed route", http.MethodHead, "/users/find", false},
+		{"success add new method already existed route", http.MethodOptions, "/users/find", false},
+		{"success add new method already existed route", http.MethodTrace, "/users/find", false},
+		{"success add new method already existed route", http.MethodConnect, "/users/find", false},
 	}
 
 	for _, it := range tests {
@@ -27,14 +33,24 @@ func TestAddRouteToPoteto(t *testing.T) {
 			var err error
 
 			switch it.method {
-			case "GET":
+			case http.MethodGet:
 				err = poteto.GET(it.path, nil)
-			case "POST":
+			case http.MethodPost:
 				err = poteto.POST(it.path, nil)
-			case "PUT":
+			case http.MethodPut:
 				err = poteto.PUT(it.path, nil)
-			case "DELETE":
+			case http.MethodPatch:
+				err = poteto.PATCH(it.path, nil)
+			case http.MethodDelete:
 				err = poteto.DELETE(it.path, nil)
+			case http.MethodHead:
+				err = poteto.HEAD(it.path, nil)
+			case http.MethodOptions:
+				err = poteto.OPTIONS(it.path, nil)
+			case http.MethodTrace:
+				err = poteto.TRACE(it.path, nil)
+			case http.MethodConnect:
+				err = poteto.CONNECT(it.path, nil)
 			}
 			if it.want {
 				if err == nil {

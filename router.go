@@ -9,8 +9,8 @@ type Router interface {
 	add(method, path string, handler HandlerFunc) error
 	GET(path string, handler HandlerFunc) error
 	POST(path string, handler HandlerFunc) error
-	PATCH(path string, handler HandlerFunc) error
 	PUT(path string, handler HandlerFunc) error
+	PATCH(path string, handler HandlerFunc) error
 	DELETE(path string, handler HandlerFunc) error
 	HEAD(path string, handler HandlerFunc) error
 	OPTIONS(path string, handler HandlerFunc) error
@@ -81,19 +81,19 @@ func (r *router) DELETE(path string, handler HandlerFunc) error {
 }
 
 func (r *router) HEAD(path string, handler HandlerFunc) error {
-	return r.add(http.MethodDelete, path, handler)
+	return r.add(http.MethodHead, path, handler)
 }
 
 func (r *router) OPTIONS(path string, handler HandlerFunc) error {
-	return r.add(http.MethodDelete, path, handler)
+	return r.add(http.MethodOptions, path, handler)
 }
 
 func (r *router) TRACE(path string, handler HandlerFunc) error {
-	return r.add(http.MethodDelete, path, handler)
+	return r.add(http.MethodTrace, path, handler)
 }
 
 func (r *router) CONNECT(path string, handler HandlerFunc) error {
-	return r.add(http.MethodDelete, path, handler)
+	return r.add(http.MethodConnect, path, handler)
 }
 
 func (r *router) GetRoutesByMethod(method string) *route {

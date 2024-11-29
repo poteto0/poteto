@@ -21,7 +21,12 @@ type Leaf interface {
 	GET(addPath string, handler HandlerFunc) error
 	POST(addPath string, handler HandlerFunc) error
 	PUT(addPath string, handler HandlerFunc) error
+	PATCH(path string, handler HandlerFunc) error
 	DELETE(addPath string, handler HandlerFunc) error
+	HEAD(path string, handler HandlerFunc) error
+	OPTIONS(path string, handler HandlerFunc) error
+	TRACE(path string, handler HandlerFunc) error
+	CONNECT(path string, handler HandlerFunc) error
 }
 
 func NewLeaf(poteto Poteto, basePath string) Leaf {
@@ -54,7 +59,32 @@ func (l *leaf) PUT(addPath string, handler HandlerFunc) error {
 	return l.poteto.PUT(path, handler)
 }
 
+func (l *leaf) PATCH(addPath string, handler HandlerFunc) error {
+	path := l.basePath + addPath
+	return l.poteto.PATCH(path, handler)
+}
+
 func (l *leaf) DELETE(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.DELETE(path, handler)
+}
+
+func (l *leaf) HEAD(addPath string, handler HandlerFunc) error {
+	path := l.basePath + addPath
+	return l.poteto.HEAD(path, handler)
+}
+
+func (l *leaf) OPTIONS(addPath string, handler HandlerFunc) error {
+	path := l.basePath + addPath
+	return l.poteto.OPTIONS(path, handler)
+}
+
+func (l *leaf) TRACE(addPath string, handler HandlerFunc) error {
+	path := l.basePath + addPath
+	return l.poteto.TRACE(path, handler)
+}
+
+func (l *leaf) CONNECT(addPath string, handler HandlerFunc) error {
+	path := l.basePath + addPath
+	return l.poteto.CONNECT(path, handler)
 }
