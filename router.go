@@ -60,6 +60,9 @@ func (r *router) add(method, path string, handler HandlerFunc) error {
 	return nil
 }
 
+// These are router Method
+// Seems redundant, but you can register your own router with poteto
+// And call it with `Poteto.GET()` etc.
 func (r *router) GET(path string, handler HandlerFunc) error {
 	return r.add(http.MethodGet, path, handler)
 }

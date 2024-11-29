@@ -1,5 +1,13 @@
 # 0.x.x
 
+## 0.23.x
+
+### 0.23.2
+
+- OPTIMIZE: optimize router's structure & faster
+- FEATURE: Now, poteto follows patch, head, options, trace, and connect
+- DOCUMENT: update some document
+
 ### 0.23.1
 
 - DOCUMENT: add example app
