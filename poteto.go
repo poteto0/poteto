@@ -44,7 +44,7 @@ type poteto struct {
 
 func New() Poteto {
 	return &poteto{
-		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		router:         NewRouter(),
 		errorHandler:   &httpErrorHandler{},
 		middlewareTree: NewMiddlewareTree(),
 		option:         DefaultPotetoOption,
@@ -53,7 +53,7 @@ func New() Poteto {
 
 func NewWithOption(option PotetoOption) Poteto {
 	return &poteto{
-		router:         NewRouter([]string{"GET", "POST", "PUT", "DELETE"}),
+		router:         NewRouter(),
 		errorHandler:   &httpErrorHandler{},
 		middlewareTree: NewMiddlewareTree(),
 		option:         option,
