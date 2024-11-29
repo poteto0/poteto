@@ -53,6 +53,10 @@ func (r *router) add(method, path string, handler HandlerFunc) error {
 	}
 
 	if that_route, _ := routes.Search(path); that_route != nil {
+		if path == "/" {
+			that_route.handler = handler
+			return nil
+		}
 		return errors.New("[" + method + "] " + path + " is already used")
 	}
 

@@ -2,6 +2,10 @@
 
 ## 0.23.x
 
+### 0.23.3
+
+- BUG: fix "/" routes nothing by @poteto0
+
 ### 0.23.2
 
 - OPTIMIZE: optimize router's structure & faster
