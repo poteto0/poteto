@@ -102,6 +102,50 @@ func BenchmarkInsertAndSearch(b *testing.B) {
 	}
 }
 
+func BenchmarkInsertAndSearchNewRoute(b *testing.B) {
+	urls := []string{
+		"https://example.com/v1/users/find/poteto",
+		"https://example.com/v1/users/find/potato",
+		"https://example.com/v1/users/find/jagaimo",
+		"https://example.com/v1/users/create/poteto",
+		"https://example.com/v1/users/create/potato",
+		"https://example.com/v1/users/create/jagaimo",
+		"https://example.com/v1/members/find/poteto",
+		"https://example.com/v1/members/find/potato",
+		"https://example.com/v1/members/find/jagaimo",
+		"https://example.com/v1/members/create/poteto",
+		"https://example.com/v1/members/create/potato",
+		"https://example.com/v1/members/create/jagaimo",
+		"https://example.com/v2/users/find/poteto",
+		"https://example.com/v2/users/find/potato",
+		"https://example.com/v2/users/find/jagaimo",
+		"https://example.com/v2/users/create/poteto",
+		"https://example.com/v2/users/create/potato",
+		"https://example.com/v2/users/create/jagaimo",
+		"https://example.com/v2/members/find/poteto",
+		"https://example.com/v2/members/find/potato",
+		"https://example.com/v2/members/find/jagaimo",
+		"https://example.com/v2/members/create/poteto",
+		"https://example.com/v2/members/create/potato",
+		"https://example.com/v2/members/create/jagaimo",
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		// Insert
+		route := NewRoute().(*route)
+		for _, url := range urls {
+			route.InsertNew(url, nil)
+		}
+
+		// Search
+		for _, url := range urls {
+			route.Search(url)
+		}
+	}
+}
+
 func TestCollisionDetection(t *testing.T) {
 	route := NewRoute().(*route)
 

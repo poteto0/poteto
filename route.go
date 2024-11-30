@@ -12,6 +12,7 @@ import (
 type Route interface {
 	Search(path string) (*route, ParamUnit)
 	Insert(path string, handler HandlerFunc)
+	InsertNew(path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
 }
@@ -85,9 +86,52 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 	}
 
 	if currentRoute.handler != nil {
-		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", utils.StrArrayToStr(params)))
+		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
 		utils.PotetoPrint(coloredWarn)
 		return
+	}
+
+	currentRoute.handler = handler
+}
+
+func (r *route) InsertNew(path string, handler HandlerFunc) {
+	currentRoute := r
+	rightPath := path[1:]
+	param := ""
+	isLast := false
+
+	for {
+
+		id := strings.Index(rightPath, "/")
+		if id < 0 {
+			param = rightPath
+		} else {
+			param = rightPath[:id]
+			rightPath = rightPath[id:]
+		}
+
+		if nextRoute := currentRoute.children[param]; nextRoute == nil {
+
+			// last path includes url param ex: /users/:id
+			if isLast && hasParamPrefix(param) {
+				currentRoute.childParamKey = param
+			}
+
+			currentRoute.children[param] = &route{
+				key:      param,
+				children: make(map[string]Route),
+			}
+
+			currentRoute = currentRoute.children[param].(*route)
+			break
+		}
+		currentRoute = currentRoute.children[param].(*route)
+
+		if currentRoute.handler != nil {
+			coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
+			utils.PotetoPrint(coloredWarn)
+			return
+		}
 	}
 
 	currentRoute.handler = handler
