@@ -38,7 +38,7 @@ func TestHandleHttpError(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
-			url := "https://example.com"
+			url := "/example.com"
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", url, nil)
 			ctx := NewContext(w, req).(*context)

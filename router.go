@@ -3,6 +3,7 @@ package poteto
 import (
 	"errors"
 	"net/http"
+	"strings"
 )
 
 type Router interface {
@@ -59,6 +60,10 @@ func (r *router) add(method, path string, handler HandlerFunc) error {
 		}
 		return errors.New("[" + method + "] " + path + " is already used")
 	}
+
+	// "/users/" -> "/users"
+	// if just "/" -> handler set by above
+	path = strings.TrimSuffix(path, "/")
 
 	routes.Insert(path, handler)
 	return nil

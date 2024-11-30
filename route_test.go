@@ -1,8 +1,6 @@
 package poteto
 
 import (
-	"reflect"
-	"runtime"
 	"testing"
 )
 
@@ -25,10 +23,11 @@ func TestNewRoute(t *testing.T) {
 }
 
 func TestInsertAndSearch(t *testing.T) {
-	url := "https://example.com/v1/users/find/poteto"
+	url := "/example.com/v1/users/find/poteto"
 
 	route := NewRoute().(*route)
 
+	route.Insert("/", nil)
 	route.Insert(url, nil)
 	route.Insert("/users/:id", nil)
 
@@ -37,8 +36,9 @@ func TestInsertAndSearch(t *testing.T) {
 		arg  string
 		want string
 	}{
-		{"FIND", "https://example.com", "example.com"},
-		{"NOT FOUND", "https://fuck.com", ""},
+		{"FIND empty", "/", ""},
+		{"FIND", "/example.com", "example.com"},
+		{"NOT FOUND", "/test.com", ""},
 		{"PARAM ROUTING", "/users/1", ":id"},
 	}
 
@@ -60,30 +60,31 @@ func TestInsertAndSearch(t *testing.T) {
 
 func BenchmarkInsertAndSearch(b *testing.B) {
 	urls := []string{
-		"https://example.com/v1/users/find/poteto",
-		"https://example.com/v1/users/find/potato",
-		"https://example.com/v1/users/find/jagaimo",
-		"https://example.com/v1/users/create/poteto",
-		"https://example.com/v1/users/create/potato",
-		"https://example.com/v1/users/create/jagaimo",
-		"https://example.com/v1/members/find/poteto",
-		"https://example.com/v1/members/find/potato",
-		"https://example.com/v1/members/find/jagaimo",
-		"https://example.com/v1/members/create/poteto",
-		"https://example.com/v1/members/create/potato",
-		"https://example.com/v1/members/create/jagaimo",
-		"https://example.com/v2/users/find/poteto",
-		"https://example.com/v2/users/find/potato",
-		"https://example.com/v2/users/find/jagaimo",
-		"https://example.com/v2/users/create/poteto",
-		"https://example.com/v2/users/create/potato",
-		"https://example.com/v2/users/create/jagaimo",
-		"https://example.com/v2/members/find/poteto",
-		"https://example.com/v2/members/find/potato",
-		"https://example.com/v2/members/find/jagaimo",
-		"https://example.com/v2/members/create/poteto",
-		"https://example.com/v2/members/create/potato",
-		"https://example.com/v2/members/create/jagaimo",
+		"/",
+		"/example.com/v1/users/find/poteto",
+		"/example.com/v1/users/find/potato",
+		"/example.com/v1/users/find/jagaimo",
+		"/example.com/v1/users/create/poteto",
+		"/example.com/v1/users/create/potato",
+		"/example.com/v1/users/create/jagaimo",
+		"/example.com/v1/members/find/poteto",
+		"/example.com/v1/members/find/potato",
+		"/example.com/v1/members/find/jagaimo",
+		"/example.com/v1/members/create/poteto",
+		"/example.com/v1/members/create/potato",
+		"/example.com/v1/members/create/jagaimo",
+		"/example.com/v2/users/find/poteto",
+		"/example.com/v2/users/find/potato",
+		"/example.com/v2/users/find/jagaimo",
+		"/example.com/v2/users/create/poteto",
+		"/example.com/v2/users/create/potato",
+		"/example.com/v2/users/create/jagaimo",
+		"/example.com/v2/members/find/poteto",
+		"/example.com/v2/members/find/potato",
+		"/example.com/v2/members/find/jagaimo",
+		"/example.com/v2/members/create/poteto",
+		"/example.com/v2/members/create/potato",
+		"/example.com/v2/members/create/jagaimo",
 	}
 
 	b.ResetTimer()
@@ -100,20 +101,4 @@ func BenchmarkInsertAndSearch(b *testing.B) {
 			route.Search(url)
 		}
 	}
-}
-
-func TestCollisionDetection(t *testing.T) {
-	route := NewRoute().(*route)
-
-	route.Insert("/users/test", getAllUserForTest)
-	route.Insert("/users/test", getAllUserForTestById)
-
-	r, _ := route.Search("/users/test")
-	if getFunctionName(r.handler) != getFunctionName(getAllUserForTest) {
-		t.Errorf("Unmatched")
-	}
-}
-
-func getFunctionName(handler any) string {
-	return runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
 }

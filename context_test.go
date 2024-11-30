@@ -56,7 +56,7 @@ func TestQueryParam(t *testing.T) {
 	}{
 		{
 			"Test valid case",
-			"https://example.com?hello=world",
+			"/example.com?hello=world",
 			"hello",
 			"world",
 			"unknown",
@@ -64,7 +64,7 @@ func TestQueryParam(t *testing.T) {
 		},
 		{
 			"Test nothing param case",
-			"https://example.com?hello",
+			"/example.com?hello",
 			"hello",
 			"",
 			"unknown",
@@ -72,7 +72,7 @@ func TestQueryParam(t *testing.T) {
 		},
 		{
 			"too many param case",
-			"https://example.com?a=a&b=b&c=c&d=d&e=e&f=f#g=g&h=h&i=i&j=j&k=k&l=l&m=m&n=n&o=o&p=p&q=q&r=r&s=s&t=t&u=u&v=v&w=w&x=x&y=y&z=z&a1=a1&b1=b1&c1=c1&d1=d1&e1=e1&f1=f1&g1=g1&h1=h1",
+			"/example.com?a=a&b=b&c=c&d=d&e=e&f=f#g=g&h=h&i=i&j=j&k=k&l=l&m=m&n=n&o=o&p=p&q=q&r=r&s=s&t=t&u=u&v=v&w=w&x=x&y=y&z=z&a1=a1&b1=b1&c1=c1&d1=d1&e1=e1&f1=f1&g1=g1&h1=h1",
 			"a",
 			"",
 			"unknown",
@@ -103,7 +103,7 @@ func TestQueryParam(t *testing.T) {
 }
 
 func TestPathParam(t *testing.T) {
-	url := "https://example.com/users/1"
+	url := "/example.com/users/1"
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", url, nil)
@@ -151,7 +151,7 @@ func TestSetPath(t *testing.T) {
 
 func BenchmarkJSON(b *testing.B) {
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
+	req := httptest.NewRequest("GET", "/example.com", strings.NewReader(userJSON))
 	ctx := NewContext(w, req).(*context)
 
 	testUser := user{}
@@ -166,7 +166,7 @@ func BenchmarkJSON(b *testing.B) {
 
 func TestRemoteIP(t *testing.T) {
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
+	req := httptest.NewRequest("GET", "/example.com", strings.NewReader(userJSON))
 	ctx := NewContext(w, req).(*context)
 
 	if _, err := ctx.GetRemoteIP(); err != nil {
@@ -237,7 +237,7 @@ func TestRealIP(t *testing.T) {
 
 func TestGetLogger(t *testing.T) {
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "https://example.com", strings.NewReader(userJSON))
+	req := httptest.NewRequest("GET", "/example.com", strings.NewReader(userJSON))
 	ctx := NewContext(w, req).(*context)
 
 	logger := func(msg string) {
@@ -275,7 +275,7 @@ func TestBindOnContext(t *testing.T) {
 			user := User{}
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "https://example.com", bytes.NewBufferString(string(it.body)))
+			req := httptest.NewRequest("GET", "/example.com", bytes.NewBufferString(string(it.body)))
 			req.Header.Set(constant.HEADER_CONTENT_TYPE, constant.APPLICATION_JSON)
 			ctx := NewContext(w, req).(*context)
 

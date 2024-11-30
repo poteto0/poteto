@@ -61,18 +61,23 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 
 func (r *route) Insert(path string, handler HandlerFunc) {
 	currentRoute := r
-	params := strings.Split(path, "/")
-	last := len(params) - 1
+	rightPath := path[1:]
+	param := ""
 
-	for i, param := range params {
-		if param == "" {
-			continue
+	// optimized router insert
+	// https://github.com/poteto0/poteto/issues/113
+	for {
+		id := strings.Index(rightPath, "/")
+		if id < 0 { // means last
+			param = rightPath
+		} else {
+			param = rightPath[:id]
+			rightPath = rightPath[(id + 1):]
 		}
 
 		if nextRoute := currentRoute.children[param]; nextRoute == nil {
-
 			// last path includes url param ex: /users/:id
-			if i == last && hasParamPrefix(param) {
+			if (id < 0) && hasParamPrefix(param) {
 				currentRoute.childParamKey = param
 			}
 
@@ -82,10 +87,14 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 			}
 		}
 		currentRoute = currentRoute.children[param].(*route)
+
+		if id < 0 {
+			break
+		}
 	}
 
 	if currentRoute.handler != nil {
-		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", utils.StrArrayToStr(params)))
+		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
 		utils.PotetoPrint(coloredWarn)
 		return
 	}

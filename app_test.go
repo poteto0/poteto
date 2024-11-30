@@ -9,6 +9,7 @@ import (
 
 func TestServeHTTP(t *testing.T) {
 	p := New()
+	p.GET("/", getAllUserForTest)
 	p.GET("/users", getAllUserForTest)
 	p.GET("/users/:id", getAllUserForTestById)
 	logger := func(msg string) {
@@ -35,6 +36,12 @@ func TestServeHTTP(t *testing.T) {
 			http.StatusOK,
 		},
 		{
+			"Test static empty url",
+			"GET",
+			"/",
+			http.StatusOK,
+		},
+		{
 			"Test param url",
 			"GET",
 			"/users/1",
@@ -55,7 +62,11 @@ func TestServeHTTP(t *testing.T) {
 
 			p.ServeHTTP(w, req)
 			if w.Code != it.expectedCode {
-				t.Errorf("Unmatched")
+				t.Errorf(
+					"Unmatched Status Code actual(%d) != expected(%d)",
+					w.Code,
+					it.expectedCode,
+				)
 			}
 		})
 	}
