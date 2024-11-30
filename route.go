@@ -98,22 +98,18 @@ func (r *route) InsertNew(path string, handler HandlerFunc) {
 	currentRoute := r
 	rightPath := path[1:]
 	param := ""
-	isLast := false
-
 	for {
-
 		id := strings.Index(rightPath, "/")
-		if id < 0 {
+		if id < 0 { // means last
 			param = rightPath
 		} else {
 			param = rightPath[:id]
-			rightPath = rightPath[id:]
+			rightPath = rightPath[(id + 1):]
 		}
 
 		if nextRoute := currentRoute.children[param]; nextRoute == nil {
-
 			// last path includes url param ex: /users/:id
-			if isLast && hasParamPrefix(param) {
+			if (id < 0) && hasParamPrefix(param) {
 				currentRoute.childParamKey = param
 			}
 
@@ -121,9 +117,6 @@ func (r *route) InsertNew(path string, handler HandlerFunc) {
 				key:      param,
 				children: make(map[string]Route),
 			}
-
-			currentRoute = currentRoute.children[param].(*route)
-			break
 		}
 		currentRoute = currentRoute.children[param].(*route)
 
@@ -131,6 +124,10 @@ func (r *route) InsertNew(path string, handler HandlerFunc) {
 			coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
 			utils.PotetoPrint(coloredWarn)
 			return
+		}
+
+		if id < 0 {
+			break
 		}
 	}
 
