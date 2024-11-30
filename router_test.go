@@ -45,7 +45,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestGetRoutesByMethod(t *testing.T) {
-	rtr.GET("users/get", nil)
+	rtr.GET("/users/get", nil)
 
 	routes := rtr.GetRoutesByMethod("GET")
 	child, ok := routes.children["users"].(*route)

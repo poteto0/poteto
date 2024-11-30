@@ -12,7 +12,6 @@ import (
 type Route interface {
 	Search(path string) (*route, ParamUnit)
 	Insert(path string, handler HandlerFunc)
-	InsertNew(path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
 }
@@ -62,42 +61,11 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 
 func (r *route) Insert(path string, handler HandlerFunc) {
 	currentRoute := r
-	params := strings.Split(path, "/")
-	last := len(params) - 1
-
-	for i, param := range params {
-		if param == "" {
-			continue
-		}
-
-		if nextRoute := currentRoute.children[param]; nextRoute == nil {
-
-			// last path includes url param ex: /users/:id
-			if i == last && hasParamPrefix(param) {
-				currentRoute.childParamKey = param
-			}
-
-			currentRoute.children[param] = &route{
-				key:      param,
-				children: make(map[string]Route),
-			}
-		}
-		currentRoute = currentRoute.children[param].(*route)
-	}
-
-	if currentRoute.handler != nil {
-		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
-		utils.PotetoPrint(coloredWarn)
-		return
-	}
-
-	currentRoute.handler = handler
-}
-
-func (r *route) InsertNew(path string, handler HandlerFunc) {
-	currentRoute := r
 	rightPath := path[1:]
 	param := ""
+
+	// optimized router insert
+	// https://github.com/poteto0/poteto/issues/113
 	for {
 		id := strings.Index(rightPath, "/")
 		if id < 0 { // means last
@@ -120,15 +88,15 @@ func (r *route) InsertNew(path string, handler HandlerFunc) {
 		}
 		currentRoute = currentRoute.children[param].(*route)
 
-		if currentRoute.handler != nil {
-			coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
-			utils.PotetoPrint(coloredWarn)
-			return
-		}
-
 		if id < 0 {
 			break
 		}
+	}
+
+	if currentRoute.handler != nil {
+		coloredWarn := color.HiRedString(fmt.Sprintf("Handler Collision on %s \n", path))
+		utils.PotetoPrint(coloredWarn)
+		return
 	}
 
 	currentRoute.handler = handler
