@@ -5,6 +5,7 @@
 ### 0.23.4
 
 - OPTIMIZE: performance tuning by @poteto0 in #116
+- OPTIMIZE: performance tuning by @poteto0 in #117
 
 ### 0.23.3
 
