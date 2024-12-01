@@ -33,20 +33,30 @@ func NewRoute() Route {
 
 func (r *route) Search(path string) (*route, ParamUnit) {
 	currentRoute := r
-	params := strings.Split(path, "/")
-	last := len(params) - 1
+	rightPath := path[1:]
+	param := ""
 	var httpParam ParamUnit
 
-	for i, param := range params {
-		if param == "" {
-			continue
+	if rightPath == "" {
+		return currentRoute, ParamUnit{}
+	}
+
+	// optimized router insert
+	// https://github.com/poteto0/poteto/issues/113
+	for {
+		id := strings.Index(rightPath, "/")
+		if id < 0 {
+			param = rightPath
+		} else {
+			param = rightPath[:id]
+			rightPath = rightPath[(id + 1):]
 		}
 
 		if nextRoute, ok := currentRoute.children[param]; ok {
 			currentRoute = nextRoute.(*route)
 		} else {
 			// last path includes url param ex: /users/:id
-			if chParam := currentRoute.childParamKey; i == last && chParam != "" {
+			if chParam := currentRoute.childParamKey; (id < 0) && chParam != "" {
 				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
 					httpParam = ParamUnit{key: chParam, value: param}
@@ -55,7 +65,12 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 				return nil, ParamUnit{}
 			}
 		}
+
+		if id < 0 {
+			break
+		}
 	}
+
 	return currentRoute, httpParam
 }
 
