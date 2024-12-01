@@ -2,23 +2,27 @@
 
 ## 0.23.x
 
+### 0.23.4
+
+- OPTIMIZE: performance tuning by @poteto0 in #116
+
 ### 0.23.3
 
-- BUG: fix "/" routes nothing by @poteto0
+- BUG: fix "/" routes nothing by @poteto0 in #112
 
 ### 0.23.2
 
-- OPTIMIZE: optimize router's structure & faster
-- FEATURE: Now, poteto follows patch, head, options, trace, and connect
-- DOCUMENT: update some document
+- OPTIMIZE: optimize router's structure & faster by @poteto0 in #109
+- FEATURE: Now, poteto follows patch, head, options, trace, and connect by @poteto0 in #109
+- DOCUMENT: update some document by @poteto0 in #109
 
 ### 0.23.1
 
-- DOCUMENT: add example app
+- DOCUMENT: add example app by @poteto0 #104
 
 ### 0.23.0
 
-- BUG: fix not allocated Server
+- BUG: fix not allocated Server by @poteto0 #101
 
 ## 0.22.x: has critical bug
 
