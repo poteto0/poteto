@@ -31,15 +31,14 @@ func NewMiddlewareTree() MiddlewareTree {
 
 func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	currentNode := mt
-
 	// faster
 	middlewares := mt.middlewares
+	if pattern == "/" {
+		return middlewares
+	}
 
 	rightPattern := pattern[1:]
 	p := ""
-	if rightPattern == "" {
-		return middlewares
-	}
 
 	for {
 		id := strings.Index(rightPattern, "/")
@@ -63,14 +62,12 @@ func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 
 func (mt *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
 	currentNode := mt
-
-	rightPattern := pattern[1:]
-	p := ""
-
-	if rightPattern == "" {
+	if pattern == "/" || pattern == "" {
 		currentNode.Register(middlewares...)
 		return currentNode
 	}
+	rightPattern := pattern[1:]
+	p := ""
 
 	for {
 		id := strings.Index(rightPattern, "/")
