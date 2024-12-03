@@ -30,28 +30,31 @@ func TestAddRouteToPoteto(t *testing.T) {
 
 	for _, it := range tests {
 		t.Run(it.name, func(tt *testing.T) {
-			var err error
+			err := func() error {
+				switch it.method {
+				case http.MethodGet:
+					return poteto.GET(it.path, nil)
+				case http.MethodPost:
+					return poteto.POST(it.path, nil)
+				case http.MethodPut:
+					return poteto.PUT(it.path, nil)
+				case http.MethodPatch:
+					return poteto.PATCH(it.path, nil)
+				case http.MethodDelete:
+					return poteto.DELETE(it.path, nil)
+				case http.MethodHead:
+					return poteto.HEAD(it.path, nil)
+				case http.MethodOptions:
+					return poteto.OPTIONS(it.path, nil)
+				case http.MethodTrace:
+					return poteto.TRACE(it.path, nil)
+				case http.MethodConnect:
+					return poteto.CONNECT(it.path, nil)
+				default:
+					return nil
+				}
+			}()
 
-			switch it.method {
-			case http.MethodGet:
-				err = poteto.GET(it.path, nil)
-			case http.MethodPost:
-				err = poteto.POST(it.path, nil)
-			case http.MethodPut:
-				err = poteto.PUT(it.path, nil)
-			case http.MethodPatch:
-				err = poteto.PATCH(it.path, nil)
-			case http.MethodDelete:
-				err = poteto.DELETE(it.path, nil)
-			case http.MethodHead:
-				err = poteto.HEAD(it.path, nil)
-			case http.MethodOptions:
-				err = poteto.OPTIONS(it.path, nil)
-			case http.MethodTrace:
-				err = poteto.TRACE(it.path, nil)
-			case http.MethodConnect:
-				err = poteto.CONNECT(it.path, nil)
-			}
 			if it.want {
 				if err == nil {
 					t.Errorf("FATAL: success already existed route")
