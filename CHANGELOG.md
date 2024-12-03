@@ -1,5 +1,12 @@
 # 0.x.x
 
+## 0.24.x
+
+### 0.24.0
+
+- FEATURE: mid param router ex /users/:id/name by @poteto0 in
+- REFACTOR: some switch case by @poteto0 in
+
 ## 0.23.x
 
 ### 0.23.4
