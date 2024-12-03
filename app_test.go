@@ -251,3 +251,72 @@ func TestLeafHandler(t *testing.T) {
 		})
 	}
 }
+
+func TestParamRouter(t *testing.T) {
+	p := New().(*poteto)
+	p.GET("/users/:id", getAllUserForTest)
+	p.GET("/users/:id/name", getAllUserForTest)
+	p.GET("/users/:id/name/:greet", getAllUserForTest)
+
+	tests := []struct {
+		name         string
+		reqUrl       string
+		expectedKeys []string
+		expectedVals []string
+	}{
+		{
+			"Test last param case",
+			"/users/1",
+			[]string{"id"},
+			[]string{"1"},
+		},
+		{
+			"Test mid param case",
+			"/users/1/name",
+			[]string{"id"},
+			[]string{"1"},
+		},
+		{
+			"Test two param case",
+			"/users/1/name/hello",
+			[]string{"id", "greet"},
+			[]string{"1", "hello"},
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, it.reqUrl, nil)
+
+			p.ServeHTTP(w, req)
+
+			if w.Body.String()[0:10] != `{"string":"user"}`[0:10] {
+				t.Errorf(
+					"Unmatched actual(%s) -> expected(%s)",
+					w.Body.String()[0:10],
+					`{"string":"user"}`[0:10],
+				)
+			}
+
+			if ctx, ok := p.cache.Get().(*context); ok {
+				for i, key := range it.expectedKeys {
+					val, ok := ctx.PathParam(key)
+					if !ok {
+						t.Errorf("Not has key %s", key)
+						return
+					}
+					if val != it.expectedVals[i] {
+						t.Errorf(
+							"Unmatched actual(%s:%s) -> expected(%s:%s)",
+							key,
+							val,
+							key,
+							it.expectedVals[i],
+						)
+					}
+				}
+			}
+		})
+	}
+}

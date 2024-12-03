@@ -94,7 +94,7 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	routes := p.router.GetRoutesByMethod(r.Method)
 
-	targetRoute, httpParam := routes.Search(r.URL.Path)
+	targetRoute, httpParams := routes.Search(r.URL.Path)
 	handler := targetRoute.GetHandler()
 
 	if targetRoute == nil || handler == nil {
@@ -104,7 +104,9 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ctx.SetQueryParam(r.URL.Query())
 	ctx.SetPath(r.URL.Path)
-	ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
+	for _, httpParam := range httpParams {
+		ctx.SetParam(constant.PARAM_TYPE_PATH, httpParam)
+	}
 
 	// Search middleware
 	middlewares := p.middlewareTree.SearchMiddlewares(r.URL.Path)

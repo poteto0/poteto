@@ -10,7 +10,7 @@ import (
 )
 
 type Route interface {
-	Search(path string) (*route, ParamUnit)
+	Search(path string) (*route, []ParamUnit)
 	Insert(path string, handler HandlerFunc)
 
 	GetHandler() HandlerFunc
@@ -31,14 +31,14 @@ func NewRoute() Route {
 	}
 }
 
-func (r *route) Search(path string) (*route, ParamUnit) {
+func (r *route) Search(path string) (*route, []ParamUnit) {
 	currentRoute := r
 	rightPath := path[1:]
 	param := ""
-	var httpParam ParamUnit
+	httpParams := []ParamUnit{}
 
 	if rightPath == "" {
-		return currentRoute, ParamUnit{}
+		return currentRoute, httpParams
 	}
 
 	// optimized router insert
@@ -55,14 +55,15 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 		if nextRoute, ok := currentRoute.children[param]; ok {
 			currentRoute = nextRoute.(*route)
 		} else {
-			// last path includes url param ex: /users/:id
-			if chParam := currentRoute.childParamKey; (id < 0) && chParam != "" {
+			// includes url param ex: /users/:id, /users/:id/name
+			if chParam := currentRoute.childParamKey; chParam != "" {
 				if nextRoute, ok = currentRoute.children[chParam]; ok {
 					currentRoute = nextRoute.(*route)
-					httpParam = ParamUnit{key: chParam, value: param}
+					httpParam := ParamUnit{key: chParam, value: param}
+					httpParams = append(httpParams, httpParam)
 				}
 			} else {
-				return nil, ParamUnit{}
+				return nil, httpParams
 			}
 		}
 
@@ -71,7 +72,7 @@ func (r *route) Search(path string) (*route, ParamUnit) {
 		}
 	}
 
-	return currentRoute, httpParam
+	return currentRoute, httpParams
 }
 
 func (r *route) Insert(path string, handler HandlerFunc) {
@@ -92,7 +93,7 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 
 		if nextRoute := currentRoute.children[param]; nextRoute == nil {
 			// last path includes url param ex: /users/:id
-			if (id < 0) && hasParamPrefix(param) {
+			if hasParamPrefix(param) {
 				currentRoute.childParamKey = param
 			}
 
