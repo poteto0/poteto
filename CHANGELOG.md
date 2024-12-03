@@ -4,8 +4,8 @@
 
 ### 0.24.0
 
-- FEATURE: mid param router ex /users/:id/name by @poteto0 in
-- REFACTOR: some switch case by @poteto0 in
+- FEATURE: mid param router ex /users/:id/name by @poteto0 in #122
+- REFACTOR: some switch case by @poteto0 in #122
 
 ## 0.23.x
 
