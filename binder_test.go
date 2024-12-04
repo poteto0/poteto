@@ -69,6 +69,19 @@ func TestBind(t *testing.T) {
 	}
 }
 
+func TestZeroLengthContentBind(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "https://example.com", bytes.NewBufferString(string(userJSON)))
+	req.ContentLength = 0
+	ctx := NewContext(w, req).(*context)
+
+	user := user{}
+	binder := NewBinder()
+	if err := binder.Bind(ctx, &user); err != nil {
+		t.Errorf("cannot go through")
+	}
+}
+
 func BenchmarkBind(b *testing.B) {
 	binder := NewBinder()
 
