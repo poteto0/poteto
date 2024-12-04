@@ -22,6 +22,13 @@ func TestNewRoute(t *testing.T) {
 	}
 }
 
+func TestInsertAlreadyExistPath(t *testing.T) {
+	route := NewRoute().(*route)
+
+	route.Insert("/", getAllUserForTest)
+	route.Insert("/", getAllUserForTest)
+}
+
 func TestInsertAndSearch(t *testing.T) {
 	url := "/example.com/v1/users/find/poteto"
 
