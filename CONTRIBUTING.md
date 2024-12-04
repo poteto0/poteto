@@ -1,4 +1,4 @@
-# Contributing to [Project Name]
+# Contributing to Poteto
 
 I appreciate your consideration to contribute to this project! This document is a guide to help make your contribution easier and more effective. Thank you :)
 
@@ -37,7 +37,6 @@ git checkout -b your-account/feature
 
 4. Make changes to the code and run tests to make sure everything is working properly.
 5. Write a clear commit message.
-6. Pass the Test
-7. Pull request
+6. Pull request
 
 ### Thank you :)
