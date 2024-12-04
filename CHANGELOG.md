@@ -1,5 +1,11 @@
 # 0.x.x
 
+## 0.24.x
+
+### 0.24.0
+
+- FEATURE: ctx.DebugParam by @poteto0 in #125
+
 ## 0.23.x
 
 ### 0.23.4
