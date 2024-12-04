@@ -38,17 +38,17 @@ func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	}
 
 	rightPattern := pattern[1:]
-	p := ""
+	param := ""
 
 	for {
 		id := strings.Index(rightPattern, "/")
 		if id < 0 {
-			p = rightPattern
+			param = rightPattern
 		} else {
-			p = rightPattern[:id]
+			param = rightPattern[:id]
 			rightPattern = rightPattern[(id + 1):]
 		}
-		if nextNode, ok := currentNode.children[p]; ok {
+		if nextNode, ok := currentNode.children[param]; ok {
 			currentNode = nextNode.(*middlewareTree)
 			middlewares = append(middlewares, currentNode.middlewares...)
 		} else {
@@ -67,25 +67,28 @@ func (mt *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) 
 		return currentNode
 	}
 	rightPattern := pattern[1:]
-	p := ""
+	param := ""
 
 	for {
 		id := strings.Index(rightPattern, "/")
 		if id < 0 {
-			p = rightPattern
+			param = rightPattern
 		} else {
-			p = rightPattern[:id]
+			param = rightPattern[:id]
 			rightPattern = rightPattern[(id + 1):]
 		}
-		if _, ok := currentNode.children[p]; !ok {
-			currentNode.children[p] = &middlewareTree{
+		if _, ok := currentNode.children[param]; !ok {
+			currentNode.children[param] = &middlewareTree{
 				children:    make(map[string]MiddlewareTree),
 				middlewares: []MiddlewareFunc{},
-				key:         p,
+				key:         param,
 			}
+		}
+		currentNode = currentNode.children[param].(*middlewareTree)
+
+		if id < 0 {
 			break
 		}
-		currentNode = currentNode.children[p].(*middlewareTree)
 	}
 	currentNode.Register(middlewares...)
 	return currentNode
