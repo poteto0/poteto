@@ -413,3 +413,24 @@ func TestRequestId(t *testing.T) {
 		})
 	}
 }
+
+func TestDebugParam(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test/", nil)
+	ctx := NewContext(w, req)
+
+	ctx.SetParam(constant.PARAM_TYPE_PATH, ParamUnit{"user_id", "1"})
+	ctx.SetParam(constant.PARAM_TYPE_PATH, ParamUnit{"player_id", "2"})
+	ctx.SetParam(constant.PARAM_TYPE_QUERY, ParamUnit{"user_id", "1"})
+
+	expected := `{"path":{"player_id":"2","user_id":"1"},"query":{"user_id":"1"}}`
+
+	debugParam, _ := ctx.DebugParam()
+	if debugParam != expected {
+		t.Errorf(
+			"Unmatched actual(%s) -> expected(%s)",
+			debugParam,
+			expected,
+		)
+	}
+}
