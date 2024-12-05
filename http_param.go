@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"github.com/goccy/go-json"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -10,12 +11,13 @@ type ParamUnit struct {
 }
 
 type httpParam struct {
-	params map[string]map[string]string
+	params map[string]map[string]string `json:"params"`
 }
 
 type HttpParam interface {
 	GetParam(paramType, key string) (string, bool)
 	AddParam(paramType string, paramUnit ParamUnit)
+	JsonSerialize() ([]byte, error)
 }
 
 func NewHttpParam() HttpParam {
@@ -40,4 +42,12 @@ func (hp *httpParam) GetParam(paramType, key string) (string, bool) {
 
 func (hp *httpParam) AddParam(paramType string, paramUnit ParamUnit) {
 	hp.params[paramType][paramUnit.key] = paramUnit.value
+}
+
+func (hp *httpParam) JsonSerialize() ([]byte, error) {
+	v, err := json.Marshal(hp.params)
+	if err != nil {
+		return []byte{}, err
+	}
+	return v, nil
 }

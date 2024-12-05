@@ -35,5 +35,19 @@ func TestAddAndGetParam(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestJsonSerializeHttpParam(t *testing.T) {
+	hp := NewHttpParam()
+	hp.AddParam(constant.PARAM_TYPE_PATH, ParamUnit{key: "key", value: "value"})
+
+	expected := `{"path":{"key":"value"},"query":{}}`
+	serialized, _ := hp.JsonSerialize()
+	if string(serialized) != expected {
+		t.Errorf(
+			"Unmatched actual(%s) -> expected(%s)",
+			string(serialized),
+			expected,
+		)
+	}
 }

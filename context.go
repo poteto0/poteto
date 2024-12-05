@@ -16,21 +16,25 @@ import (
 
 type Context interface {
 	JSON(code int, value any) error
+	Bind(object any) error
 	WriteHeader(code int)
+	JsonSerialize(value any) error
+	JsonDeserialize(object any) error
+
 	SetQueryParam(queryParams url.Values)
 	SetParam(paramType string, paramUnit ParamUnit)
 	PathParam(key string) (string, bool)
 	QueryParam(key string) (string, bool)
-	Bind(object any) error
-	GetPath() string
+	DebugParam() (string, bool)
 	SetPath(path string)
-	GetResponse() *response
-	GetRequest() *http.Request
-	JsonSerialize(value any) error
-	JsonDeserialize(object any) error
-	NoContent() error
+	GetPath() string
 	Set(key string, val any)
 	Get(key string) (any, bool)
+
+	GetResponse() *response
+	GetRequest() *http.Request
+
+	NoContent() error
 
 	// set request id to store
 	// and return value
@@ -117,6 +121,16 @@ func (ctx *context) QueryParam(key string) (string, bool) {
 func (ctx *context) Bind(object any) error {
 	err := ctx.binder.Bind(ctx, object)
 	return err
+}
+
+// DebugParam return all http parameters
+// use for debug or log
+func (ctx *context) DebugParam() (string, bool) {
+	val, err := ctx.httpParams.JsonSerialize()
+	if err != nil {
+		return "", false
+	}
+	return string(val), true
 }
 
 func (ctx *context) WriteHeader(code int) {
