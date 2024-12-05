@@ -37,6 +37,7 @@ func TestInsertAndSearch(t *testing.T) {
 	route.Insert("/", nil)
 	route.Insert(url, nil)
 	route.Insert("/users/:id", nil)
+	route.Insert("/users/:id/name", nil)
 
 	tests := []struct {
 		name string
@@ -47,6 +48,7 @@ func TestInsertAndSearch(t *testing.T) {
 		{"FIND", "/example.com", "example.com"},
 		{"NOT FOUND", "/test.com", ""},
 		{"PARAM ROUTING", "/users/1", ":id"},
+		{"PARAM ROUTING", "/users/1/name", "name"},
 	}
 
 	for _, it := range tests {
