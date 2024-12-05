@@ -31,17 +31,24 @@ func NewMiddlewareTree() MiddlewareTree {
 
 func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 	currentNode := mt
-
 	// faster
 	middlewares := mt.middlewares
+	if pattern == "/" {
+		return middlewares
+	}
 
-	patterns := strings.Split(pattern, "/")
-	for _, p := range patterns {
-		if p == "" {
-			continue
+	rightPattern := pattern[1:]
+	param := ""
+
+	for {
+		id := strings.Index(rightPattern, "/")
+		if id < 0 {
+			param = rightPattern
+		} else {
+			param = rightPattern[:id]
+			rightPattern = rightPattern[(id + 1):]
 		}
-
-		if nextNode, ok := currentNode.children[p]; ok {
+		if nextNode, ok := currentNode.children[param]; ok {
 			currentNode = nextNode.(*middlewareTree)
 			middlewares = append(middlewares, currentNode.middlewares...)
 		} else {
@@ -50,27 +57,38 @@ func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 			break
 		}
 	}
-
 	return middlewares
 }
 
 func (mt *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) *middlewareTree {
 	currentNode := mt
-	patterns := strings.Split(pattern, "/")
+	if pattern == "/" || pattern == "" {
+		currentNode.Register(middlewares...)
+		return currentNode
+	}
+	rightPattern := pattern[1:]
+	param := ""
 
-	for _, p := range patterns {
-		if p == "" {
-			continue
+	for {
+		id := strings.Index(rightPattern, "/")
+		if id < 0 {
+			param = rightPattern
+		} else {
+			param = rightPattern[:id]
+			rightPattern = rightPattern[(id + 1):]
 		}
-
-		if _, ok := currentNode.children[p]; !ok {
-			currentNode.children[p] = &middlewareTree{
+		if _, ok := currentNode.children[param]; !ok {
+			currentNode.children[param] = &middlewareTree{
 				children:    make(map[string]MiddlewareTree),
 				middlewares: []MiddlewareFunc{},
-				key:         p,
+				key:         param,
 			}
 		}
-		currentNode = currentNode.children[p].(*middlewareTree)
+		currentNode = currentNode.children[param].(*middlewareTree)
+
+		if id < 0 {
+			break
+		}
 	}
 	currentNode.Register(middlewares...)
 	return currentNode

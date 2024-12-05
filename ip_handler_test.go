@@ -55,6 +55,8 @@ func TestGetIPFromXFFHeader(t *testing.T) {
 
 func TestGetRealIP(t *testing.T) {
 	iph := &ipHandler{}
+	_, ipnet, _ := net.ParseCIDR("13.0.0.0/24")
+	iph.RegisterTrustIPRange(ipnet)
 
 	tests := []struct {
 		name        string
@@ -73,6 +75,12 @@ func TestGetRealIP(t *testing.T) {
 			constant.HEADER_X_FORWARDED_FOR,
 			"11.0.0.1",
 			"11.0.0.1",
+		},
+		{
+			"All trusted case",
+			constant.HEADER_X_FORWARDED_FOR,
+			"13.0.0.1",
+			"13.0.0.1",
 		},
 		{
 			"Get from RemoteAddr",
@@ -97,5 +105,18 @@ func TestGetRealIP(t *testing.T) {
 				t.Errorf("Not matched")
 			}
 		})
+	}
+}
+
+func TestGetRemoteIpThrowError(t *testing.T) {
+	iph := &ipHandler{}
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	req.RemoteAddr = "hello"
+	ctx := NewContext(w, req).(*context)
+
+	if _, err := iph.GetRemoteIP(ctx); err == nil {
+		t.Errorf("Don't throw error")
 	}
 }

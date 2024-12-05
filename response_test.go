@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -9,10 +10,14 @@ func TestWriteHeader(t *testing.T) {
 	w := httptest.NewRecorder()
 	resp := NewResponse(w).(*response)
 
-	resp.WriteHeader(200)
+	resp.WriteHeader(http.StatusOK)
 
-	if resp.Status != 200 {
-		t.Errorf("Cannot write status of header")
+	if resp.Status != http.StatusOK {
+		t.Errorf(
+			"Unmatched actual(%d) -> expected(%d)",
+			resp.Status,
+			http.StatusOK,
+		)
 	}
 }
 
@@ -27,6 +32,7 @@ func TestWrite(t *testing.T) {
 		expected    int
 	}{
 		{"write not committed response", false, []byte("Hello"), 5},
+		{"don't write committed reponse", true, []byte(""), 0},
 	}
 
 	for _, it := range tests {
@@ -34,7 +40,11 @@ func TestWrite(t *testing.T) {
 			resp.IsCommitted = it.IsCommitted
 			n, _ := resp.Write(it.b)
 			if n != it.expected {
-				t.Errorf("FATAL write response")
+				t.Errorf(
+					"Unmatched actual(%d) -> expected(%d)",
+					n,
+					it.expected,
+				)
 			}
 		})
 	}
