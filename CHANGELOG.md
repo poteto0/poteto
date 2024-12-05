@@ -7,6 +7,7 @@
 - FEATURE: mid param router ex /users/:id/name by @poteto0 in #122
 - REFACTOR: some switch case by @poteto0 in #122
 - FEATURE: ctx.DebugParam by @poteto0 in #125
+- OPTIMIZE: middlewareTree by @eaggle23 in #131
 
 ## 0.23.x
 
