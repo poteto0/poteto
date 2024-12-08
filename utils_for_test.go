@@ -1,6 +1,8 @@
 package poteto
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func sampleMiddleware(next HandlerFunc) HandlerFunc {
 	return func(ctx Context) error {

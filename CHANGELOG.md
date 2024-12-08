@@ -1,5 +1,11 @@
 # 0.x.x
 
+## 0.25.x
+
+### 0.25.0
+
+- FEATURE: poteto-cli released by @poteto0
+
 ## 0.24.x
 
 ### 0.24.0
