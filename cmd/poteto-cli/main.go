@@ -23,8 +23,6 @@ func main() {
 		case os.Args[i] == "-h", os.Args[i] == "--help":
 			help()
 			os.Exit(-1)
-		case os.Args[i] == "new":
-			continue
 		default:
 			fmt.Println("unknown command or option:", os.Args[i])
 			os.Exit(-1)
