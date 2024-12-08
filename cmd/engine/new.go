@@ -14,7 +14,7 @@ import (
 
 var isFast = false
 
-func New() {
+func CommandNew() {
 	fmt.Println("You can also use poteto-cli -h | --help")
 	for i := 2; i < len(os.Args); i++ {
 		switch {

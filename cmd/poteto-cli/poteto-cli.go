@@ -14,7 +14,7 @@ func main() {
 	}
 
 	if os.Args[1] == "new" {
-		engine.New()
+		engine.CommandNew()
 		os.Exit(-1)
 	}
 
