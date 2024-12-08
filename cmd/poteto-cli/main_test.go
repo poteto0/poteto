@@ -5,14 +5,17 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
+	"github.com/poteto0/poteto/cmd/engine"
 )
 
-func TestPotetoCliMain(t *testing.T) {
-	t.Errorf("Error")
+func TestPotetoCliMai(t *testing.T) {
 	var isExit bool
 	monkey.Patch(os.Exit, func(code int) {
 		isExit = true
 		os.Args = []string{"poteto-cli", "escape"}
+	})
+	monkey.Patch(engine.CommandNew, func() {
+		return
 	})
 
 	tests := []struct {
@@ -38,6 +41,11 @@ func TestPotetoCliMain(t *testing.T) {
 		{
 			"Test arg unknown case",
 			"-hello",
+			true,
+		},
+		{
+			"Test arg new case",
+			"new",
 			true,
 		},
 	}

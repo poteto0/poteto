@@ -207,6 +207,7 @@ func TestRunCommandNew(t *testing.T) {
 }
 
 func TestCommandNew(t *testing.T) {
+	monkey.Unpatch(CommandNew)
 	// Mock
 	var capture int
 	monkey.Patch(os.Exit, func(code int) { capture = code })
