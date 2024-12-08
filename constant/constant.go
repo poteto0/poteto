@@ -1,5 +1,7 @@
 package constant
 
+const VERSION = "v0.25.0"
+
 const (
 	MAX_DOMAIN_LENGTH      int    = 255
 	PARAM_PREFIX           string = ":"
