@@ -2,9 +2,13 @@ package poteto
 
 import (
 	stdContext "context"
+	"errors"
+	"net"
 	"net/http"
 	"testing"
 	"time"
+
+	"bou.ke/monkey"
 )
 
 func TestAddRouteToPoteto(t *testing.T) {
@@ -121,6 +125,45 @@ func TestSetLogger(t *testing.T) {
 
 	p.SetLogger(logger)
 	if p.logger == nil {
+		t.Errorf("Unmatched")
+	}
+}
+
+func TestRunHandlerErrorInSetupServer(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	p := New()
+	monkey.Patch((*poteto).setupServer, func(p *poteto) error {
+		return errors.New("error")
+	})
+
+	if err := p.Run("90"); err == nil {
+		t.Errorf("Unmatched")
+	}
+}
+
+func TestSetupServerHandleListenError(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	p := New()
+	monkey.Patch(net.Listen, func(pro, add string) (net.Listener, error) {
+		return nil, errors.New("error")
+	})
+
+	if err := p.setupServer(); err == nil {
+		t.Errorf("Unmatched")
+	}
+}
+
+func TestStopHandleError(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	p := New()
+	monkey.Patch((*http.Server).Shutdown, func(srv *http.Server, ctx stdContext.Context) error {
+		return errors.New("error")
+	})
+
+	if err := p.Stop(stdContext.Background()); err == nil {
 		t.Errorf("Unmatched")
 	}
 }
