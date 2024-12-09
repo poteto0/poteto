@@ -5,13 +5,37 @@
 ## Simple Web Framework of GoLang
 
 ```sh
-go get github.com/poteto0/poteto@v0.24.0
+go get github.com/poteto0/poteto@v0.25.0
 go mod tidy
 ```
 
 ## Example App For Poteto
 
 https://github.com/poteto0/poteto-sample-api/tree/main
+
+## Poteto-Cli
+
+We support cli tool. But if you doesn't like it, you can create poteto-app w/o cli of course.
+
+```sh
+go install github.com/poteto0/poteto/cmd/poteto-cli@v0.25.0
+```
+
+Create file.
+
+```sh
+poteto-cli new
+```
+
+fast mode.
+
+```sh
+poteto-cli new --fast
+```
+
+### Demo
+
+https://github.com/user-attachments/assets/4b739964-1b4f-4913-b643-5984bf1ceae1
 
 ## Feature
 
