@@ -4,7 +4,8 @@
 
 ### 0.25.0
 
-- FEATURE: poteto-cli released by @poteto0
+- FEATURE: poteto-cli released by @poteto0 in #133
+- DEPENDENCY: Bump github.com/goccy/go-yaml from 1.15.5 to 1.15.7 in #134
 
 ## 0.24.x
 
