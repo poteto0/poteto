@@ -2,6 +2,8 @@ package poteto
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +11,8 @@ import (
 	"sync"
 	"testing"
 
+	"bou.ke/monkey"
+	"github.com/google/uuid"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -137,14 +141,16 @@ func TestPathParam(t *testing.T) {
 	}
 }
 
-func TestSetPath(t *testing.T) {
+func TestSetAndPath(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "http://example.com", nil)
 	ctx := NewContext(w, req).(*context)
 
 	expected := "http://expected.com"
 	ctx.SetPath(expected)
-	if ctx.path != expected {
+
+	path := ctx.GetPath()
+	if path != expected {
 		t.Errorf("Not Matched")
 	}
 }
@@ -414,6 +420,22 @@ func TestRequestId(t *testing.T) {
 	}
 }
 
+func TestRequestIdErrorGenInUuid(t *testing.T) {
+	defer monkey.UnpatchAll()
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	ctx := NewContext(w, req).(*context)
+
+	monkey.Patch(uuid.NewRandom, func() (uuid.UUID, error) {
+		return uuid.UUID{}, errors.New("error")
+	})
+
+	val := ctx.RequestId()
+	if val != "" {
+		t.Errorf("Unmatched")
+	}
+}
+
 func TestDebugParam(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/test/", nil)
@@ -433,4 +455,39 @@ func TestDebugParam(t *testing.T) {
 			expected,
 		)
 	}
+}
+
+func TestJsonDeserialize(t *testing.T) {
+	defer monkey.UnpatchAll()
+	tests := []struct {
+		name string
+		err  any
+	}{
+		{"UnmarshalTypeError", &json.UnmarshalTypeError{}},
+		{"SyntaxError", &json.SyntaxError{}},
+	}
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test/", nil)
+	ctx := NewContext(w, req)
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			monkey.Patch((*json.Decoder).Decode, func(d *json.Decoder, v any) error {
+				return it.err.(error)
+			})
+
+			if err := ctx.JsonDeserialize(&user{}); err == nil {
+				t.Errorf("Not occur error: %v", err)
+			}
+		})
+	}
+}
+
+func TestRegisterTrustIPRangeInContext(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test/", nil)
+	ctx := NewContext(w, req)
+	_, ipnet, _ := net.ParseCIDR("10.0.0.0/24")
+	ctx.RegisterTrustIPRange(ipnet)
 }

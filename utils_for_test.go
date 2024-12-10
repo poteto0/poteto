@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -38,6 +39,10 @@ func getAllUserForTest(ctx Context) error {
 		Name: "user",
 	}
 	return ctx.JSON(http.StatusOK, user)
+}
+
+func throwError(ctx Context) error {
+	return errors.New("error")
 }
 
 func getAllUserForTestById(ctx Context) error {

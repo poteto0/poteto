@@ -12,6 +12,7 @@ func TestServeHTTP(t *testing.T) {
 	p.GET("/", getAllUserForTest)
 	p.GET("/users", getAllUserForTest)
 	p.GET("/users/:id", getAllUserForTestById)
+	p.GET("/error", throwError)
 	logger := func(msg string) {
 		return
 	}
@@ -52,6 +53,12 @@ func TestServeHTTP(t *testing.T) {
 			"POST",
 			"/users",
 			http.StatusNotFound,
+		},
+		{
+			"Test error case",
+			"GET",
+			"/error",
+			http.StatusInternalServerError,
 		},
 	}
 

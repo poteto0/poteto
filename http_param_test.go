@@ -1,8 +1,11 @@
 package poteto
 
 import (
+	"errors"
 	"testing"
 
+	"bou.ke/monkey"
+	"github.com/goccy/go-json"
 	"github.com/poteto0/poteto/constant"
 )
 
@@ -49,5 +52,18 @@ func TestJsonSerializeHttpParam(t *testing.T) {
 			string(serialized),
 			expected,
 		)
+	}
+}
+
+func TestJsonSerializeHttpHandleError(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	hp := NewHttpParam()
+	monkey.Patch(json.Marshal, func(v any) ([]byte, error) {
+		return []byte(""), errors.New("error")
+	})
+
+	if _, err := hp.JsonSerialize(); err == nil {
+		t.Errorf("Unmatched")
 	}
 }

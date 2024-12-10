@@ -10,15 +10,31 @@ func TestWriteHeader(t *testing.T) {
 	w := httptest.NewRecorder()
 	resp := NewResponse(w).(*response)
 
-	resp.WriteHeader(http.StatusOK)
-
-	if resp.Status != http.StatusOK {
-		t.Errorf(
-			"Unmatched actual(%d) -> expected(%d)",
-			resp.Status,
-			http.StatusOK,
-		)
+	tests := []struct {
+		name        string
+		IsCommitted bool
+		expected    int
+	}{
+		{"Test not committed case", false, http.StatusOK},
+		{"Test committed case", true, 0},
 	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			resp.IsCommitted = it.IsCommitted
+
+			resp.WriteHeader(http.StatusOK)
+
+			if resp.Status != http.StatusOK {
+				t.Errorf(
+					"Unmatched actual(%d) -> expected(%d)",
+					resp.Status,
+					it.expected,
+				)
+			}
+		})
+	}
+
 }
 
 func TestWrite(t *testing.T) {

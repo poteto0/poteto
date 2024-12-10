@@ -53,3 +53,13 @@ func TestHandleHttpError(t *testing.T) {
 		})
 	}
 }
+
+func TestIsCommitedHandlerHttpErrorCase(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/users", nil)
+	ctx := NewContext(w, req).(*context)
+	ctx.GetResponse().IsCommitted = true
+
+	handler := httpErrorHandler{}
+	handler.HandleHttpError(errors.New("error"), ctx)
+}
