@@ -2,6 +2,12 @@
 
 ## 0.25.x
 
+### 0.25.1
+
+- TEST: ut progress by @poteto0 in #141
+- CHANGE: appropriate error messages by @poteto0 in #140
+- TEST: ut progress by @poteto0 in #136
+
 ### 0.25.0
 
 - FEATURE: poteto-cli released by @poteto0 in #133
