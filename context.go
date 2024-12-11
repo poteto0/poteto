@@ -1,7 +1,6 @@
 package poteto
 
 import (
-	"errors"
 	"net"
 	"net/http"
 	"net/url"
@@ -162,9 +161,9 @@ func (ctx *context) JsonDeserialize(object any) error {
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
 	err := decoder.Decode(object)
 	if _, ok := err.(*json.UnmarshalTypeError); ok {
-		return errors.New("error")
+		return err
 	} else if _, ok := err.(*json.SyntaxError); ok {
-		return errors.New("error")
+		return err
 	}
 	return err
 }

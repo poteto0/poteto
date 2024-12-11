@@ -41,7 +41,7 @@ func NewPotetoJWSConfig(contextKey string, signKey any) PotetoJWSConfig {
 
 func (cfg *potetoJWSConfig) KeyFunc(token *jwt.Token) (any, error) {
 	if token.Method.Alg() != cfg.SignMethod {
-		return nil, errors.New("unexpected jwt signing method")
+		return nil, errors.New("unexpected jwt signing method: " + cfg.SignMethod)
 	}
 
 	if cfg.SignKey == nil {
@@ -91,7 +91,7 @@ func extractBearer(ctx poteto.Context) (string, error) {
 	target := constant.AUTH_SCHEME
 	bearers := strings.Split(authHeader, target)
 	if len(bearers) <= 1 {
-		return "", errors.New("Not included bearer token")
+		return "", errors.New("not included bearer token")
 	}
 	return strings.Trim(bearers[1], " "), nil
 }
