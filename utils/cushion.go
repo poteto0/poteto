@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"reflect"
+
 	"github.com/goccy/go-yaml"
 )
 
@@ -19,6 +20,6 @@ func YamlParse[T string | []byte](source T, dest interface{}) error {
 		parseError := yaml.Unmarshal(source_asserted, dest)
 		return parseError
 	default:
-		return errors.New("unexpected input")
+		return errors.New("unexpected input, expected string | []byte")
 	}
 }

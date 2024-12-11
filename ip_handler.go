@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/poteto0/poteto/constant"
-	"github.com/poteto0/poteto/utils"
 )
 
 type ipHandler struct {
@@ -62,7 +61,7 @@ func (iph *ipHandler) GetIPFromXFFHeader(ctx Context) (string, error) {
 		ip := net.ParseIP(ips[i])
 
 		if ip == nil {
-			return "", errors.New("XFF not found")
+			return "", errors.New("ip from XFF is nil")
 		}
 
 		// return first not trusted ip
@@ -80,7 +79,6 @@ func (iph *ipHandler) GetRemoteIP(ctx Context) (string, error) {
 	)
 
 	if err != nil {
-		utils.PotetoPrint("Error in GetRemoteIP: %v \n")
 		return "", err
 	}
 
