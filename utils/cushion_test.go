@@ -29,6 +29,7 @@ func TestYamlParse(t *testing.T) {
 	}{
 		{"Test string yaml", data, true, AB{A: "test", B: "hello"}},
 		{"Test []byte yaml", []byte(data), true, AB{A: "test", B: "hello"}},
+		{"Test not string | []byte yaml", 1, false, AB{A: "test", B: "hello"}},
 	}
 
 	for _, it := range tests {
@@ -71,5 +72,14 @@ func TestYamlParse(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestYamlParseNotPtrCase(t *testing.T) {
+	var ab AB
+	yamlFile := []byte(data)
+	err := YamlParse(yamlFile, ab)
+	if err == nil {
+		t.Errorf("Not throw error")
 	}
 }
