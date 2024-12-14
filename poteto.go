@@ -168,6 +168,8 @@ func (p *poteto) RunTLS(addr string, cert, key []byte) error {
 		return err
 	}
 
+	utils.PotetoPrint("server is available at https://localhost" + addr + "\n")
+
 	p.startupMutex.Unlock()
 	return p.Server.Serve(p.Listener)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -110,6 +111,27 @@ func TestRunAndStop(t *testing.T) {
 				return
 			}
 		})
+	}
+}
+
+func TestRunTLS(t *testing.T) {
+	cert, _ := os.ReadFile("./_fixture/certs/cert.pem")
+	key, _ := os.ReadFile("./_fixture/certs/key.pem")
+
+	p := New()
+
+	errChan := make(chan error)
+	go func() {
+		errChan <- p.RunTLS("8080", cert, key)
+	}()
+
+	select {
+	case <-time.After(500 * time.Millisecond):
+		if err := p.Stop(stdContext.Background()); err != nil {
+			t.Errorf("Unmatched")
+		}
+	case <-errChan:
+		return
 	}
 }
 
