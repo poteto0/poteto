@@ -7,7 +7,7 @@
 We have confirmed that it works with various versions: go@1.21.x, go@1.22.x, go@1.23.x
 
 ```sh
-go get github.com/poteto0/poteto@v0.25.1
+go get github.com/poteto0/poteto@v0.25.2
 go mod tidy
 ```
 
@@ -20,7 +20,7 @@ https://github.com/poteto0/poteto-sample-api/tree/main
 We support cli tool. But if you doesn't like it, you can create poteto-app w/o cli of course.
 
 ```sh
-go install github.com/poteto0/poteto/cmd/poteto-cli@v0.25.0
+go install github.com/poteto0/poteto/cmd/poteto-cli@v0.25.2
 ```
 
 Create file.
