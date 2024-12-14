@@ -1,4 +1,4 @@
-name: Test
+name: Test-1_21
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: remove not test path
         run: cat cover.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > cover2.out.tmp
       - name: remove not test path2
-        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > coverage.txt
+        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/constant" > coverage.txt
 
       - name: upload coverage
         uses: codecov/codecov-action@v1
