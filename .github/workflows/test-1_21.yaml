@@ -1,0 +1,35 @@
+name: Test-1_21
+
+on:
+  push:
+    paths:
+      - "**.go"
+      - "**.md"
+      - "**.yaml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Use golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21.x"
+      - name: Test
+        run: go test ./... -coverprofile cover.out.tmp -bench . -benchtime 100000x
+      - name: remove not test path
+        run: cat cover.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > cover2.out.tmp
+      - name: remove not test path2
+        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/constant" > coverage.txt
+
+      - name: upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

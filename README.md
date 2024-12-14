@@ -4,6 +4,8 @@
 
 ## Simple Web Framework of GoLang
 
+We have confirmed that it works with various versions: go@1.21.x, go@1.22.x, go@1.23.x
+
 ```sh
 go get github.com/poteto0/poteto@v0.25.1
 go mod tidy

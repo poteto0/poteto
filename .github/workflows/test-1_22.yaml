@@ -1,4 +1,4 @@
-name: Test
+name: Test-1_22
 
 on:
   push:
@@ -21,13 +21,13 @@ jobs:
       - name: Use golang
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21.x"
+          go-version: "1.22.x"
       - name: Test
         run: go test ./... -coverprofile cover.out.tmp -bench . -benchtime 100000x
       - name: remove not test path
         run: cat cover.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > cover2.out.tmp
       - name: remove not test path2
-        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > coverage.txt
+        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/constant" > coverage.txt
 
       - name: upload coverage
         uses: codecov/codecov-action@v1
