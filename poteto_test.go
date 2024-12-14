@@ -135,6 +135,29 @@ func TestRunTLS(t *testing.T) {
 	}
 }
 
+func TestCertParseError(t *testing.T) {
+	cert := []byte("hello")
+	key, _ := os.ReadFile("./_fixture/certs/key.pem")
+
+	p := New()
+
+	errChan := make(chan error)
+	go func() {
+		errChan <- p.RunTLS("8080", cert, key)
+	}()
+
+	select {
+	case <-time.After(500 * time.Millisecond):
+		t.Errorf("not occur error")
+		if err := p.Stop(stdContext.Background()); err != nil {
+			t.Errorf("Unmatched")
+		}
+	case <-errChan:
+		// Pass case
+		return
+	}
+}
+
 func TestSetLogger(t *testing.T) {
 	p := New().(*poteto)
 	logger := func(msg string) {
