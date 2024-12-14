@@ -2,6 +2,12 @@
 
 ## 0.25.x
 
+### 0.25.2
+
+- BUG: fix ut ignore path by @poteto0 in #147
+- OP: test on go@1.21.x, go@1.22.x, go@1.23.x by @poteto0 in #147
+- OP: only go@1.23.x upload to codecov by @poteto0 in #148
+
 ### 0.25.1
 
 - TEST: ut progress by @poteto0 in #141
