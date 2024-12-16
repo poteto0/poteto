@@ -15,7 +15,7 @@ var (
 
 // inspired by
 // https://github.com/kanocz/goginjsonrpc/blob/master/jsonrpc.go
-// * Just Method Post
+// * Only Support "POST" method
 func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 	if ctx.GetRequest().Method != http.MethodPost {
 		return ctx.JSONRPCError(
