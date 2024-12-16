@@ -2,6 +2,11 @@
 
 ## 0.25.x
 
+### 0.25.3
+
+- Bump github.com/goccy/go-json from 0.10.3 to 0.10.4 in #152
+- Bump github.com/goccy/go-yaml from 1.15.7 to 1.15.10 in #151
+
 ### 0.25.2
 
 - BUG: fix ut ignore path by @poteto0 in #147
