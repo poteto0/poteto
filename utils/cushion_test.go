@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -81,5 +82,48 @@ func TestYamlParseNotPtrCase(t *testing.T) {
 	err := YamlParse(yamlFile, ab)
 	if err == nil {
 		t.Errorf("Not throw error")
+	}
+}
+
+func TestAssertToInt(t *testing.T) {
+	tests := []struct {
+		name     string
+		source   any
+		expected bool
+	}{
+		{
+			"Test int case",
+			int(10),
+			true,
+		},
+		{
+			"Test string case",
+			string("10"),
+			true,
+		},
+		{
+			"Test byteArray case",
+			[]byte("10"),
+			true,
+		},
+		{
+			"Test float64 case",
+			float64(10),
+			true,
+		},
+		{
+			"Test invalid case",
+			errors.New("error"),
+			false,
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			_, ok := AssertToInt(it.source)
+			if ok != it.expected {
+				t.Errorf("Unmatched actual(%v) -> expected(%v)", ok, it.expected)
+			}
+		})
 	}
 }
