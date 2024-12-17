@@ -31,13 +31,13 @@ func TestJSONRPCAdapter(t *testing.T) {
 
 	errChan := make(chan error)
 	go func() {
-		errChan <- p.Run("8080")
+		errChan <- p.Run("6000")
 	}()
 
 	// client
 	added := 10
 	add := 10
-	rpcClient := jsonrpc.NewClient("http://localhost:8080/add")
+	rpcClient := jsonrpc.NewClient("http://localhost:6000/add")
 	//result := &AdditionResult{}
 	result, err := rpcClient.Call(stdContext.Background(), "TestCalculator.Add", &AdditionArgs{Added: added, Add: add})
 	if err != nil {
