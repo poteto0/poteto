@@ -2,12 +2,11 @@ package poteto
 
 import (
 	stdContext "context"
-	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/ybbus/jsonrpc/v3"
 )
 
@@ -19,9 +18,6 @@ type (
 )
 
 func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
-	fmt.Println("おはようございます")
-	fmt.Println(r)
-	fmt.Println(args)
 	return args.Add + args.Added
 }
 
@@ -29,8 +25,6 @@ func TestJSONRPCAdapter(t *testing.T) {
 	p := New()
 
 	rpc := TestCalculator{}
-	call := reflect.ValueOf(&rpc).MethodByName("Add")
-	fmt.Println(call)
 	p.POST("/add", func(ctx Context) error {
 		return PotetoJsonRPCAdapter[TestCalculator, AdditionArgs](ctx, &rpc)
 	})
@@ -49,7 +43,10 @@ func TestJSONRPCAdapter(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
-	t.Errorf("%v", result)
+	num, _ := result.Result.(json.Number).Int64()
+	if int(num) != 20 {
+		t.Errorf("Unmatched actual(%v) -> expected(%v)", result.Result, 20)
+	}
 
 	select {
 	case <-time.After(500 * time.Millisecond):
