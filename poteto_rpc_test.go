@@ -3,6 +3,8 @@ package poteto
 import (
 	stdContext "context"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,7 +23,7 @@ func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
 	return args.Add + args.Added
 }
 
-func TestJSONRPCAdapter(t *testing.T) {
+func TestPotetoJSONRPCAdapterCall(t *testing.T) {
 	p := New()
 
 	rpc := TestCalculator{}
@@ -55,5 +57,51 @@ func TestJSONRPCAdapter(t *testing.T) {
 		}
 	case <-errChan:
 		t.Errorf("Unexpected error occur")
+	}
+}
+
+func TestPotetoJSONRPCAdapter(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	tests := []struct {
+		name     string
+		req      *http.Request
+		expected float64
+	}{
+		{
+			"Test not POST req",
+			httptest.NewRequest("GET", "/test", nil),
+			-32700,
+		},
+		{
+			"Test not POST body nil",
+			httptest.NewRequest("POST", "/test", nil),
+			-32700,
+		},
+		{
+			"Test not POST body not version right",
+			httptest.NewRequest("POST", "/test", strings.NewReader("1")),
+			-32700,
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			ctx := NewContext(w, it.req).(*context)
+
+			rpc := TestCalculator{}
+			PotetoJsonRPCAdapter[TestCalculator, int](ctx, &rpc)
+
+			var data map[string]any
+			json.Unmarshal(w.Body.Bytes(), &data)
+			err := data["error"].(map[string]any)
+			if err["code"] != it.expected {
+				t.Errorf(
+					"Unmatched actual(%v) -> expected(%v)",
+					err["code"],
+					it.expected,
+				)
+			}
+		})
 	}
 }
