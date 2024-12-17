@@ -2,7 +2,9 @@ package poteto
 
 import (
 	stdContext "context"
+	"fmt"
 	"net/http"
+	"reflect"
 	"testing"
 	"time"
 
@@ -16,16 +18,22 @@ type (
 	}
 )
 
-func (c *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
+func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
+	fmt.Println("おはようございます")
+	fmt.Println(r)
+	fmt.Println(args)
 	return args.Add + args.Added
 }
 
 func TestJSONRPCAdapter(t *testing.T) {
 	p := New()
 
-	rpc := &TestCalculator{}
-
-	p.POST("/add", func(ctx Context) error { return PotetoJsonRPCAdapter(ctx, &rpc) })
+	rpc := TestCalculator{}
+	call := reflect.ValueOf(&rpc).MethodByName("Add")
+	fmt.Println(call)
+	p.POST("/add", func(ctx Context) error {
+		return PotetoJsonRPCAdapter[TestCalculator, AdditionArgs](ctx, &rpc)
+	})
 
 	errChan := make(chan error)
 	go func() {

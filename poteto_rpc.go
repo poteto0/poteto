@@ -1,10 +1,11 @@
 package poteto
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
+	"strings"
 
+	"github.com/goccy/go-json"
 	"github.com/poteto0/poteto/utils"
 )
 
@@ -19,7 +20,7 @@ var (
 // inspired by
 // https://github.com/kanocz/goginjsonrpc/blob/master/jsonrpc.go
 // * Only Support "POST" method
-func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
+func PotetoJsonRPCAdapter[T any, S any](ctx Context, api *T) error {
 	if ctx.GetRequest().Method != http.MethodPost {
 		return ctx.JSONRPCError(
 			rpcErrorStatus,
@@ -68,7 +69,7 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 		)
 	}
 
-	method, ok := data["method"].(string)
+	methodName, ok := data["method"].(string)
 	if !ok {
 		return ctx.JSONRPCError(
 			rpcErrorStatusBadRequest,
@@ -77,20 +78,8 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 			id,
 		)
 	}
-
-	fmt.Println(data["params"]) // TODO: map
-	params, ok := data["params"].([]T)
-	if !ok {
-		return ctx.JSONRPCError(
-			rpcErrorStatusBadRequest,
-			"BadRequest",
-			"invalid params",
-			id,
-		)
-	}
-
-	fmt.Println("はろー")
-	fmt.Println(id)
+	methodArr := strings.Split(methodName, ".")
+	method := methodArr[len(methodArr)-1]
 
 	call := reflect.ValueOf(api).MethodByName(method)
 	if !call.IsValid() {
@@ -102,7 +91,7 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 		)
 	}
 
-	if call.Type().NumIn() != len(params) {
+	if call.Type().NumIn() != 2 {
 		return ctx.JSONRPCError(
 			rpcErrorStatusBadRequest,
 			"BadRequest",
@@ -111,9 +100,22 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 		)
 	}
 
-	args := make([]reflect.Value, len(params))
-	result := call.Call(args)
+	var params S
+	bytes, _ := json.Marshal(data["params"])
+	err := json.Unmarshal(bytes, &params)
+	if err != nil {
+		return ctx.JSONRPCError(
+			rpcErrorStatusBadRequest,
+			"BadRequest",
+			"invalid params",
+			id,
+		)
+	}
+	args := make([]reflect.Value, 2)
+	args[0] = reflect.ValueOf(ctx.GetRequest())
+	args[1] = reflect.ValueOf(&params)
 
+	result := call.Call(args)
 	if len(result) > 0 {
 		return ctx.JSON(http.StatusOK, map[string]any{
 			"result":  result[0].Interface(),
