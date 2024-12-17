@@ -491,3 +491,11 @@ func TestRegisterTrustIPRangeInContext(t *testing.T) {
 	_, ipnet, _ := net.ParseCIDR("10.0.0.0/24")
 	ctx.RegisterTrustIPRange(ipnet)
 }
+
+func TestJSONRPCError(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/test", nil)
+	ctx := NewContext(w, req).(*context)
+
+	ctx.JSONRPCError(200, "message", "data", 10)
+}
