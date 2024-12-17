@@ -15,7 +15,7 @@ import (
 
 type Context interface {
 	JSON(code int, value any) error
-	JSONRPCError(code int, message string, data string, id string) error
+	JSONRPCError(code int, message string, data string, id int) error
 	Bind(object any) error
 	WriteHeader(code int)
 	JsonSerialize(value any) error
@@ -80,7 +80,7 @@ func (ctx *context) JSON(code int, value any) error {
 	return ctx.JsonSerialize(value)
 }
 
-func (ctx *context) JSONRPCError(code int, message string, data string, id string) error {
+func (ctx *context) JSONRPCError(code int, message string, data string, id int) error {
 	return ctx.JSON(http.StatusOK, map[string]any{
 		"result":  nil,
 		"jsonrpc": "2.0",

@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"reflect"
+	"strconv"
 
 	"github.com/goccy/go-yaml"
 )
@@ -21,5 +22,22 @@ func YamlParse[T string | []byte](source T, dest interface{}) error {
 		return parseError
 	default:
 		return errors.New("unexpected input, expected string | []byte")
+	}
+}
+
+func AssertToInt(source any) (int, bool) {
+	switch asserted := any(source).(type) {
+	case string:
+		tmp, _ := strconv.Atoi(asserted)
+		return tmp, true
+	case int:
+		return asserted, true
+	case []byte:
+		tmp, _ := strconv.Atoi(string(asserted))
+		return tmp, true
+	case float64:
+		return int(asserted), true
+	default:
+		return 0, false
 	}
 }

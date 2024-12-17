@@ -1,8 +1,11 @@
 package poteto
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
+
+	"github.com/poteto0/poteto/utils"
 )
 
 // TODO: error status code
@@ -22,7 +25,7 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 			rpcErrorStatus,
 			"parse error",
 			"POST method excepted",
-			"",
+			0,
 		)
 	}
 
@@ -31,7 +34,7 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 			rpcErrorStatus,
 			"parse error",
 			"No Post data",
-			"",
+			0,
 		)
 	}
 
@@ -41,17 +44,17 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 			rpcErrorStatus,
 			"parse error",
 			"error during decode json",
-			"",
+			0,
 		)
 	}
 
-	id, ok := data["id"].(string)
+	id, ok := utils.AssertToInt(data["id"])
 	if !ok {
 		return ctx.JSONRPCError(
 			rpcErrorStatusBadRequest,
 			"BadRequest",
 			"invalid id",
-			"",
+			0,
 		)
 	}
 
@@ -75,6 +78,7 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 		)
 	}
 
+	fmt.Println(data["params"]) // TODO: map
 	params, ok := data["params"].([]T)
 	if !ok {
 		return ctx.JSONRPCError(
@@ -84,6 +88,9 @@ func PotetoJsonRPCAdapter[T any](ctx Context, api T) error {
 			id,
 		)
 	}
+
+	fmt.Println("はろー")
+	fmt.Println(id)
 
 	call := reflect.ValueOf(api).MethodByName(method)
 	if !call.IsValid() {
