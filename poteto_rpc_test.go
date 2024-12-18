@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
+	"github.com/poteto0/poteto/constant"
 	"github.com/ybbus/jsonrpc/v3"
 )
 
@@ -61,32 +62,63 @@ func TestPotetoJSONRPCAdapterCall(t *testing.T) {
 }
 
 func TestPotetoJSONRPCAdapter(t *testing.T) {
-	w := httptest.NewRecorder()
-
 	tests := []struct {
 		name     string
 		req      *http.Request
 		expected float64
 	}{
 		{
-			"Test not POST req",
+			"Test GET req",
 			httptest.NewRequest("GET", "/test", nil),
 			-32700,
 		},
 		{
-			"Test not POST body nil",
+			"Test POST body nil",
 			httptest.NewRequest("POST", "/test", nil),
-			-32700,
+			-32600,
 		},
 		{
-			"Test not POST body not version right",
-			httptest.NewRequest("POST", "/test", strings.NewReader("1")),
-			-32700,
+			"Test POST body not version right",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONId),
+			),
+			-32600,
+		},
+		{
+			"Test not POST body not method right",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONVersion),
+			),
+			-32600,
+		},
+		{
+			"Test POST body not found method",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONMethod),
+			),
+			-32601,
+		},
+		{
+			"Test params not equal length",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONParams),
+			),
+			-32600,
 		},
 	}
 
 	for _, it := range tests {
 		t.Run(it.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			it.req.Header.Set(constant.HEADER_CONTENT_TYPE, constant.APPLICATION_JSON)
 			ctx := NewContext(w, it.req).(*context)
 
 			rpc := TestCalculator{}
