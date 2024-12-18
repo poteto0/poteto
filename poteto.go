@@ -1,6 +1,7 @@
 package poteto
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"strings"
@@ -18,6 +19,7 @@ type Poteto interface {
 	// you can make WithRequestIdOption false: you can faster request
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	Run(addr string) error
+	RunTLS(addr string, cert, key []byte) error
 	Stop(ctx stdContext.Context) error
 	setupServer() error
 	Register(middlewares ...MiddlewareFunc)
@@ -145,20 +147,54 @@ func (p *poteto) Run(addr string) error {
 	return p.Server.Serve(p.Listener)
 }
 
+func (p *poteto) RunTLS(addr string, cert, key []byte) error {
+	p.startupMutex.Lock()
+
+	// Setting TLS
+	p.Server.TLSConfig = &tls.Config{}
+	p.Server.TLSConfig.Certificates = make([]tls.Certificate, 1)
+	parsedCert, err := tls.X509KeyPair(cert, key)
+	if err != nil {
+		p.startupMutex.Unlock()
+		return err
+	}
+	p.Server.TLSConfig.Certificates[0] = parsedCert
+
+	// Setup Server
+	p.Server.Addr = addr
+	if err := p.setupServer(); err != nil {
+		p.startupMutex.Unlock()
+		return err
+	}
+
+	utils.PotetoPrint("server is available at https://localhost" + addr + "\n")
+
+	p.startupMutex.Unlock()
+	return p.Server.Serve(p.Listener)
+}
+
 func (p *poteto) setupServer() error {
 	// Print Banner
 	coloredBanner := color.HiGreenString(Banner)
 	utils.PotetoPrint(coloredBanner)
 
-	// setup Server
+	// setting handler
 	p.Server.Handler = p
+
+	// set listener
 	if p.Listener == nil {
 		ln, err := net.Listen(p.option.ListenerNetwork, p.Server.Addr)
 		if err != nil {
 			return err
 		}
 
-		p.Listener = ln
+		if p.Server.TLSConfig == nil {
+			p.Listener = ln
+			return nil
+		}
+
+		// tls mode
+		p.Listener = tls.NewListener(ln, p.Server.TLSConfig)
 	}
 
 	return nil

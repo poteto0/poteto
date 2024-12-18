@@ -7,7 +7,7 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-func YamlParse[T string | []byte](source T, dest interface{}) error {
+func YamlParse[T string | []byte](source T, dest any) error {
 	if reflect.TypeOf(dest).Kind() != reflect.Ptr {
 		return errors.New("dest is not pointer")
 	}
