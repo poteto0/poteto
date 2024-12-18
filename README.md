@@ -7,7 +7,7 @@
 We have confirmed that it works with various versions: go@1.21.x, go@1.22.x, go@1.23.x
 
 ```sh
-go get github.com/poteto0/poteto@v0.25.3
+go get github.com/poteto0/poteto@v0.26.0
 go mod tidy
 ```
 
@@ -20,7 +20,7 @@ https://github.com/poteto0/poteto-sample-api/tree/main
 We support cli tool. But if you doesn't like it, you can create poteto-app w/o cli of course.
 
 ```sh
-go install github.com/poteto0/poteto/cmd/poteto-cli@v0.25.3
+go install github.com/poteto0/poteto/cmd/poteto-cli@v0.26.0
 ```
 
 Create file.
@@ -41,7 +41,36 @@ https://github.com/user-attachments/assets/4b739964-1b4f-4913-b643-5984bf1ceae1
 
 ## Feature
 
-### Leaf router & middlewareTree
+### JSONRPCAdapter (`>=0.26.0`)
+
+KeyNote: You can serve JSONRPC server easily.
+
+```go
+type (
+  Calculator struct{}
+  AdditionArgs   struct {
+    Add, Added int
+  }
+)
+
+func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
+ return args.Add + args.Added
+}
+
+func main() {
+  p := New()
+
+  rpc := TestCalculator{}
+  // you can access "/add/Calculator.Add"
+  p.POST("/add", func(ctx Context) error {
+    return PotetoJsonRPCAdapter[Calculator, AdditionArgs](ctx, &rpc)
+  })
+
+  p.Run("8080")
+}
+```
+
+### Leaf router & middlewareTree (`>=0.21.0`)
 
 ```go
 func main() {
