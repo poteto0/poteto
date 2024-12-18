@@ -1,5 +1,40 @@
 # 0.x.x
 
+## 0.26.x
+
+## 0.26.0
+
+- FEATURE: `PotetoJSONAdapter` provides json rpc by @poteto0 in #154
+
+KeyNote: You can serve JSONRPC server easily.
+
+```go
+type (
+  Calculator struct{}
+  AdditionArgs   struct {
+    Add, Added int
+  }
+)
+
+func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
+ return args.Add + args.Added
+}
+
+func main() {
+  p := New()
+
+  rpc := TestCalculator{}
+  // you can access "/add/Calculator.Add"
+  p.POST("/add", func(ctx Context) error {
+    return PotetoJsonRPCAdapter[Calculator, AdditionArgs](ctx, &rpc)
+  })
+
+  p.Run("8080")
+}
+```
+
+- FEATURE: `Poteto.RunTLS` serve https server provided cert & key file by @poteto0 in #144
+
 ## 0.25.x
 
 ### 0.25.3
