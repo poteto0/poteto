@@ -53,9 +53,11 @@ func getAllUserForTestById(ctx Context) error {
 }
 
 const (
-	userJSON       = `{"name":"poteto"}`
-	rpcJSONId      = `{"id":1}`
-	rpcJSONVersion = `{"id":1, "jsonrpc":"2.0"}`
-	rpcJSONMethod  = `{"id":1, "jsonrpc":"2.0", "method":"hello"}`
-	rpcJSONParams  = `{"id":1, "jsonrpc":"2.0", "method":"Add", "params":{"Added": 1}}`
+	userJSON           = `{"name":"poteto"}`
+	rpcJSONId          = `{"id":1}`
+	rpcJSONVersion     = `{"id":1, "jsonrpc":"2.0"}`
+	rpcJSONMethod      = `{"id":1, "jsonrpc":"2.0", "method":"Hello"}`
+	rpcJSONMethodClass = `{"id":1, "jsonrpc":"2.0", "method":"BestCalculator.Add"}`
+	rpcJSONMethodWrong = `{"id":1, "jsonrpc":"2.0", "method":"TestCalculator.Hello"}`
+	rpcJSONParams      = `{"id":1, "jsonrpc":"2.0", "method":"TestCalculator.Add", "params":{"Added": 1}}`
 )
