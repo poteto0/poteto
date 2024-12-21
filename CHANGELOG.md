@@ -2,6 +2,13 @@
 
 ## 0.26.x
 
+### 0.26.1
+
+- EXAMPLE: add example on jsonrpc by @poteto0 in #160
+- EXAMPLE: add example on fast-api by @poteto0 in #160
+- EXAMPLE: add example on api by @poteto0 in #160
+- BUG: fix `PotetoJSONRPCAdapter` dosen't check class by @poteto0 in #158
+
 ## 0.26.0
 
 - FEATURE: `PotetoJSONAdapter` provides json rpc by @poteto0 in #154
@@ -21,12 +28,12 @@ func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
 }
 
 func main() {
-  p := New()
+  p := poteto.New()
 
   rpc := TestCalculator{}
   // you can access "/add/Calculator.Add"
-  p.POST("/add", func(ctx Context) error {
-    return PotetoJsonRPCAdapter[Calculator, AdditionArgs](ctx, &rpc)
+  p.POST("/add", func(ctx poteto.Context) error {
+    return poteto.PotetoJsonRPCAdapter[Calculator, AdditionArgs](ctx, &rpc)
   })
 
   p.Run("8080")
