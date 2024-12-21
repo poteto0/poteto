@@ -78,8 +78,28 @@ func PotetoJsonRPCAdapter[T any, S any](ctx Context, api *T) error {
 			id,
 		)
 	}
+
 	methodArr := strings.Split(methodName, ".")
-	method := methodArr[len(methodArr)-1]
+	if len(methodArr) != 2 {
+		return ctx.JSONRPCError(
+			rpcErrorStatusNotFound,
+			"NotFound",
+			"Method is not found",
+			id,
+		)
+	}
+
+	className, method := methodArr[0], methodArr[1]
+	fullClass := strings.Split(reflect.TypeOf(api).String(), ".")
+	extractNamespace := fullClass[len(fullClass)-1]
+	if className != extractNamespace {
+		return ctx.JSONRPCError(
+			rpcErrorStatusNotFound,
+			"NotFound",
+			"Method is not found",
+			id,
+		)
+	}
 
 	call := reflect.ValueOf(api).MethodByName(method)
 	if !call.IsValid() {

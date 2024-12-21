@@ -105,6 +105,24 @@ func TestPotetoJSONRPCAdapter(t *testing.T) {
 			-32601,
 		},
 		{
+			"Test POST body not found method but class is matched",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONMethodWrong),
+			),
+			-32601,
+		},
+		{
+			"Test POST body not found method cause class is wrong",
+			httptest.NewRequest(
+				http.MethodPost,
+				"/test",
+				strings.NewReader(rpcJSONMethodClass),
+			),
+			-32601,
+		},
+		{
 			"Test params not equal length",
 			httptest.NewRequest(
 				http.MethodPost,
