@@ -13,6 +13,7 @@ import (
 )
 
 var isFast = false
+var isJSONRPC = false
 
 func CommandNew() {
 	fmt.Println("You can also use poteto-cli -h | --help")
@@ -23,6 +24,8 @@ func CommandNew() {
 			os.Exit(-1)
 		case os.Args[i] == "-f", os.Args[i] == "--fast":
 			isFast = true
+		case os.Args[i] == "-j", os.Args[i] == "--jsonrpc":
+			isJSONRPC = true
 		default:
 			fmt.Println("unknown command or option:", os.Args[i])
 			os.Exit(-1)
@@ -89,17 +92,28 @@ func createMain() error {
 	}
 	defer f.Close()
 
-	templateFile := []byte(template.DefaultTemplate)
-	if isFast {
-		templateFile = []byte(template.FastTemplate)
-	}
-
-	mainGoByte := templateFile
+	mainGoByte := choiceTemplateFile()
 	if _, err := f.Write(mainGoByte); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func choiceTemplateFile() []byte {
+	if isFast && !isJSONRPC {
+		return []byte(template.FastTemplate)
+	}
+
+	if isJSONRPC && !isFast {
+		return []byte(template.JSONRPCTemplate)
+	}
+
+	if isJSONRPC && isFast {
+		return []byte(template.JSONRPCFastTemplate)
+	}
+
+	return []byte(template.DefaultTemplate)
 }
 
 func help() {
@@ -110,4 +124,5 @@ func help() {
 	fmt.Println("Options:")
 	fmt.Println("  -h, --help: Display help (this is this)")
 	fmt.Println("  -f, --fast: fast mode api (doesn't gen requestId automatic)")
+	fmt.Println("  -j, --jsonrpc: jsonrpc template")
 }
