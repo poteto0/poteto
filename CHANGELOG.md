@@ -2,6 +2,11 @@
 
 ## 0.26.x
 
+### 0.26.2
+
+- TEST: add benchmark by @poteto0 in #164
+- Build(deps): bump github.com/goccy/go-yaml from 1.15.10 to 1.15.13 in #163
+
 ### 0.26.1
 
 - EXAMPLE: add example on jsonrpc by @poteto0 in #160
