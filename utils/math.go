@@ -16,12 +16,12 @@ func SliceEqual[T comparable](as, bs []T) bool {
 
 // EX:) []string{"hello", "world"} -> hello,world
 func StrArrayToStr(targets []string) string {
-	var val_str string
+	var valStr string
 	for i, target := range targets {
-		val_str += target
+		valStr += target
 		if i != len(targets)-1 {
-			val_str += ","
+			valStr += ","
 		}
 	}
-	return val_str
+	return valStr
 }

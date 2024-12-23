@@ -45,3 +45,17 @@ func TestStrArrayToStr(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkStrArrayToStr(b *testing.B) {
+	input := []string{}
+	for i := 0; i < 100; i++ {
+		input = append(input, "hello")
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		output := StrArrayToStr(input)
+		_ = output
+	}
+}
