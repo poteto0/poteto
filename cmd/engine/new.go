@@ -13,6 +13,7 @@ import (
 )
 
 var isFast = false
+var isDocker = false
 var isJSONRPC = false
 
 func CommandNew() {
@@ -24,6 +25,8 @@ func CommandNew() {
 			os.Exit(-1)
 		case os.Args[i] == "-f", os.Args[i] == "--fast":
 			isFast = true
+		case os.Args[i] == "-d", os.Args[i] == "--docker":
+			isDocker = true
 		case os.Args[i] == "-j", os.Args[i] == "--jsonrpc":
 			isJSONRPC = true
 		default:
@@ -82,38 +85,64 @@ func run(projectName string) error {
 	if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
 		return err
 	}
+
+	if !isDocker {
+		return nil
+	}
+
+	fmt.Println("4. generating docker")
+	if err := createDockerfile(); err != nil {
+		return err
+	}
+	if err := createDockerCompose(); err != nil {
+		return err
+	}
 	return nil
 }
 
 func createMain() error {
-	f, err := os.Create("main.go")
+	templateFile := choiceTemplateFile()
+
+	return createAndWrite("main.go", templateFile)
+}
+
+func createDockerfile() error {
+	return createAndWrite("Dockerfile", template.DockerTemplate)
+}
+
+func createDockerCompose() error {
+	return createAndWrite("docker-compose.yaml", template.DockerComposeTemplate)
+}
+
+func createAndWrite(filename, templateFile string) error {
+	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	mainGoByte := choiceTemplateFile()
-	if _, err := f.Write(mainGoByte); err != nil {
+	templateFileByte := []byte(templateFile)
+	if _, err := f.Write(templateFileByte); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func choiceTemplateFile() []byte {
+func choiceTemplateFile() string {
 	if isFast && !isJSONRPC {
-		return []byte(template.FastTemplate)
+		return template.FastTemplate
 	}
 
 	if isJSONRPC && !isFast {
-		return []byte(template.JSONRPCTemplate)
+		return template.JSONRPCTemplate
 	}
 
 	if isJSONRPC && isFast {
-		return []byte(template.JSONRPCFastTemplate)
+		return template.JSONRPCFastTemplate
 	}
 
-	return []byte(template.DefaultTemplate)
+	return template.DefaultTemplate
 }
 
 func help() {
@@ -124,5 +153,6 @@ func help() {
 	fmt.Println("Options:")
 	fmt.Println("  -h, --help: Display help (this is this)")
 	fmt.Println("  -f, --fast: fast mode api (doesn't gen requestId automatic)")
+	fmt.Println("  -d, --docker: with Dockerfile & docker-compose w golang@1.23")
 	fmt.Println("  -j, --jsonrpc: jsonrpc template")
 }

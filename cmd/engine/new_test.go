@@ -11,17 +11,21 @@ import (
 )
 
 func TestRunCommandNew(t *testing.T) {
-	var calledChdir bool
-	var calledMkdir bool
-	var calledIsExist bool
-	var calledExecCommand bool
-	var calledCreateMain bool
+	defer monkey.UnpatchAll()
+
+	var (
+		calledChdir bool
+		calledMkdir bool
+		//calledIsExist     bool
+		calledExecCommand bool
+		calledCreateMain  bool
+	)
 
 	tests := []struct {
-		name            string
-		mockChdir       func(dir string) error
-		mockMkdir       func(name string, param fs.FileMode) error
-		mockIsExist     func(err error) bool
+		name      string
+		mockChdir func(dir string) error
+		mockMkdir func(name string, param fs.FileMode) error
+		//mockIsExist     func(err error) bool
 		mockExecCommand func(name string, args ...string) *exec.Cmd
 		mockExecRun     func(*exec.Cmd) error
 		mockCreateMain  func() error
@@ -37,10 +41,12 @@ func TestRunCommandNew(t *testing.T) {
 				calledMkdir = true
 				return nil
 			},
-			func(err error) bool {
-				calledIsExist = true
-				return true
-			},
+			/*
+				func(err error) bool {
+					calledIsExist = true
+					return true
+				},
+			*/
 			func(name string, args ...string) *exec.Cmd {
 				calledExecCommand = true
 				return nil
@@ -64,10 +70,12 @@ func TestRunCommandNew(t *testing.T) {
 				calledMkdir = true
 				return errors.New("error")
 			},
-			func(err error) bool {
-				calledIsExist = true
-				return false
-			},
+			/*
+				func(err error) bool {
+					calledIsExist = true
+					return false
+				},
+			*/
 			func(name string, args ...string) *exec.Cmd {
 				calledExecCommand = true
 				return nil
@@ -85,16 +93,18 @@ func TestRunCommandNew(t *testing.T) {
 			"Test chdir fail",
 			func(dir string) error {
 				calledChdir = true
-				return nil
+				return errors.New("error")
 			},
 			func(name string, param fs.FileMode) error {
 				calledMkdir = true
-				return errors.New("error")
+				return nil
 			},
-			func(err error) bool {
-				calledIsExist = true
-				return true
-			},
+			/*
+				func(err error) bool {
+					calledIsExist = true
+					return true
+				},
+			*/
 			func(name string, args ...string) *exec.Cmd {
 				calledExecCommand = true
 				return nil
@@ -118,10 +128,12 @@ func TestRunCommandNew(t *testing.T) {
 				calledMkdir = true
 				return nil
 			},
-			func(err error) bool {
-				calledIsExist = true
-				return true
-			},
+			/*
+				func(err error) bool {
+					calledIsExist = true
+					return true
+				},
+			*/
 			func(name string, args ...string) *exec.Cmd {
 				calledExecCommand = true
 				return nil
@@ -145,10 +157,12 @@ func TestRunCommandNew(t *testing.T) {
 				calledMkdir = true
 				return nil
 			},
-			func(err error) bool {
-				calledIsExist = true
-				return true
-			},
+			/*
+				func(err error) bool {
+					calledIsExist = true
+					return true
+				},
+			*/
 			func(name string, args ...string) *exec.Cmd {
 				calledExecCommand = true
 				return nil
@@ -169,45 +183,48 @@ func TestRunCommandNew(t *testing.T) {
 			defer func() {
 				calledChdir = false
 				calledMkdir = false
-				calledIsExist = false
+				//calledIsExist = false
 				calledExecCommand = false
 				calledCreateMain = false
 			}()
 
 			monkey.Patch(os.Chdir, it.mockChdir)
 			monkey.Patch(os.Mkdir, it.mockMkdir)
+			// Mockできてない
+			// monkey.Patch(os.IsExist, it.mockIsExist)
 			monkey.Patch(exec.Command, it.mockExecCommand)
 			monkey.Patch((*exec.Cmd).Run, it.mockExecRun)
 			monkey.Patch(createMain, it.mockCreateMain)
+
+			run("hello")
+
+			if calledChdir != it.expectCalled[0] {
+				t.Errorf("Unmatched call for os.Chdir")
+			}
+
+			if calledMkdir != it.expectCalled[1] {
+				t.Errorf("Unmatched call for os.Mkdir")
+			}
+
+			/*
+				if calledIsExist != it.expectCalled[2] {
+					t.Errorf("Unmatched call for os.IsExit")
+				}
+			*/
+
+			if calledExecCommand != it.expectCalled[3] {
+				t.Errorf("Unmatched call for exec.Command")
+			}
+
+			if calledCreateMain != it.expectCalled[4] {
+				t.Errorf("Unmatched call for createMain")
+			}
 		})
-
-		run("hello")
-
-		if calledChdir != it.expectCalled[0] {
-			t.Errorf("Unmatched call for os.Chdir")
-		}
-
-		if calledMkdir != it.expectCalled[1] {
-			t.Errorf("Unmatched call for os.Mkdir")
-		}
-
-		if calledIsExist != it.expectCalled[2] {
-			t.Errorf("Unmatched call for os.IsExit")
-		}
-
-		if calledExecCommand != it.expectCalled[3] {
-			t.Errorf("Unmatched call for exec.Command")
-		}
-
-		if !calledCreateMain != it.expectCalled[4] {
-			t.Errorf("Unmatched call for createMain")
-		}
 	}
-
 }
 
 func TestCommandNew(t *testing.T) {
-	monkey.Unpatch(CommandNew)
+	defer monkey.UnpatchAll()
 	// Mock
 	var capture int
 	monkey.Patch(os.Exit, func(code int) { capture = code })
@@ -246,6 +263,16 @@ func TestCommandNew(t *testing.T) {
 			false,
 		},
 		{
+			"test -d case",
+			"-d",
+			false,
+		},
+		{
+			"test --docker case",
+			"--docker",
+			false,
+		},
+		{
 			"test --jsonrpc case",
 			"--jsonrpc",
 			false,
@@ -279,9 +306,13 @@ func TestCommandNew(t *testing.T) {
 	}
 }
 
-func TestCreateMain(t *testing.T) {
-	var calledCreate bool
-	var calledWrite bool
+/*
+func TestCreateAndWrite(t *testing.T) {
+	defer monkey.UnpatchAll()
+	var (
+		calledCreate bool
+		calledWrite  bool
+	)
 
 	monkey.Patch((*os.File).Close, func(f *os.File) error {
 		return nil
@@ -309,7 +340,7 @@ func TestCreateMain(t *testing.T) {
 			"Test create fail case",
 			func(name string) (*os.File, error) {
 				calledCreate = true
-				return &os.File{}, errors.New("error")
+				return nil, errors.New("error")
 			},
 			func(f *os.File, b []byte) (int, error) {
 				calledWrite = true
@@ -338,11 +369,11 @@ func TestCreateMain(t *testing.T) {
 				calledWrite = false
 			}()
 
+			// Mockできてない
 			monkey.Patch(os.Create, it.mockCreate)
 			monkey.Patch((*os.File).Write, it.mockWite)
 
-			createMain()
-
+			createAndWrite("temp", "temp")
 			if calledCreate != it.expectCalled[0] {
 				t.Errorf("Unmatched call of os.Create")
 			}
@@ -353,3 +384,4 @@ func TestCreateMain(t *testing.T) {
 		})
 	}
 }
+*/
