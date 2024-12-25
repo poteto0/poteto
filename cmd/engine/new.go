@@ -13,6 +13,7 @@ import (
 )
 
 var isFast = false
+var isDocker = false
 
 func CommandNew() {
 	fmt.Println("You can also use poteto-cli -h | --help")
@@ -23,6 +24,8 @@ func CommandNew() {
 			os.Exit(-1)
 		case os.Args[i] == "-f", os.Args[i] == "--fast":
 			isFast = true
+		case os.Args[i] == "-d", os.Args[i] == "--docker":
+			isDocker = true
 		default:
 			fmt.Println("unknown command or option:", os.Args[i])
 			os.Exit(-1)
@@ -79,22 +82,45 @@ func run(projectName string) error {
 	if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
 		return err
 	}
+
+	if !isDocker {
+		return nil
+	}
+
+	fmt.Println("4. generating docker")
+	if err := createDockerfile(); err != nil {
+		return err
+	}
+	if err := createDockerCompose(); err != nil {
+		return err
+	}
 	return nil
 }
 
 func createMain() error {
-	f, err := os.Create("main.go")
+	if isFast {
+		return createAndWrite("main.go", template.FastTemplate)
+	}
+
+	return createAndWrite("main.go", template.DefaultTemplate)
+}
+
+func createDockerfile() error {
+	return createAndWrite("Dockerfile", template.DockerTemplate)
+}
+
+func createDockerCompose() error {
+	return createAndWrite("docker-compose.yaml", template.DockerComposeTemplate)
+}
+
+func createAndWrite(filename, templateFile string) error {
+	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	templateFile := []byte(template.DefaultTemplate)
-	if isFast {
-		templateFile = []byte(template.FastTemplate)
-	}
-
-	mainGoByte := templateFile
+	mainGoByte := []byte(templateFile)
 	if _, err := f.Write(mainGoByte); err != nil {
 		return err
 	}

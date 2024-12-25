@@ -245,6 +245,16 @@ func TestCommandNew(t *testing.T) {
 			"--fast",
 			false,
 		},
+		{
+			"test -d case",
+			"-d",
+			false,
+		},
+		{
+			"test --docker case",
+			"--docker",
+			false,
+		},
 	}
 
 	for _, it := range tests {
@@ -332,6 +342,156 @@ func TestCreateMain(t *testing.T) {
 			monkey.Patch((*os.File).Write, it.mockWite)
 
 			createMain()
+
+			if calledCreate != it.expectCalled[0] {
+				t.Errorf("Unmatched call of os.Create")
+			}
+
+			if calledWrite != it.expectCalled[1] {
+				t.Errorf("Unmatched call of f.Write")
+			}
+		})
+	}
+}
+
+func TestCreateDocker(t *testing.T) {
+	var calledCreate bool
+	var calledWrite bool
+
+	monkey.Patch((*os.File).Close, func(f *os.File) error {
+		return nil
+	})
+
+	tests := []struct {
+		name         string
+		mockCreate   func(string) (*os.File, error)
+		mockWite     func(*os.File, []byte) (int, error)
+		expectCalled []bool
+	}{
+		{
+			"Test right case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, nil
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, nil
+			},
+			[]bool{true, true},
+		},
+		{
+			"Test create fail case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, errors.New("error")
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, nil
+			},
+			[]bool{true, false},
+		},
+		{
+			"Test write fail case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, nil
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, errors.New("error")
+			},
+			[]bool{true, true},
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			defer func() {
+				calledCreate = false
+				calledWrite = false
+			}()
+
+			monkey.Patch(os.Create, it.mockCreate)
+			monkey.Patch((*os.File).Write, it.mockWite)
+
+			createDockerfile()
+
+			if calledCreate != it.expectCalled[0] {
+				t.Errorf("Unmatched call of os.Create")
+			}
+
+			if calledWrite != it.expectCalled[1] {
+				t.Errorf("Unmatched call of f.Write")
+			}
+		})
+	}
+}
+
+func TestCreateDockerCompose(t *testing.T) {
+	var calledCreate bool
+	var calledWrite bool
+
+	monkey.Patch((*os.File).Close, func(f *os.File) error {
+		return nil
+	})
+
+	tests := []struct {
+		name         string
+		mockCreate   func(string) (*os.File, error)
+		mockWite     func(*os.File, []byte) (int, error)
+		expectCalled []bool
+	}{
+		{
+			"Test right case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, nil
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, nil
+			},
+			[]bool{true, true},
+		},
+		{
+			"Test create fail case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, errors.New("error")
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, nil
+			},
+			[]bool{true, false},
+		},
+		{
+			"Test write fail case",
+			func(name string) (*os.File, error) {
+				calledCreate = true
+				return &os.File{}, nil
+			},
+			func(f *os.File, b []byte) (int, error) {
+				calledWrite = true
+				return 0, errors.New("error")
+			},
+			[]bool{true, true},
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(t *testing.T) {
+			defer func() {
+				calledCreate = false
+				calledWrite = false
+			}()
+
+			monkey.Patch(os.Create, it.mockCreate)
+			monkey.Patch((*os.File).Write, it.mockWite)
+
+			createDockerCompose()
 
 			if calledCreate != it.expectCalled[0] {
 				t.Errorf("Unmatched call of os.Create")
