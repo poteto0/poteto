@@ -2,6 +2,12 @@
 
 ## 0.26.x
 
+### 0.26.3
+
+- TEST: fix not ut in poteto-cli by @poteto0 in #168
+- FEAT: FEAT: `poteto-cli new -d | --docker` gen with Dockerfile & docker-compose.yaml by @poteto0 in #168
+- FEAT: `poteto-cli new -j | --jsonrpc` gen jsonrpc template by @poteto0 in #166
+
 ### 0.26.2
 
 - TEST: add benchmark by @poteto0 in #164
