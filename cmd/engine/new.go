@@ -14,6 +14,7 @@ import (
 
 var isFast = false
 var isDocker = false
+var isJSONRPC = false
 
 func CommandNew() {
 	fmt.Println("You can also use poteto-cli -h | --help")
@@ -26,6 +27,8 @@ func CommandNew() {
 			isFast = true
 		case os.Args[i] == "-d", os.Args[i] == "--docker":
 			isDocker = true
+		case os.Args[i] == "-j", os.Args[i] == "--jsonrpc":
+			isJSONRPC = true
 		default:
 			fmt.Println("unknown command or option:", os.Args[i])
 			os.Exit(-1)
@@ -98,11 +101,9 @@ func run(projectName string) error {
 }
 
 func createMain() error {
-	if isFast {
-		return createAndWrite("main.go", template.FastTemplate)
-	}
+	templateFile := choiceTemplateFile()
 
-	return createAndWrite("main.go", template.DefaultTemplate)
+	return createAndWrite("main.go", templateFile)
 }
 
 func createDockerfile() error {
@@ -120,12 +121,28 @@ func createAndWrite(filename, templateFile string) error {
 	}
 	defer f.Close()
 
-	mainGoByte := []byte(templateFile)
-	if _, err := f.Write(mainGoByte); err != nil {
+	templateFileByte := []byte(templateFile)
+	if _, err := f.Write(templateFileByte); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func choiceTemplateFile() string {
+	if isFast && !isJSONRPC {
+		return template.FastTemplate
+	}
+
+	if isJSONRPC && !isFast {
+		return template.JSONRPCTemplate
+	}
+
+	if isJSONRPC && isFast {
+		return template.JSONRPCFastTemplate
+	}
+
+	return template.DefaultTemplate
 }
 
 func help() {
@@ -137,4 +154,5 @@ func help() {
 	fmt.Println("  -h, --help: Display help (this is this)")
 	fmt.Println("  -f, --fast: fast mode api (doesn't gen requestId automatic)")
 	fmt.Println("  -d, --docker: with Dockerfile & docker-compose w golang@1.23")
+	fmt.Println("  -j, --jsonrpc: jsonrpc template")
 }

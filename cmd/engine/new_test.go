@@ -255,6 +255,16 @@ func TestCommandNew(t *testing.T) {
 			"--docker",
 			false,
 		},
+		{
+			"test --jsonrpc case",
+			"--jsonrpc",
+			false,
+		},
+		{
+			"test -j case",
+			"-j",
+			false,
+		},
 	}
 
 	for _, it := range tests {
