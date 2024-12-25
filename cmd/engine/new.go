@@ -136,4 +136,5 @@ func help() {
 	fmt.Println("Options:")
 	fmt.Println("  -h, --help: Display help (this is this)")
 	fmt.Println("  -f, --fast: fast mode api (doesn't gen requestId automatic)")
+	fmt.Println("  -d, --docker: with Dockerfile & docker-compose w golang@1.23")
 }
