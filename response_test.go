@@ -65,3 +65,31 @@ func TestWrite(t *testing.T) {
 		})
 	}
 }
+
+func TestAddHeader(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	res := NewResponse(w)
+
+	res.AddHeader("key", "value1")
+	res.AddHeader("key", "value2")
+
+	header := w.Header()
+	if len(header["Key"]) != 2 {
+		t.Error("Unmatched")
+	}
+}
+
+func TestSetHeader(t *testing.T) {
+	w := httptest.NewRecorder()
+
+	res := NewResponse(w)
+
+	res.SetHeader("key", "value1")
+	res.SetHeader("key", "value2")
+
+	header := w.Header()
+	if len(header["Key"]) != 1 {
+		t.Error("Unmatched")
+	}
+}

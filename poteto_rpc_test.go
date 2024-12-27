@@ -24,6 +24,8 @@ func (tc *TestCalculator) Add(r *http.Request, args *AdditionArgs) int {
 	return args.Add + args.Added
 }
 
+func (tc *TestCalculator) AddVoid(r *http.Request, args *AdditionArgs) {}
+
 func TestPotetoJSONRPCAdapterCall(t *testing.T) {
 	p := New()
 
@@ -49,6 +51,43 @@ func TestPotetoJSONRPCAdapterCall(t *testing.T) {
 	num, _ := result.Result.(json.Number).Int64()
 	if int(num) != 20 {
 		t.Errorf("Unmatched actual(%v) -> expected(%v)", result.Result, 20)
+	}
+
+	select {
+	case <-time.After(500 * time.Millisecond):
+		if err := p.Stop(stdContext.Background()); err != nil {
+			t.Errorf("Unmatched")
+		}
+	case <-errChan:
+		t.Errorf("Unexpected error occur")
+	}
+}
+
+func TestPotetoJSONRPCAdapterCallReturnVoid(t *testing.T) {
+	p := New()
+
+	rpc := TestCalculator{}
+	p.POST("/add", func(ctx Context) error {
+		return PotetoJsonRPCAdapter[TestCalculator, AdditionArgs](ctx, &rpc)
+	})
+
+	errChan := make(chan error)
+	go func() {
+		errChan <- p.Run("6001")
+	}()
+
+	// client
+	added := 10
+	add := 10
+	rpcClient := jsonrpc.NewClient("http://localhost:6001/add")
+	//result := &AdditionResult{}
+	result, err := rpcClient.Call(stdContext.Background(), "TestCalculator.AddVoid", &AdditionArgs{Added: added, Add: add})
+	if err != nil {
+		t.Errorf("Unexpected error %v", err)
+	}
+
+	if result.Result != nil {
+		t.Errorf("Unmatched expected nil")
 	}
 
 	select {
