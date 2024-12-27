@@ -51,29 +51,45 @@ func CamaraWithConfig(config CamaraConfig) poteto.MiddlewareFunc {
 
 	return func(next poteto.HandlerFunc) poteto.HandlerFunc {
 		return func(ctx poteto.Context) error {
-			res := ctx.GetResponse()
-
 			// * XXS
 			// CSP Header
-			res.Header().Set(constant.CONTENT_SECURITY_POLICY, config.ContentSecurityPolicy)
+			ctx.SetResponseHeader(
+				constant.CONTENT_SECURITY_POLICY,
+				config.ContentSecurityPolicy,
+			)
 
 			// * Fishing
 			// Cannot open in Server
-			res.Header().Set(constant.X_DOWNLOAD_OPTION, config.XDownloadOption)
+			ctx.SetResponseHeader(
+				constant.X_DOWNLOAD_OPTION,
+				config.XDownloadOption,
+			)
 
 			// * Click Jacking
 			// X-Frame-Option: Cannot use in iframe except Same Origin
-			res.Header().Set(constant.X_FRAME_OPTION, config.XFrameOption)
+			ctx.SetResponseHeader(
+				constant.X_FRAME_OPTION,
+				config.XFrameOption,
+			)
 
 			// * Sec Transport
 			// Strict-Transport-Security: Required https?
-			res.Header().Set(constant.STRICT_TRANSPORT_SECURITY, config.StrictTransportSecurity)
+			ctx.SetResponseHeader(
+				constant.STRICT_TRANSPORT_SECURITY,
+				config.StrictTransportSecurity,
+			)
 
 			// * MIME Sniffing
-			res.Header().Set(constant.X_CONTENT_TYPE_OPTION, config.XContentTypeOption)
+			ctx.SetResponseHeader(
+				constant.X_CONTENT_TYPE_OPTION,
+				config.XContentTypeOption,
+			)
 
 			// * Session HighJack
-			res.Header().Set(constant.REFERRER_POLICY, config.ReferrerPolicy)
+			ctx.SetResponseHeader(
+				constant.REFERRER_POLICY,
+				config.ReferrerPolicy,
+			)
 
 			return next(ctx)
 		}

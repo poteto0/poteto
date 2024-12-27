@@ -13,6 +13,7 @@ type Response interface {
 	SetStatus(code int)
 	Header() http.Header
 	SetHeader(key, value string)
+	AddHeader(key, value string)
 }
 
 type response struct {
@@ -43,6 +44,10 @@ func (r *response) SetHeader(key, value string) {
 	}
 
 	r.Writer.Header().Set(key, value)
+}
+
+func (r *response) AddHeader(key, value string) {
+	r.Writer.Header().Add(key, value)
 }
 
 func (r *response) Write(b []byte) (int, error) {
