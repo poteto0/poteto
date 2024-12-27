@@ -148,7 +148,7 @@ func (p *poteto) Run(addr string) error {
 		return err
 	}
 
-	utils.PotetoPrint("server is available at http://localhost" + addr + "\n")
+	utils.PotetoPrint("server is available at http://127.0.0.1" + addr + "\n")
 
 	p.startupMutex.Unlock()
 	return p.Server.Serve(p.Listener)
@@ -175,7 +175,7 @@ func (p *poteto) RunTLS(addr string, cert, key []byte) error {
 		return err
 	}
 
-	utils.PotetoPrint("server is available at https://localhost" + addr + "\n")
+	utils.PotetoPrint("server is available at https://127.0.0.1" + addr + "\n")
 
 	p.startupMutex.Unlock()
 	return p.Server.Serve(p.Listener)

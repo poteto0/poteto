@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -38,5 +37,5 @@ func main() {
 		})
 	})
 
-	p.Run(":8000")
+	p.Run("127.0.0.1:8000")
 }

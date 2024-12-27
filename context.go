@@ -181,13 +181,7 @@ func (ctx *context) JsonSerialize(value any) error {
 
 func (ctx *context) JsonDeserialize(object any) error {
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
-	err := decoder.Decode(object)
-	if _, ok := err.(*json.UnmarshalTypeError); ok {
-		return err
-	} else if _, ok := err.(*json.SyntaxError); ok {
-		return err
-	}
-	return err
+	return decoder.Decode(object)
 }
 
 func (c *context) NoContent() error {

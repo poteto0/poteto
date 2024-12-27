@@ -51,7 +51,7 @@ func NewRouter() Router {
 func (r *router) add(method, path string, handler HandlerFunc) error {
 	routes := r.GetRoutesByMethod(method)
 	if routes == nil {
-		return errors.New("Unexpected method error: " + method)
+		return errors.New("unexpected method error: " + method)
 	}
 
 	thisRoute, _ := routes.Search(path)

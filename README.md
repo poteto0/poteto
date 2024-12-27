@@ -83,7 +83,7 @@ func main() {
 		userApi.GET("/:name", controller.UserIdHandler)
 	})
 
-	p.Run(":8000")
+	p.Run("127.0.0.1:8000")
 }
 ```
 
@@ -125,7 +125,7 @@ func main() {
 		userApi.GET("/:name", controller.UserNameHandler)
 	})
 
-	p.Run(":8000")
+	p.Run("127.0.0.1:8000")
 }
 
 type User struct {
