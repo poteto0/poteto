@@ -39,7 +39,7 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 			res := ctx.GetResponse()
 			origin := req.Header.Get(constant.HEADER_ORIGIN)
 
-			res.Header().Add(constant.HEADER_VARY, constant.HEADER_ORIGIN)
+			res.AddHeader(constant.HEADER_VARY, constant.HEADER_ORIGIN)
 			preflight := req.Method == http.MethodOptions
 
 			// Not From Browser
@@ -64,7 +64,7 @@ func CORSWithConfig(config CORSConfig) poteto.MiddlewareFunc {
 
 			// allowed method
 			if matchMethod(req.Method, config.AllowMethods) {
-				res.Header().Set(constant.HEADER_ACCESS_CONTROL_ORIGIN, allowOrigin)
+				res.SetHeader(constant.HEADER_ACCESS_CONTROL_ORIGIN, allowOrigin)
 				return next(ctx)
 			}
 

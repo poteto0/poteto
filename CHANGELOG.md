@@ -166,7 +166,7 @@ func main() {
 
 ## 0.17.2
 
-- `Poteto.Run()` will now also accept mere numbers. For example, `8080` is converted to `:8080` and processed.
+- `Poteto.Run()` will now also accept mere numbers. For example, `8080` is converted to `127.0.0.1:8080` and processed.
 - Poteto logged "http://localhost:<port>"
 
 ### 0.17.1

@@ -81,9 +81,9 @@ func TestRunAndStop(t *testing.T) {
 		port1 string
 		port2 string
 	}{
-		{"Test :8080", ":8080", ""},
+		{"Test 127.0.0.1:8080", "127.0.0.1:8080", ""},
 		{"Test 8080", "8080", ""},
-		{"Test collision panic", ":8080", ":8080"},
+		{"Test collision panic", "127.0.0.1:8080", "127.0.0.1:8080"},
 	}
 
 	for _, it := range tests {

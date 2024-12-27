@@ -23,7 +23,7 @@ func (*binder) Bind(ctx Context, object any) error {
 	}
 
 	base, _, _ := strings.Cut(
-		req.Header.Get(constant.HEADER_CONTENT_TYPE), ";",
+		ctx.GetRequestHeaderParam(constant.HEADER_CONTENT_TYPE), ";",
 	)
 	mediaType := strings.TrimSpace(base)
 
@@ -34,5 +34,7 @@ func (*binder) Bind(ctx Context, object any) error {
 		}
 	}
 
+	// if not application/json
+	// return nil
 	return nil
 }

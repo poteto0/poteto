@@ -21,6 +21,7 @@ type Router interface {
 	GetRoutesByMethod(method string) *route
 }
 
+// Each Router has TrieTreeRouting by method
 type router struct {
 	routesGET     Route
 	routesPOST    Route
@@ -50,12 +51,13 @@ func NewRouter() Router {
 func (r *router) add(method, path string, handler HandlerFunc) error {
 	routes := r.GetRoutesByMethod(method)
 	if routes == nil {
-		return errors.New("Unexpected method error: " + method)
+		return errors.New("unexpected method error: " + method)
 	}
 
-	if that_route, _ := routes.Search(path); that_route != nil {
+	thisRoute, _ := routes.Search(path)
+	if thisRoute != nil {
 		if path == "/" {
-			that_route.handler = handler
+			thisRoute.handler = handler
 			return nil
 		}
 		return errors.New("[" + method + "] " + path + " is already used")

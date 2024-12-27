@@ -28,6 +28,6 @@ func main() {
 		return poteto.PotetoJsonRPCAdapter[Calculator, AdditionArgs](ctx, &rpc)
 	})
 
-	p.Run(":8000")
+	p.Run("127.0.0.1:8000")
 }
 `

@@ -32,7 +32,10 @@ type Context interface {
 	Get(key string) (any, bool)
 
 	GetResponse() *response
+	SetResponseHeader(key, value string)
 	GetRequest() *http.Request
+	GetRequestHeaderParam(key string) string
+	ExtractRequestHeaderParam(key string) []string
 
 	NoContent() error
 
@@ -75,7 +78,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) Context {
 }
 
 func (ctx *context) JSON(code int, value any) error {
-	ctx.writeContentType(constant.APPLICATION_JSON)
+	ctx.SetResponseHeader(constant.HEADER_CONTENT_TYPE, constant.APPLICATION_JSON)
 	ctx.response.SetStatus(code)
 	return ctx.JsonSerialize(value)
 }
@@ -132,8 +135,7 @@ func (ctx *context) QueryParam(key string) (string, bool) {
 }
 
 func (ctx *context) Bind(object any) error {
-	err := ctx.binder.Bind(ctx, object)
-	return err
+	return ctx.binder.Bind(ctx, object)
 }
 
 // DebugParam return all http parameters
@@ -143,6 +145,7 @@ func (ctx *context) DebugParam() (string, bool) {
 	if err != nil {
 		return "", false
 	}
+
 	return string(val), true
 }
 
@@ -150,20 +153,25 @@ func (ctx *context) WriteHeader(code int) {
 	ctx.response.WriteHeader(code)
 }
 
-func (ctx *context) writeContentType(value string) {
-	header := ctx.response.Header()
-
-	if header.Get(constant.HEADER_CONTENT_TYPE) == "" {
-		header.Set(constant.HEADER_CONTENT_TYPE, value)
-	}
-}
-
 func (ctx *context) GetResponse() *response {
 	return ctx.response.(*response)
 }
 
+func (ctx *context) SetResponseHeader(key, value string) {
+	ctx.response.SetHeader(key, value)
+}
+
 func (ctx *context) GetRequest() *http.Request {
 	return ctx.request
+}
+
+func (ctx *context) GetRequestHeaderParam(key string) string {
+	return ctx.request.Header.Get(key)
+}
+
+// extract from header directly
+func (ctx *context) ExtractRequestHeaderParam(key string) []string {
+	return ctx.request.Header[key]
 }
 
 func (ctx *context) JsonSerialize(value any) error {
@@ -173,17 +181,12 @@ func (ctx *context) JsonSerialize(value any) error {
 
 func (ctx *context) JsonDeserialize(object any) error {
 	decoder := json.NewDecoder(ctx.GetRequest().Body)
-	err := decoder.Decode(object)
-	if _, ok := err.(*json.UnmarshalTypeError); ok {
-		return err
-	} else if _, ok := err.(*json.SyntaxError); ok {
-		return err
-	}
-	return err
+	return decoder.Decode(object)
 }
 
 func (c *context) NoContent() error {
 	c.response.WriteHeader(http.StatusNoContent)
+	// to provide the same interface as ctx.JSON()
 	return nil
 }
 
@@ -213,7 +216,7 @@ func (ctx *context) RequestId() string {
 	}
 
 	// get from header
-	if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id != "" {
+	if id := ctx.GetRequestHeaderParam(constant.HEADER_X_REQUEST_ID); id != "" {
 		return id
 	}
 
