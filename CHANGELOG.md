@@ -2,6 +2,15 @@
 
 ## 0.26.x
 
+### 0.26.4
+
+- REFACT: poteto & middleware by @poteto0 in #171
+- FEAT: `ctx.SetResponseHeader(key, value string)` internal call `res.Header().Set(key, value string)` by @poteto0 in #171
+- FEAT: `Response.SetHeader(key, value string)` internal call `writer.Header().Set(key, value string)` by @poteto0 in #171
+- FEAT: `ctx.GetRequestHeaderParam(key string) string` internal call `req.Header().Get(key string) string` by @poteto0 in #171
+- FEAT: `ctx.ExtractRequestHeaderParam(key string) []string` internal call `return req.Header[key]` by @poteto0 in #171
+- FEAT: `AddHeader(key, value string)` internal call `writer.Add(key, value string)` by @poteto0 in #171
+
 ### 0.26.3
 
 - TEST: fix not ut in poteto-cli by @poteto0 in #168
