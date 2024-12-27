@@ -37,6 +37,7 @@ func (hp *httpParam) GetParam(paramType, key string) (string, bool) {
 	if val != "" {
 		return val, true
 	}
+
 	return "", false
 }
 
@@ -49,5 +50,6 @@ func (hp *httpParam) JsonSerialize() ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
+
 	return v, nil
 }

@@ -48,6 +48,7 @@ func (mt *middlewareTree) SearchMiddlewares(pattern string) []MiddlewareFunc {
 			param = rightPattern[:id]
 			rightPattern = rightPattern[(id + 1):]
 		}
+
 		if nextNode, ok := currentNode.children[param]; ok {
 			currentNode = nextNode.(*middlewareTree)
 			middlewares = append(middlewares, currentNode.middlewares...)
@@ -77,6 +78,7 @@ func (mt *middlewareTree) Insert(pattern string, middlewares ...MiddlewareFunc) 
 			param = rightPattern[:id]
 			rightPattern = rightPattern[(id + 1):]
 		}
+
 		if _, ok := currentNode.children[param]; !ok {
 			currentNode.children[param] = &middlewareTree{
 				children:    make(map[string]MiddlewareTree),

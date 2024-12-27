@@ -43,11 +43,10 @@ func (iph *ipHandler) CanTrust(ip net.IP) bool {
 	return false
 }
 
-// first not trusted ip
+// return first not trusted ip
 // cause first app can exploit X-Forwarded-For
 func (iph *ipHandler) GetIPFromXFFHeader(ctx Context) (string, error) {
-	reqHeader := ctx.GetRequest().Header
-	xffs := reqHeader[constant.HEADER_X_FORWARDED_FOR]
+	xffs := ctx.ExtractRequestHeaderParam(constant.HEADER_X_FORWARDED_FOR)
 	if len(xffs) == 0 {
 		return "", errors.New("XFF not found")
 	}
@@ -92,7 +91,7 @@ func (iph *ipHandler) RealIP(ctx Context) (string, error) {
 	}
 
 	// 2. Get from RealIP
-	if ip := ctx.GetRequest().Header.Get(constant.HEADER_X_REAL_IP); ip != "" {
+	if ip := ctx.GetRequestHeaderParam(constant.HEADER_X_REAL_IP); ip != "" {
 		ip = strings.TrimPrefix(ip, "[")
 		ip = strings.TrimSuffix(ip, "]")
 		return ip, nil

@@ -1,14 +1,14 @@
 package poteto
 
 /*
-* Leaf Make Router Great
-p.Leaf("/users", func(leaf Leaf) {
-	leaf.Register(sampleMiddleware)
-	leaf.GET("/", getAllUserForTest)
-	leaf.POST("/create", getAllUserForTest)
-	leaf.PUT("/change", getAllUserForTest)
-	leaf.DELETE("/delete", getAllUserForTest)
-})
+/ Leaf Make Router Great
+/ p.Leaf("/users", func(leaf Leaf) {
+/   leaf.Register(sampleMiddleware)
+/   leaf.GET("/", getAllUserForTest)
+/   leaf.POST("/create", getAllUserForTest)
+/   leaf.PUT("/change", getAllUserForTest)
+/   leaf.DELETE("/delete", getAllUserForTest)
+/ })
 */
 
 type leaf struct {
@@ -59,31 +59,37 @@ func (l *leaf) PUT(addPath string, handler HandlerFunc) error {
 	return l.poteto.PUT(path, handler)
 }
 
+// internal call Poteto.PATCH w/ bp
 func (l *leaf) PATCH(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.PATCH(path, handler)
 }
 
+// internal call Poteto.DELETE w/ bp
 func (l *leaf) DELETE(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.DELETE(path, handler)
 }
 
+// internal call Poteto.HEAD w/ bp
 func (l *leaf) HEAD(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.HEAD(path, handler)
 }
 
+// internal call Poteto.OPTIONS w/ bp
 func (l *leaf) OPTIONS(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.OPTIONS(path, handler)
 }
 
+// internal call Poteto.TRACE w/ bp
 func (l *leaf) TRACE(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.TRACE(path, handler)
 }
 
+// internal call Poteto.CONNECT w/ bp
 func (l *leaf) CONNECT(addPath string, handler HandlerFunc) error {
 	path := l.basePath + addPath
 	return l.poteto.CONNECT(path, handler)

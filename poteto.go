@@ -16,7 +16,6 @@ import (
 
 type Poteto interface {
 	// If requested, call this
-	// you can make WithRequestIdOption false: you can faster request
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	Run(addr string) error
 	RunTLS(addr string, cert, key []byte) error
@@ -68,6 +67,7 @@ func NewWithOption(option PotetoOption) Poteto {
 	}
 }
 
+// Cashed context | NewContext
 func (p *poteto) initializeContext(w http.ResponseWriter, r *http.Request) *context {
 	if ctx, ok := p.cache.Get().(*context); ok {
 		ctx.Reset(w, r)
@@ -85,12 +85,19 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get from cache & reset context
 	ctx := p.initializeContext(w, r)
 
-	// default get & set RequestId
+	/* default get & set RequestId
+	/  you can make WithRequestIdOption false: you can faster request
+	/  option := poteto.PotetoOption{
+	/    WithRequestId: false,
+	/    ListenerNetwork: "tcp",
+	/  }
+	/  p := poteto.NewWithOption(option)
+	*/
 	if p.option.WithRequestId {
 		reqId := ctx.RequestId()
 		ctx.Set(constant.STORE_REQUEST_ID, reqId)
-		if id := ctx.GetRequest().Header.Get(constant.HEADER_X_REQUEST_ID); id == "" {
-			ctx.GetResponse().Header().Set(constant.HEADER_X_REQUEST_ID, reqId)
+		if id := ctx.GetRequestHeaderParam(constant.HEADER_X_REQUEST_ID); id == "" {
+			ctx.SetResponseHeader(constant.HEADER_X_REQUEST_ID, reqId)
 		}
 	}
 
@@ -147,6 +154,7 @@ func (p *poteto) Run(addr string) error {
 	return p.Server.Serve(p.Listener)
 }
 
+// RunTLS required file byte not file path
 func (p *poteto) RunTLS(addr string, cert, key []byte) error {
 	p.startupMutex.Lock()
 

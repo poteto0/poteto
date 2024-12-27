@@ -136,16 +136,16 @@ func PotetoJsonRPCAdapter[T any, S any](ctx Context, api *T) error {
 	args[1] = reflect.ValueOf(&params)
 
 	result := call.Call(args)
-	if len(result) > 0 {
+	if len(result) <= 0 {
 		return ctx.JSON(http.StatusOK, map[string]any{
-			"result":  result[0].Interface(),
+			"result":  nil,
 			"jsonrpc": "2.0",
 			"id":      id,
 		})
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]any{
-		"result":  nil,
+		"result":  result[0].Interface(),
 		"jsonrpc": "2.0",
 		"id":      id,
 	})
