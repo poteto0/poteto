@@ -64,6 +64,87 @@ func TestRunNew(t *testing.T) {
 			[]bool{true, true, false, true, true},
 		},
 		{
+			"Test good case docker",
+			func(dir string) error {
+				calledChdir = true
+				return nil
+			},
+			func(name string, param fs.FileMode) error {
+				calledMkdir = true
+				return nil
+			},
+			func(err error) bool {
+				calledIsExist = true
+				return true
+			},
+			func(name string, args ...string) *exec.Cmd {
+				calledExecCommand = true
+				return nil
+			},
+			func(*exec.Cmd) error {
+				return nil
+			},
+			func(param EngineNewParam) error {
+				calledCreateMain = true
+				return nil
+			},
+			[]bool{true, true, false, true, true},
+		},
+		{
+			"Test good case docker bud dockerfile error",
+			func(dir string) error {
+				calledChdir = true
+				return nil
+			},
+			func(name string, param fs.FileMode) error {
+				calledMkdir = true
+				return nil
+			},
+			func(err error) bool {
+				calledIsExist = true
+				return true
+			},
+			func(name string, args ...string) *exec.Cmd {
+				calledExecCommand = true
+				return nil
+			},
+			func(*exec.Cmd) error {
+				return nil
+			},
+			func(param EngineNewParam) error {
+				calledCreateMain = true
+				return nil
+			},
+			[]bool{true, true, false, true, true},
+		},
+		{
+			"Test good case docker bud docker-compose error",
+			func(dir string) error {
+				calledChdir = true
+				return nil
+			},
+			func(name string, param fs.FileMode) error {
+				calledMkdir = true
+				return nil
+			},
+			func(err error) bool {
+				calledIsExist = true
+				return true
+			},
+			func(name string, args ...string) *exec.Cmd {
+				calledExecCommand = true
+				return nil
+			},
+			func(*exec.Cmd) error {
+				return nil
+			},
+			func(param EngineNewParam) error {
+				calledCreateMain = true
+				return nil
+			},
+			[]bool{true, true, false, true, true},
+		},
+		{
 			"Test fail make dir",
 			func(dir string) error {
 				calledChdir = true
@@ -181,6 +262,7 @@ func TestRunNew(t *testing.T) {
 				calledIsExist = false
 				calledExecCommand = false
 				calledCreateMain = false
+				param.IsDocker = false
 			}()
 
 			// Mock
@@ -190,6 +272,35 @@ func TestRunNew(t *testing.T) {
 			monkey.Patch(exec.Command, it.mockExecCommand)
 			monkey.Patch((*exec.Cmd).Run, it.mockExecRun)
 			monkey.Patch(createMain, it.mockCreateMain)
+
+			// 書くのめんどい
+			if it.name == "Test good case docker" {
+				param.IsDocker = true
+				monkey.Patch(createDockerfile, func() error {
+					return nil
+				})
+				monkey.Patch(createDockerCompose, func() error {
+					return nil
+				})
+			}
+			if it.name == "Test good case docker bud dockerfile error" {
+				param.IsDocker = true
+				monkey.Patch(createDockerfile, func() error {
+					return errors.New("error")
+				})
+				monkey.Patch(createDockerCompose, func() error {
+					return nil
+				})
+			}
+			if it.name == "Test good case docker bud docker-compose error" {
+				param.IsDocker = true
+				monkey.Patch(createDockerfile, func() error {
+					return nil
+				})
+				monkey.Patch(createDockerCompose, func() error {
+					return errors.New("error")
+				})
+			}
 
 			// Act
 			RunNew(param)
