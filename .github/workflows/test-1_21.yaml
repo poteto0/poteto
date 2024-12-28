@@ -22,5 +22,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.21.x"
+      # noinlineによるテスト実行
+      # https://github.com/poteto0/poteto/issues/169
       - name: Test
-        run: go test ./... -cover -bench . -benchtime 100000x
+        run: go test ./... -cover -bench . -benchtime 100000x -gcflags=all=-l
