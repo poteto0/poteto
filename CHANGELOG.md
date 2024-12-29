@@ -2,6 +2,13 @@
 
 ## 0.26.x
 
+### 0.26.5
+
+- BUG: no-inline test; issue below by @poteto0 in #173
+  https://github.com/poteto0/poteto/issues/169
+- TEST: ut upgrated by @poteto0 in #173
+- REF: split cmd & engine by @poteto0 in #173
+
 ### 0.26.4
 
 - REFACT: poteto & middleware by @poteto0 in #171
