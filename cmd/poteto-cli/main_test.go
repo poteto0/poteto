@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	"github.com/poteto0/poteto/cmd/engine"
+	cmdnew "github.com/poteto0/poteto/cmd/cmd-new"
 )
 
 func TestPotetoCliMai(t *testing.T) {
@@ -14,7 +14,7 @@ func TestPotetoCliMai(t *testing.T) {
 		isExit = true
 		os.Args = []string{"poteto-cli", "escape"}
 	})
-	monkey.Patch(engine.CommandNew, func() {
+	monkey.Patch(cmdnew.CommandNew, func() {
 		return
 	})
 

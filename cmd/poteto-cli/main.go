@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/poteto0/poteto/cmd/engine"
+	cmdnew "github.com/poteto0/poteto/cmd/cmd-new"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	}
 
 	if os.Args[1] == "new" {
-		engine.CommandNew()
+		cmdnew.CommandNew()
 		os.Exit(-1)
 	}
 

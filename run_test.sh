@@ -1,6 +1,8 @@
 #!bin/bash
 echo "start test"
-go test . -coverprofile cover.out.tmp -bench . -benchtime 100000x
+# noinlineによるテスト実行
+# https://github.com/poteto0/poteto/issues/169
+go test ./... -coverprofile cover.out.tmp -bench . -benchtime 100000x go test ./... -cover -gcflags=all=-l
 
 echo "remove"
 cat cover.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > cover2.out.tmp

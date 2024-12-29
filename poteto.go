@@ -104,9 +104,13 @@ func (p *poteto) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	routes := p.router.GetRoutesByMethod(r.Method)
 
 	targetRoute, httpParams := routes.Search(r.URL.Path)
-	handler := targetRoute.GetHandler()
+	if targetRoute == nil {
+		ctx.WriteHeader(http.StatusNotFound)
+		return
+	}
 
-	if targetRoute == nil || handler == nil {
+	handler := targetRoute.GetHandler()
+	if handler == nil {
 		ctx.WriteHeader(http.StatusNotFound)
 		return
 	}
