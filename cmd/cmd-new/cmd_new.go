@@ -12,7 +12,7 @@ import (
 func CommandNew() {
 	param := engine.EngineNewParam{}
 
-	fmt.Println("You can also use poteto-cli -h | --help")
+	fmt.Println("You can also use poteto-cli new -h | --help")
 	for i := 2; i < len(os.Args); i++ {
 		switch {
 		case os.Args[i] == "-h", os.Args[i] == "--help":
