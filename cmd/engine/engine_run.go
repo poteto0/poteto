@@ -21,20 +21,30 @@ func RunRun(param EngineRunParam) error {
 		clientContext,
 		fileChangeStream,
 	)
+	buildRunner := runnerClient.BuildRunner(
+		clientContext,
+		fileChangeStream,
+	)
+
+	errBuildChan := make(chan error, 1)
+	errWatcherChan := make(chan error, 1)
 	go func() {
+		if err := buildRunner(); err != nil {
+			errBuildChan <- err
+		}
+
 		// FileWatcher watch file system
-		err := fileWatcher()
-		if err != nil {
-			fmt.Println(err)
-			panic(err)
+		if err := fileWatcher(); err != nil {
+			errWatcherChan <- err
 		}
 	}()
 
 	for {
 		select {
-		// TODO: Rebuild
-		case <-fileChangeStream:
-			return nil
+		case err := <-errBuildChan:
+			return err
+		case err := <-errWatcherChan:
+			return err
 		}
 	}
 }
