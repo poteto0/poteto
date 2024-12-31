@@ -4,34 +4,39 @@ import (
 	stdContext "context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"sync"
+	"syscall"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/poteto0/poteto/utils"
 )
 
 type RunnerOption struct {
-	isBuildScript bool   `yaml:"is_build_script"`
-	buildScript   string `yaml:"build_script"`
+	isBuildScript bool     `yaml:"is_build_script"`
+	buildScript   []string `yaml:"build_script"`
 }
 
 var DefaultRunnerOption = RunnerOption{
 	isBuildScript: true,
-	buildScript:   "go run main.go",
+	buildScript:   []string{"go", "run", "main.go"},
 }
 
 type runnerClient struct {
 	runnerDir    string
 	watcher      *fsnotify.Watcher
 	startupMutex sync.RWMutex
-	process      *os.Process
 	option       RunnerOption
+	logStream    io.ReadCloser
+	pid          int
 }
 
 type IRunnerClient interface {
+	LogTransporter(ctx stdContext.Context) func() error
 	FileWatcher(ctx stdContext.Context, fileChangeStream chan<- struct{}) func() error
 	BuildRunner(ctx stdContext.Context, fileChangeStream chan struct{}) func() error
 	AsyncBuild(ctx stdContext.Context, errChan chan<- error)
@@ -56,6 +61,37 @@ func NewRunnerClient() IRunnerClient {
 	}
 }
 
+func (client *runnerClient) LogTransporter(ctx stdContext.Context) func() error {
+	return func() error {
+		buff := make([]byte, 4096)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+
+			// if log
+			default:
+				if client.logStream == nil {
+					continue
+				}
+
+				n, err := client.logStream.Read(buff)
+				if err != nil {
+					if err == io.EOF {
+						return nil
+					}
+					return err
+				}
+
+				if n > 0 {
+					fmt.Print(string(buff[:n]))
+				}
+			}
+		}
+	}
+}
+
 func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream chan<- struct{}) func() error {
 	return func() error {
 		for {
@@ -70,7 +106,7 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 				}
 
 				utils.PotetoPrint(
-					fmt.Sprintf("poteto-cli detect event: %s", event.Op),
+					fmt.Sprintf("poteto-cli detect event: %s\n", event.Op),
 				)
 
 				switch {
@@ -81,6 +117,7 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 					event.Has(fsnotify.Remove),
 					event.Has(fsnotify.Rename):
 
+					// ! これが複数回走ってしまっている
 					fileChangeStream <- struct{}{}
 
 				// skip just chmod
@@ -103,10 +140,13 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 
 func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream chan struct{}) func() error {
 	return func() error {
-
 		errChan := make(chan error, 1)
+		fmt.Println(fileChangeStream)
 		go func() {
-			client.AsyncBuild(ctx, errChan)
+			if err := client.Build(ctx); err != nil {
+				errChan <- err
+			}
+			//client.AsyncBuild(ctx, errChan)
 		}()
 
 		for {
@@ -120,6 +160,7 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 
 			// rebuild
 			case <-fileChangeStream:
+				fmt.Println("Changed")
 				go func() {
 					client.AsyncBuild(ctx, errChan)
 				}()
@@ -129,8 +170,9 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 }
 
 func (client *runnerClient) AsyncBuild(ctx stdContext.Context, errChan chan<- error) {
-	if err := client.Build(ctx); err != nil {
+	if err := client.killProcess(); err != nil {
 		errChan <- err
+		//client.startupMutex.Unlock()
 	}
 }
 
@@ -138,17 +180,23 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 	client.startupMutex.Lock()
 
 	if err := client.killProcess(); err != nil {
+		fmt.Println(err)
+		client.startupMutex.Unlock()
 		return err
 	}
 
 	// run build script
-	cmd := exec.Command(client.option.buildScript)
+	cmd := exec.Command("go", "run", "main.go")
+	client.logStream, _ = cmd.StdoutPipe()
+	// バッファを作成
 	if err := cmd.Start(); err != nil {
+		fmt.Println(err)
+		client.startupMutex.Unlock()
 		return err
 	}
 
 	// save process for kill
-	client.process = cmd.Process
+	client.pid = cmd.Process.Pid
 	client.startupMutex.Unlock()
 
 	return nil
@@ -157,15 +205,34 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 // syscall.Kill is not defined in Windows
 // https://pkg.go.dev/syscall
 func (client *runnerClient) killProcess() error {
-	if client.process == nil {
+	if client.pid == 0 {
+		fmt.Println("nil process")
 		return nil
 	}
+	fmt.Println("kill, ", client.pid)
 
-	if err := client.process.Kill(); err != nil {
+	cmd := client.killCommandByOS()
+	if err := cmd.Run(); err != nil {
 		return err
 	}
-
 	return nil
+}
+
+func (client *runnerClient) killCommandByOS() *exec.Cmd {
+	switch runtime.GOOS {
+	case "windows":
+		return exec.Command(
+			"taskkill", "/pid", string(client.pid), "/F",
+		)
+	case "linux", "ubuntu":
+		return exec.Command(
+			"bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid),
+		)
+	default:
+		return exec.Command(
+			"bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid),
+		)
+	}
 }
 
 func (client *runnerClient) Close() error {
