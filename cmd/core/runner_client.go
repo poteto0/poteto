@@ -199,10 +199,12 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 
 	// run build script
 	cmd := exec.Command("go", "run", "main.go")
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
 	client.logStream, _ = cmd.StdoutPipe()
 	// バッファを作成
 	if err := cmd.Start(); err != nil {
-		fmt.Println(err)
 		client.startupMutex.Unlock()
 		return err
 	}
@@ -216,32 +218,40 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 	return nil
 }
 
-// syscall.Kill is not defined in Windows
-// https://pkg.go.dev/syscall
 func (client *runnerClient) killProcess() error {
 	if client.pid == 0 {
 		fmt.Println("nil process")
 		return nil
 	}
-	fmt.Println("kill, ", client.pid)
+	fmt.Println("kill,", client.pid)
 
-	cmd := exec.Command("bash", "-c", client.killCommandByOS())
-	if err := cmd.Run(); err != nil {
+	if err := client.killByOS(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (client *runnerClient) killCommandByOS() string {
+func (client *runnerClient) killByOS() error {
 	switch runtime.GOOS {
+	// syscall.Kill is not defined in Windows
+	// https://pkg.go.dev/syscall
 	case "windows":
-		return fmt.Sprintf(
-			"taskkill %s %d %s", "/pid", client.pid, "/F",
-		)
+		cmd := exec.Command("bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid))
+		return cmd.Run()
+
 	case "linux", "ubuntu":
-		return fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid)
+		// 子プロセスを完全に終了する
+		// https://makiuchi-d.github.io/2020/05/10/go-kill-child-process.ja.html
+		if err := syscall.Kill(-client.pid, syscall.SIGTERM); err != nil {
+			return err
+		}
+		return nil
+
 	default:
-		return fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid)
+		if err := syscall.Kill(-client.pid, syscall.SIGTERM); err != nil {
+			return err
+		}
+		return nil
 	}
 }
 

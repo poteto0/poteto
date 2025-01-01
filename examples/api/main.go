@@ -22,7 +22,7 @@ func main() {
 
 	p.GET("/", func(ctx poteto.Context) error {
 		fmt.Println("hello world")
-		return ctx.JSON(http.StatusOK, "Poteto Simple Web framework")
+		return ctx.JSON(http.StatusOK, "Poteto Simple Web fraawork")
 	})
 
 	p.Leaf("/users", func(userApi poteto.Leaf) {
