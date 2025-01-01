@@ -233,14 +233,14 @@ func (client *runnerClient) killProcess() error {
 
 func (client *runnerClient) killByOS() error {
 	switch runtime.GOOS {
-	// syscall.Kill is not defined in Windows
-	// https://pkg.go.dev/syscall
 	case "windows":
-		cmd := exec.Command("bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid))
+		// syscall.Kill is not defined in Windows
+		// https://pkg.go.dev/syscall
+		cmd := exec.Command("taskkill", "/pid", fmt.Sprintf("%d %s", client.pid, "/F"))
 		return cmd.Run()
 
 	case "linux", "ubuntu":
-		// 子プロセスを完全に終了する
+		// -pid
 		// https://makiuchi-d.github.io/2020/05/10/go-kill-child-process.ja.html
 		if err := syscall.Kill(-client.pid, syscall.SIGTERM); err != nil {
 			return err
