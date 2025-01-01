@@ -15,6 +15,7 @@ func RunRun(param EngineRunParam) error {
 
 	clientContext := stdContext.Background()
 	fileChangeStream := make(chan struct{}, 1)
+	defer close(fileChangeStream)
 
 	errWatcherChan := make(chan error, 1)
 	fileWatcher := runnerClient.FileWatcher(

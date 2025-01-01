@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/poteto0/poteto/utils"
@@ -94,6 +95,13 @@ func (client *runnerClient) LogTransporter(ctx stdContext.Context) func() error 
 
 func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream chan<- struct{}) func() error {
 	return func() error {
+		var (
+			timer     *time.Timer
+			lastEvent fsnotify.Event
+		)
+		timer = time.NewTimer(time.Millisecond)
+		<-timer.C // timer should be expired at first
+
 		for {
 			select {
 			case <-ctx.Done():
@@ -105,23 +113,27 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 					return nil
 				}
 
+				lastEvent = event
+				timer.Reset(time.Millisecond)
+
+			// 複数回イベントが発行されるため、timerを上で作り出して、一定時間後に処理する
+			case <-timer.C:
 				utils.PotetoPrint(
-					fmt.Sprintf("poteto-cli detect event: %s\n", event.Op),
+					fmt.Sprintf("poteto-cli detect event: %s\n", lastEvent.Op),
 				)
 
 				switch {
 				// reload event
 				// write, create, remove, rename
-				case event.Has(fsnotify.Write),
-					event.Has(fsnotify.Create),
-					event.Has(fsnotify.Remove),
-					event.Has(fsnotify.Rename):
+				case lastEvent.Has(fsnotify.Write),
+					lastEvent.Has(fsnotify.Create),
+					lastEvent.Has(fsnotify.Remove),
+					lastEvent.Has(fsnotify.Rename):
 
-					// ! これが複数回走ってしまっている
 					fileChangeStream <- struct{}{}
 
 				// skip just chmod
-				case event.Has(fsnotify.Chmod):
+				case lastEvent.Has(fsnotify.Chmod):
 					continue
 
 				default:
@@ -143,10 +155,7 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 		errChan := make(chan error, 1)
 		fmt.Println(fileChangeStream)
 		go func() {
-			if err := client.Build(ctx); err != nil {
-				errChan <- err
-			}
-			//client.AsyncBuild(ctx, errChan)
+			client.AsyncBuild(ctx, errChan)
 		}()
 
 		for {
@@ -162,7 +171,11 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 			case <-fileChangeStream:
 				fmt.Println("Changed")
 				go func() {
-					client.AsyncBuild(ctx, errChan)
+					if err := client.killProcess(); err != nil {
+						fmt.Println(err)
+						errChan <- err
+					}
+					//client.AsyncBuild(ctx, errChan)
 				}()
 			}
 		}
@@ -170,9 +183,8 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 }
 
 func (client *runnerClient) AsyncBuild(ctx stdContext.Context, errChan chan<- error) {
-	if err := client.killProcess(); err != nil {
+	if err := client.Build(ctx); err != nil {
 		errChan <- err
-		//client.startupMutex.Unlock()
 	}
 }
 
@@ -195,6 +207,8 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 		return err
 	}
 
+	fmt.Println("run the proc in ", cmd.Process.Pid)
+
 	// save process for kill
 	client.pid = cmd.Process.Pid
 	client.startupMutex.Unlock()
@@ -211,27 +225,23 @@ func (client *runnerClient) killProcess() error {
 	}
 	fmt.Println("kill, ", client.pid)
 
-	cmd := client.killCommandByOS()
+	cmd := exec.Command("bash", "-c", client.killCommandByOS())
 	if err := cmd.Run(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (client *runnerClient) killCommandByOS() *exec.Cmd {
+func (client *runnerClient) killCommandByOS() string {
 	switch runtime.GOOS {
 	case "windows":
-		return exec.Command(
-			"taskkill", "/pid", string(client.pid), "/F",
+		return fmt.Sprintf(
+			"taskkill %s %d %s", "/pid", client.pid, "/F",
 		)
 	case "linux", "ubuntu":
-		return exec.Command(
-			"bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid),
-		)
+		return fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid)
 	default:
-		return exec.Command(
-			"bash", "-c", fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid),
-		)
+		return fmt.Sprintf("kill -%d %d", syscall.SIGKILL, client.pid)
 	}
 }
 
