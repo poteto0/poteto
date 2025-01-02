@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -52,7 +51,11 @@ type IRunnerClient interface {
 func NewRunnerClient() IRunnerClient {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		utils.PotetoPrint(
+			fmt.Sprintf("%s cannot set fs watcher\n", color.HiBlueString("pdebug |")),
+		)
+
+		return &runnerClient{}
 	}
 
 	wd, _ := os.Getwd()
@@ -239,16 +242,10 @@ func (client *runnerClient) killByOS() error {
 	case "linux", "ubuntu":
 		// -pid
 		// https://makiuchi-d.github.io/2020/05/10/go-kill-child-process.ja.html
-		if err := syscall.Kill(-client.pid, syscall.SIGTERM); err != nil {
-			return err
-		}
-		return nil
+		return syscall.Kill(-client.pid, syscall.SIGTERM)
 
 	default:
-		if err := syscall.Kill(-client.pid, syscall.SIGTERM); err != nil {
-			return err
-		}
-		return nil
+		return syscall.Kill(-client.pid, syscall.SIGTERM)
 	}
 }
 
