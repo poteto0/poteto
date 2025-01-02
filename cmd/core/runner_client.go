@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bufio"
 	stdContext "context"
 	"errors"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 	"github.com/poteto0/poteto/utils"
 )
@@ -34,10 +36,11 @@ type runnerClient struct {
 	option       RunnerOption
 	logStream    io.ReadCloser
 	pid          int
+	reader       *bufio.Reader
 }
 
 type IRunnerClient interface {
-	LogTransporter(ctx stdContext.Context) func() error
+	LogTransporter(ctx stdContext.Context, fileChangeStream chan struct{}) func() error
 	FileWatcher(ctx stdContext.Context, fileChangeStream chan<- struct{}) func() error
 	BuildRunner(ctx stdContext.Context, fileChangeStream chan struct{}) func() error
 	AsyncBuild(ctx stdContext.Context, errChan chan<- error)
@@ -62,22 +65,24 @@ func NewRunnerClient() IRunnerClient {
 	}
 }
 
-func (client *runnerClient) LogTransporter(ctx stdContext.Context) func() error {
+func (client *runnerClient) LogTransporter(ctx stdContext.Context, fileChangeStream chan struct{}) func() error {
 	return func() error {
-		buff := make([]byte, 4096)
-
 		for {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 
-			// if log
+			// re-watch log stream watcher
+			case <-fileChangeStream:
+				return nil
+
+			// log streamed
 			default:
-				if client.logStream == nil {
+				if client.reader == nil {
 					continue
 				}
 
-				n, err := client.logStream.Read(buff)
+				line, _, err := client.reader.ReadLine()
 				if err != nil {
 					if err == io.EOF {
 						return nil
@@ -85,9 +90,9 @@ func (client *runnerClient) LogTransporter(ctx stdContext.Context) func() error 
 					return err
 				}
 
-				if n > 0 {
-					fmt.Print(string(buff[:n]))
-				}
+				utils.PotetoPrint(
+					fmt.Sprintf("%s %s\n", color.HiGreenString("poteto |"), string(line)),
+				)
 			}
 		}
 	}
@@ -119,7 +124,7 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 			// 複数回イベントが発行されるため、timerを上で作り出して、一定時間後に処理する
 			case <-timer.C:
 				utils.PotetoPrint(
-					fmt.Sprintf("poteto-cli detect event: %s\n", lastEvent.Op),
+					fmt.Sprintf("%s poteto-cli detect event: %s\n", color.HiBlueString("pdebug |"), lastEvent.Op),
 				)
 
 				switch {
@@ -153,7 +158,6 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream chan struct{}) func() error {
 	return func() error {
 		errChan := make(chan error, 1)
-		fmt.Println(fileChangeStream)
 		go func() {
 			client.AsyncBuild(ctx, errChan)
 		}()
@@ -169,13 +173,8 @@ func (client *runnerClient) BuildRunner(ctx stdContext.Context, fileChangeStream
 
 			// rebuild
 			case <-fileChangeStream:
-				fmt.Println("Changed")
 				go func() {
-					if err := client.killProcess(); err != nil {
-						fmt.Println(err)
-						errChan <- err
-					}
-					//client.AsyncBuild(ctx, errChan)
+					client.AsyncBuild(ctx, errChan)
 				}()
 			}
 		}
@@ -203,13 +202,13 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 		Setpgid: true,
 	}
 	client.logStream, _ = cmd.StdoutPipe()
-	// バッファを作成
+	client.reader = bufio.NewReader(client.logStream)
+
+	// async start
 	if err := cmd.Start(); err != nil {
 		client.startupMutex.Unlock()
 		return err
 	}
-
-	fmt.Println("run the proc in ", cmd.Process.Pid)
 
 	// save process for kill
 	client.pid = cmd.Process.Pid
@@ -220,10 +219,8 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 
 func (client *runnerClient) killProcess() error {
 	if client.pid == 0 {
-		fmt.Println("nil process")
 		return nil
 	}
-	fmt.Println("kill,", client.pid)
 
 	if err := client.killByOS(); err != nil {
 		return err
@@ -256,5 +253,6 @@ func (client *runnerClient) killByOS() error {
 }
 
 func (client *runnerClient) Close() error {
+	client.killProcess()
 	return client.watcher.Close()
 }

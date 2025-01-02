@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/poteto0/poteto"
@@ -21,8 +20,7 @@ func main() {
 	}))
 
 	p.GET("/", func(ctx poteto.Context) error {
-		fmt.Println("hello world")
-		return ctx.JSON(http.StatusOK, "Poteto Simple Web fraawork")
+		return ctx.JSON(http.StatusOK, "Poteto Simple Web framework")
 	})
 
 	p.Leaf("/users", func(userApi poteto.Leaf) {

@@ -2,7 +2,8 @@ package engine
 
 import (
 	stdContext "context"
-	"fmt"
+	"os"
+	"os/signal"
 
 	"github.com/poteto0/poteto/cmd/core"
 )
@@ -12,6 +13,10 @@ type EngineRunParam struct{}
 func RunRun(param EngineRunParam) error {
 	runnerClient := core.NewRunnerClient()
 	defer runnerClient.Close()
+
+	// Ctrl+Cで子プロセスをkillする
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
 
 	clientContext := stdContext.Background()
 	fileChangeStream := make(chan struct{}, 1)
@@ -41,9 +46,11 @@ func RunRun(param EngineRunParam) error {
 		}
 	}()
 
+	logChan := make(chan struct{}, 1)
 	errLogChan := make(chan error, 1)
-	logTransporter := runnerClient.LogTransporter(clientContext)
+	logTransporter := runnerClient.LogTransporter(clientContext, fileChangeStream)
 	go func() {
+		defer close(logChan)
 		// log transport
 		if err := logTransporter(); err != nil {
 			errLogChan <- err
@@ -53,14 +60,23 @@ func RunRun(param EngineRunParam) error {
 	for {
 		select {
 		case err := <-errBuildChan:
-			fmt.Println(err)
 			return err
 		case err := <-errWatcherChan:
-			fmt.Println(err)
 			return err
 		case err := <-errLogChan:
-			fmt.Println(err)
 			return err
+		case <-logChan:
+			logChan = make(chan struct{}, 1)
+			// re-watch log stream watcher
+			go func() {
+				defer close(logChan)
+				// log transport
+				if err := logTransporter(); err != nil {
+					errLogChan <- err
+				}
+			}()
+		case <-quit:
+			return runnerClient.Close()
 		}
 	}
 }

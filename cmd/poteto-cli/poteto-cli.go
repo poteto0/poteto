@@ -42,6 +42,7 @@ func help() {
 	fmt.Println("========================================")
 	fmt.Println("")
 	fmt.Println("Command: poteto-cli [command]")
+	fmt.Println("  run:        hot-reload run golang app")
 	fmt.Println("  new:        create new poteto app")
 	fmt.Println("")
 	fmt.Println("Options:")
