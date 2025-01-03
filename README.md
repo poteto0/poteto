@@ -13,48 +13,21 @@ go mod tidy
 
 ## Example App For Poteto
 
-https://github.com/poteto-go/poteto-sample-api/tree/main
-
-or `/examples`
+https://github.com/poteto-go/poteto-examples
 
 ## Poteto-Cli
 
-It will be moved to other repo.
-
 We support cli tool. But if you doesn't like it, you can create poteto-app w/o cli of course.
 
-```sh
-go install github.com/poteto-go/poteto/cmd/poteto-cli@v0.26.5
-```
-
-Create file.
+You can start hot-reload poteto app.
 
 ```sh
-poteto-cli new
+go install github.com/poteto-go/poteto-cli/cmd/poteto-cli@latest
 ```
 
-fast mode.
+detail on:
 
-```sh
-poteto-cli new --fast
-```
-
-### run app with hot-reload
-- create `poteto.yaml`
-```yaml
-version: "0.27"
-build_script_path: "main.go"
-debug_mode: true
-```
-
-- command
-```sh
-poteto-cli run
-```
-
-### Demo
-
-https://github.com/user-attachments/assets/4b739964-1b4f-4913-b643-5984bf1ceae1
+https://github.com/poteto-go/poteto-cli
 
 ## Feature
 
