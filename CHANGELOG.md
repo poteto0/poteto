@@ -4,6 +4,8 @@
 
 ### 1.0.1
 
+- BUG: fix lf & docker-compose by @poteto0 in https://github.com/poteto-go/poteto-cli/pull/1
+- CHANGE: using PotetoPrint by @poteto0 in https://github.com/poteto-go/poteto-cli/pull/1
 - DOC: on move by @poteto0 in #182
 - OP: poteto-cli & example repo moved by @poteto0 in #182
 
