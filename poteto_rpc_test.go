@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 	"github.com/ybbus/jsonrpc/v3"
 )
 

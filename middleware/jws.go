@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/poteto0/poteto"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto"
+	"github.com/poteto-go/poteto/constant"
 )
 
 type potetoJWSConfig struct {

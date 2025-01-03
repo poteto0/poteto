@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/poteto0/poteto/cmd/template"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/cmd/template"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type EngineNewParam struct {

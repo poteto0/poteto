@@ -16,7 +16,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type RunnerOption struct {

@@ -1,4 +1,4 @@
-module github.com/poteto0/poteto
+module github.com/poteto-go/poteto
 
 go 1.21.8
 

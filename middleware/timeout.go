@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/poteto0/poteto"
+	"github.com/poteto-go/poteto"
 )
 
 type TimeoutConfig struct {

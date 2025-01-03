@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	"github.com/poteto0/poteto/cmd/core"
-	"github.com/poteto0/poteto/cmd/engine"
+	"github.com/poteto-go/poteto/cmd/core"
+	"github.com/poteto-go/poteto/cmd/engine"
 )
 
 func TestHelp(t *testing.T) {

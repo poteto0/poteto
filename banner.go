@@ -19,6 +19,6 @@ const Banner = `
 ⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀⡀
 
 Simple Web Framework For GoLang
-https://github.com/poteto0/poteto
+https://github.com/poteto-go/poteto
 ===================================================
 `

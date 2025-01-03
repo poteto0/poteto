@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/poteto0/poteto/cmd/engine"
+	"github.com/poteto-go/poteto/cmd/engine"
 
 	"github.com/manifoldco/promptui"
 )
@@ -51,7 +51,7 @@ func CommandNew() {
 
 func help() {
 	fmt.Println("poteto-cli new: support creating poteto-app")
-	fmt.Println("https://github.com/poteto0/poteto")
+	fmt.Println("https://github.com/poteto-go/poteto")
 	fmt.Println("========================================")
 	fmt.Println("")
 	fmt.Println("Options:")

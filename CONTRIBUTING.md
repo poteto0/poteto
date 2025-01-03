@@ -22,12 +22,12 @@ I appreciate your consideration to contribute to this project! This document is 
 
 If you find a bug or have a feature request, please open an issue on GitHub.
 
-1. Check [the Issue Tracker](https://github.com/poteto0/poteto/issues) for existing issues.
-2. When requesting a new issue or feature, please use [the templates](https://github.com/poteto0/poteto/issues/new?assignees=&labels=&projects=&template=-bug-----feature--issue-title.md&title=) and provide as much detail as possible.
+1. Check [the Issue Tracker](https://github.com/poteto-go/poteto/issues) for existing issues.
+2. When requesting a new issue or feature, please use [the templates](https://github.com/poteto-go/poteto/issues/new?assignees=&labels=&projects=&template=-bug-----feature--issue-title.md&title=) and provide as much detail as possible.
 
 ### Development
 
-1. Check [the Issue Tracker](https://github.com/poteto0/poteto/issues), make sure if there is anything relevant to the problem you are trying to solve. Or create New Issue.
+1. Check [the Issue Tracker](https://github.com/poteto-go/poteto/issues), make sure if there is anything relevant to the problem you are trying to solve. Or create New Issue.
 2. Fork repo
 3. Create a new branch.
 

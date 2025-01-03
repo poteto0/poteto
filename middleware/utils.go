@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 // EX: https://example.com:* => ^https://example\.com:.*$

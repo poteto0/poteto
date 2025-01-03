@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/poteto0/poteto/cmd/core"
+	"github.com/poteto-go/poteto/cmd/core"
 )
 
 func RunRun(option core.RunnerOption) error {

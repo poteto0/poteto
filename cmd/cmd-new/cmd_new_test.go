@@ -7,7 +7,7 @@ import (
 
 	"bou.ke/monkey"
 	"github.com/manifoldco/promptui"
-	"github.com/poteto0/poteto/cmd/engine"
+	"github.com/poteto-go/poteto/cmd/engine"
 )
 
 func TestCommandNew(t *testing.T) {
