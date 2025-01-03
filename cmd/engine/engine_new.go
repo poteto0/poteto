@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/poteto0/poteto/cmd/template"
+	"github.com/poteto0/poteto/utils"
 )
 
 type EngineNewParam struct {
@@ -21,7 +22,7 @@ func RunNew(param EngineNewParam) error {
 	prevDir, _ := filepath.Abs(".")
 	defer os.Chdir(prevDir)
 
-	fmt.Println("1. generating project: ", param.ProjectName)
+	utils.PotetoPrint(fmt.Sprintf("1. generating project: %s", param.ProjectName))
 
 	dirArr := strings.Split(param.ProjectName, "/")
 	dirname := param.ProjectName
@@ -41,13 +42,18 @@ func RunNew(param EngineNewParam) error {
 		return err
 	}
 
-	fmt.Println("2. generating main.go")
+	utils.PotetoPrint("2. generating main.go")
 	if err := createMain(param); err != nil {
 		return err
 	}
 
-	fmt.Println("3. go mod tidy")
+	utils.PotetoPrint("3. go mod tidy")
 	if err := exec.Command("go", "mod", "tidy").Run(); err != nil {
+		return err
+	}
+
+	utils.PotetoPrint("4. create poteto.yaml")
+	if err := createYaml(); err != nil {
 		return err
 	}
 
@@ -55,7 +61,7 @@ func RunNew(param EngineNewParam) error {
 		return nil
 	}
 
-	fmt.Println("4. generating docker")
+	utils.PotetoPrint("5. generating docker")
 	if err := createDockerfile(); err != nil {
 		return err
 	}
@@ -69,14 +75,6 @@ func createMain(param EngineNewParam) error {
 	templateFile := choiceTemplateFile(param)
 
 	return createAndWrite("main.go", templateFile)
-}
-
-func createDockerfile() error {
-	return createAndWrite("Dockerfile", template.DockerTemplate)
-}
-
-func createDockerCompose() error {
-	return createAndWrite("docker-compose.yaml", template.DockerComposeTemplate)
 }
 
 func createAndWrite(filename, templateFile string) error {
@@ -108,4 +106,19 @@ func choiceTemplateFile(param EngineNewParam) string {
 	}
 
 	return template.DefaultTemplate
+}
+
+func createYaml() error {
+	filename := "poteto.yaml"
+	file := template.PotetoYamlTemplate
+
+	return createAndWrite(filename, file)
+}
+
+func createDockerfile() error {
+	return createAndWrite("Dockerfile", template.DockerTemplate)
+}
+
+func createDockerCompose() error {
+	return createAndWrite("docker-compose.yaml", template.DockerComposeTemplate)
 }
