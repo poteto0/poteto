@@ -13,7 +13,7 @@ import (
 
 	"bou.ke/monkey"
 	"github.com/google/uuid"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 func TestJSON(t *testing.T) {

@@ -10,8 +10,8 @@ import (
 	stdContext "context"
 
 	"github.com/fatih/color"
-	"github.com/poteto0/poteto/constant"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/constant"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type Poteto interface {

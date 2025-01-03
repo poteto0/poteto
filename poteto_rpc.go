@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-json"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/utils"
 )
 
 // TODO: error status code

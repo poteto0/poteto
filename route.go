@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/poteto0/poteto/constant"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/constant"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type Route interface {
@@ -42,7 +42,7 @@ func (r *route) Search(path string) (*route, []ParamUnit) {
 	}
 
 	// optimized router insert
-	// https://github.com/poteto0/poteto/issues/113
+	// https://github.com/poteto-go/poteto/issues/113
 	for {
 		id := strings.Index(rightPath, "/")
 		if id < 0 {
@@ -81,7 +81,7 @@ func (r *route) Insert(path string, handler HandlerFunc) {
 	param := ""
 
 	// optimized router insert
-	// https://github.com/poteto0/poteto/issues/113
+	// https://github.com/poteto-go/poteto/issues/113
 	for {
 		id := strings.Index(rightPath, "/")
 		if id < 0 { // means last

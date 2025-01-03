@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	cmdnew "github.com/poteto0/poteto/cmd/cmd-new"
-	cmdrun "github.com/poteto0/poteto/cmd/cmd-run"
+	cmdnew "github.com/poteto-go/poteto/cmd/cmd-new"
+	cmdrun "github.com/poteto-go/poteto/cmd/cmd-run"
 )
 
 func TestPotetoCliMai(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/poteto0/poteto"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto"
+	"github.com/poteto-go/poteto/constant"
 )
 
 // Example for Logrus (https://github.com/sirupsen/logrus)

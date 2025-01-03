@@ -1,7 +1,7 @@
 # Middleware
 
 Perhaps the wiki is the most up-to-date.
-https://github.com/poteto0/poteto/wiki/Middleware
+https://github.com/poteto-go/poteto/wiki/Middleware
 
 ## middleware list
 
@@ -21,8 +21,8 @@ package main
 import (
   "net/http"
 
-  "github.com/poteto0/poteto"
-  "github.com/poteto0/poteto/middleware"
+  "github.com/poteto-go/poteto"
+  "github.com/poteto-go/poteto/middleware"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 
 	"bou.ke/monkey"
 	"github.com/goccy/go-json"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 func TestAddAndGetParam(t *testing.T) {

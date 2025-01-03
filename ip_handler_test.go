@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 func TestCanTrust(t *testing.T) {

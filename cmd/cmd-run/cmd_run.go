@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/poteto0/poteto/cmd/core"
-	"github.com/poteto0/poteto/cmd/engine"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/cmd/core"
+	"github.com/poteto-go/poteto/cmd/engine"
+	"github.com/poteto-go/poteto/utils"
 )
 
 func loadOption() core.RunnerOption {
@@ -55,7 +55,7 @@ func CommandRun() {
 
 func help() {
 	fmt.Println("poteto-cli run: hot-reload run api server")
-	fmt.Println("https://github.com/poteto0/poteto")
+	fmt.Println("https://github.com/poteto-go/poteto")
 	fmt.Println("========================================")
 	fmt.Println("")
 	fmt.Println("Options:")

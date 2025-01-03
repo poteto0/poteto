@@ -2,7 +2,7 @@ package poteto
 
 import (
 	"github.com/goccy/go-json"
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 type ParamUnit struct {

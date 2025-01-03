@@ -7,13 +7,13 @@
 We have confirmed that it works with various versions: go@1.21.x, go@1.22.x, go@1.23.x
 
 ```sh
-go get github.com/poteto0/poteto@v0.26.5
+go get github.com/poteto-go/poteto@v0.26.5
 go mod tidy
 ```
 
 ## Example App For Poteto
 
-https://github.com/poteto0/poteto-sample-api/tree/main
+https://github.com/poteto-go/poteto-sample-api/tree/main
 
 or `/examples`
 
@@ -24,7 +24,7 @@ It will be moved to other repo.
 We support cli tool. But if you doesn't like it, you can create poteto-app w/o cli of course.
 
 ```sh
-go install github.com/poteto0/poteto/cmd/poteto-cli@v0.26.5
+go install github.com/poteto-go/poteto/cmd/poteto-cli@v0.26.5
 ```
 
 Create file.
@@ -120,8 +120,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/poteto0/poteto"
-	"github.com/poteto0/poteto/middleware"
+	"github.com/poteto-go/poteto"
+	"github.com/poteto-go/poteto/middleware"
 )
 
 func main() {

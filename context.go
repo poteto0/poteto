@@ -9,8 +9,8 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/harakeishi/gats"
-	"github.com/poteto0/poteto/constant"
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/constant"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type Context interface {

@@ -5,7 +5,7 @@
 ### 0.26.5
 
 - BUG: no-inline test; issue below by @poteto0 in #173
-  https://github.com/poteto0/poteto/issues/169
+  https://github.com/poteto-go/poteto/issues/169
 - TEST: ut upgrated by @poteto0 in #173
 - REF: split cmd & engine by @poteto0 in #173
 

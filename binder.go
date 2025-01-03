@@ -3,7 +3,7 @@ package poteto
 import (
 	"strings"
 
-	"github.com/poteto0/poteto/constant"
+	"github.com/poteto-go/poteto/constant"
 )
 
 type Binder interface {

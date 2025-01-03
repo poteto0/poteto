@@ -6,8 +6,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/poteto0/poteto"
-	"github.com/poteto0/poteto/middleware"
+	"github.com/poteto-go/poteto"
+	"github.com/poteto-go/poteto/middleware"
 )
 
 func main() {

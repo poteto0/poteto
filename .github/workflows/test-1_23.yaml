@@ -23,15 +23,15 @@ jobs:
         with:
           go-version: "1.23.x"
       # noinlineによるテスト実行
-      # https://github.com/poteto0/poteto/issues/169
+      # https://github.com/poteto-go/poteto/issues/169
       - name: Test
         run: go test ./... -coverprofile cover.out.tmp -bench . -benchtime 100000x -gcflags=all=-l
       - name: remove not template path
-        run: cat cover.out.tmp | grep -v "github.com/poteto0/poteto/cmd/template" > cover2.out.tmp
+        run: cat cover.out.tmp | grep -v "github.com/poteto-go/poteto/cmd/template" > cover2.out.tmp
       - name: remove not constant path
-        run: cat cover2.out.tmp | grep -v "github.com/poteto0/poteto/constant" > cover3.out.tmp
+        run: cat cover2.out.tmp | grep -v "github.com/poteto-go/poteto/constant" > cover3.out.tmp
       - name: remove example path
-        run: cat cover3.out.tmp | grep -v "github.com/poteto0/poteto/constant" > coverage.txt
+        run: cat cover3.out.tmp | grep -v "github.com/poteto-go/poteto/constant" > coverage.txt
 
       - name: upload coverage
         uses: codecov/codecov-action@v1

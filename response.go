@@ -3,7 +3,7 @@ package poteto
 import (
 	"net/http"
 
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/utils"
 )
 
 type Response interface {

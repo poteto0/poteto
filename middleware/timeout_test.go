@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/poteto0/poteto"
+	"github.com/poteto-go/poteto"
 )
 
 type ret struct {

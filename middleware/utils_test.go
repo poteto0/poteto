@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/poteto0/poteto/utils"
+	"github.com/poteto-go/poteto/utils"
 )
 
 func TestWrapRegExp(t *testing.T) {
