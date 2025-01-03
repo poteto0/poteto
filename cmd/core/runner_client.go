@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"syscall"
@@ -19,15 +20,15 @@ import (
 )
 
 type RunnerOption struct {
-	version         string `yaml:"version"`
-	buildScriptPath string `yaml:"build_script_path"`
-	debugMode       bool   `yaml:"debug_mode"`
+	Version         string `yaml:"version"`
+	BuildScriptPath string `yaml:"build_script_path"`
+	DebugMode       bool   `yaml:"debug_mode"`
 }
 
 var DefaultRunnerOption = RunnerOption{
-	version:         "0.27",
-	buildScriptPath: "main.go",
-	debugMode:       true,
+	Version:         "0.27",
+	BuildScriptPath: "main.go",
+	DebugMode:       true,
 }
 
 type runnerClient struct {
@@ -61,13 +62,40 @@ func NewRunnerClient(option RunnerOption) IRunnerClient {
 	}
 
 	wd, _ := os.Getwd()
-	watcher.Add(wd) // TODO: recursive
-
-	return &runnerClient{
+	watcher.Add(wd)
+	client := runnerClient{
 		runnerDir: wd,
 		watcher:   watcher,
 		option:    option,
 	}
+
+	err = client.registerRecursive()
+	if err != nil {
+		utils.PotetoPrint(
+			fmt.Sprintf("%s cannot set fs watcher\n", color.HiBlueString("pdebug |")),
+		)
+
+		return &runnerClient{}
+	}
+
+	return &client
+}
+
+// https://github.com/farmergreg/rfsnotify/tree/master
+func (client *runnerClient) registerRecursive() error {
+	wd, _ := os.Getwd()
+	err := filepath.Walk(wd, func(walkPath string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if fi.IsDir() {
+			if err = client.watcher.Add(walkPath); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
 }
 
 func (client *runnerClient) LogTransporter(ctx stdContext.Context, fileChangeStream chan struct{}) func() error {
@@ -128,7 +156,7 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 
 			// 複数回イベントが発行されるため、timerを上で作り出して、一定時間後に処理する
 			case <-timer.C:
-				if client.option.debugMode {
+				if client.option.DebugMode {
 					utils.PotetoPrint(
 						fmt.Sprintf("%s poteto-cli detect event: %s\n", color.HiBlueString("pdebug |"), lastEvent.Op),
 					)
@@ -198,7 +226,7 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 	client.startupMutex.Lock()
 
 	if err := client.killProcess(); err != nil {
-		if client.option.debugMode {
+		if client.option.DebugMode {
 			utils.PotetoPrint(
 				fmt.Sprintf(
 					"%s poteto-cli throw error during kill process: %v\n",
@@ -212,7 +240,7 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 	}
 
 	// run build script
-	cmd := exec.Command("go", "run", client.option.buildScriptPath)
+	cmd := exec.Command("go", "run", client.option.BuildScriptPath)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}

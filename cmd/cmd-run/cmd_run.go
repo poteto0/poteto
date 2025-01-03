@@ -26,7 +26,7 @@ func loadOption() core.RunnerOption {
 	}
 
 	var option core.RunnerOption
-	err = utils.YamlParse(configBytes, &option)
+	err = utils.YamlParse(configBytes[:n], &option)
 	if err != nil {
 		utils.PotetoPrint("warning error on reading poteto.yaml, use default option")
 		return core.DefaultRunnerOption
