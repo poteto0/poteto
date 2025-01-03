@@ -19,13 +19,15 @@ import (
 )
 
 type RunnerOption struct {
-	isBuildScript bool     `yaml:"is_build_script"`
-	buildScript   []string `yaml:"build_script"`
+	version         string `yaml:"version"`
+	buildScriptPath string `yaml:"build_script_path"`
+	debugMode       bool   `yaml:"debug_mode"`
 }
 
 var DefaultRunnerOption = RunnerOption{
-	isBuildScript: true,
-	buildScript:   []string{"go", "run", "main.go"},
+	version:         "0.27",
+	buildScriptPath: "main.go",
+	debugMode:       true,
 }
 
 type runnerClient struct {
@@ -48,7 +50,7 @@ type IRunnerClient interface {
 	Close() error
 }
 
-func NewRunnerClient() IRunnerClient {
+func NewRunnerClient(option RunnerOption) IRunnerClient {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		utils.PotetoPrint(
@@ -64,7 +66,7 @@ func NewRunnerClient() IRunnerClient {
 	return &runnerClient{
 		runnerDir: wd,
 		watcher:   watcher,
-		option:    DefaultRunnerOption,
+		option:    option,
 	}
 }
 
@@ -126,9 +128,11 @@ func (client *runnerClient) FileWatcher(ctx stdContext.Context, fileChangeStream
 
 			// 複数回イベントが発行されるため、timerを上で作り出して、一定時間後に処理する
 			case <-timer.C:
-				utils.PotetoPrint(
-					fmt.Sprintf("%s poteto-cli detect event: %s\n", color.HiBlueString("pdebug |"), lastEvent.Op),
-				)
+				if client.option.debugMode {
+					utils.PotetoPrint(
+						fmt.Sprintf("%s poteto-cli detect event: %s\n", color.HiBlueString("pdebug |"), lastEvent.Op),
+					)
+				}
 
 				switch {
 				// reload event
@@ -194,13 +198,21 @@ func (client *runnerClient) Build(ctx stdContext.Context) error {
 	client.startupMutex.Lock()
 
 	if err := client.killProcess(); err != nil {
-		fmt.Println(err)
+		if client.option.debugMode {
+			utils.PotetoPrint(
+				fmt.Sprintf(
+					"%s poteto-cli throw error during kill process: %v\n",
+					color.HiBlueString("pdebug |"),
+					err,
+				),
+			)
+		}
 		client.startupMutex.Unlock()
 		return err
 	}
 
 	// run build script
-	cmd := exec.Command("go", "run", "main.go")
+	cmd := exec.Command("go", "run", client.option.buildScriptPath)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}

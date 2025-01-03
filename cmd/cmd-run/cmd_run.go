@@ -4,12 +4,39 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/poteto0/poteto/cmd/core"
 	"github.com/poteto0/poteto/cmd/engine"
+	"github.com/poteto0/poteto/utils"
 )
 
-// TODO: setting yaml file
+func loadOption() core.RunnerOption {
+	configFile, err := os.Open("./poteto.yaml")
+	defer configFile.Close()
+
+	if err != nil {
+		utils.PotetoPrint("you can use poteto.yaml")
+		return core.DefaultRunnerOption
+	}
+
+	configBytes := make([]byte, 1024)
+	n, err := configFile.Read(configBytes)
+	if err != nil || n == 0 {
+		utils.PotetoPrint("warning error on reading poteto.yaml, use default option")
+		return core.DefaultRunnerOption
+	}
+
+	var option core.RunnerOption
+	err = utils.YamlParse(configBytes, &option)
+	if err != nil {
+		utils.PotetoPrint("warning error on reading poteto.yaml, use default option")
+		return core.DefaultRunnerOption
+	}
+
+	return option
+}
+
 func CommandRun() {
-	param := engine.EngineRunParam{}
+	option := loadOption()
 
 	fmt.Println("You can also use poteto-cli run -h | --help")
 	for i := 2; i < len(os.Args); i++ {
@@ -23,7 +50,7 @@ func CommandRun() {
 		}
 	}
 
-	engine.RunRun(param)
+	engine.RunRun(option)
 }
 
 func help() {

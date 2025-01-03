@@ -3,10 +3,12 @@ package engine
 import (
 	"testing"
 	"time"
+
+	"github.com/poteto0/poteto/cmd/core"
 )
 
 func TestSuccessRunRun(t *testing.T) {
-	param := EngineRunParam{}
+	param := core.DefaultRunnerOption
 
 	go func() {
 		RunRun(param)

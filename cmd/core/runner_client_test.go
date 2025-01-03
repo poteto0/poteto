@@ -16,27 +16,20 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func TestDefineRunnerOption(t *testing.T) {
-	option := DefaultRunnerOption
-	if !option.isBuildScript {
-		t.Errorf("Unmatched optin")
-	}
-}
-
 func TestNewRunnerClient(t *testing.T) {
 	defer monkey.UnpatchAll()
 
-	NewRunnerClient()
+	NewRunnerClient(DefaultRunnerOption)
 
 	monkey.Patch(fsnotify.NewWatcher, func() (*fsnotify.Watcher, error) {
 		return &fsnotify.Watcher{}, errors.New("error")
 	})
 
-	NewRunnerClient()
+	NewRunnerClient(DefaultRunnerOption)
 }
 
 func TestStartLogTransporter(t *testing.T) {
-	runnerClient := NewRunnerClient()
+	runnerClient := NewRunnerClient(DefaultRunnerOption)
 
 	fileChangeStream := make(chan struct{}, 1)
 
@@ -54,7 +47,7 @@ func TestStartLogTransporter(t *testing.T) {
 }
 
 func TestContextFinLogTransporter(t *testing.T) {
-	runnerClient := NewRunnerClient()
+	runnerClient := NewRunnerClient(DefaultRunnerOption)
 
 	fileChangeStream := make(chan struct{}, 1)
 
@@ -72,7 +65,7 @@ func TestContextFinLogTransporter(t *testing.T) {
 }
 
 func TestStreamLogTransporter(t *testing.T) {
-	runnerClient := NewRunnerClient().(*runnerClient)
+	runnerClient := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	reader := bufio.NewReader(strings.NewReader("test"))
 	runnerClient.reader = reader
 
@@ -97,7 +90,7 @@ func TestStreamLogTransporter(t *testing.T) {
 func TestStreamErrorLogTransporter(t *testing.T) {
 	defer monkey.UnpatchAll()
 
-	runnerClient := NewRunnerClient().(*runnerClient)
+	runnerClient := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	reader := bufio.NewReader(strings.NewReader("test"))
 	runnerClient.reader = reader
 	monkey.Patch((*bufio.Reader).ReadLine, func(b *bufio.Reader) (line []byte, isPrefix bool, err error) {
@@ -124,7 +117,7 @@ func TestStreamErrorLogTransporter(t *testing.T) {
 }
 
 func TestClientWatcherUnexpectedEvent(t *testing.T) {
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	fileChangeStream := make(chan struct{}, 1)
 	clientContext := stdContext.Background()
 	fileWatcher := client.FileWatcher(clientContext, fileChangeStream)
@@ -146,7 +139,7 @@ func TestClientWatcherUnexpectedEvent(t *testing.T) {
 }
 
 func TestClientWatcherWatchEvent(t *testing.T) {
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	fileChangeStream := make(chan struct{}, 1)
 	clientContext := stdContext.Background()
 	fileWatcher := client.FileWatcher(clientContext, fileChangeStream)
@@ -189,7 +182,7 @@ func TestBuildRunnerCallAsyncBuildIfFileChange(t *testing.T) {
 		calledBuild++
 	})
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	fileChangeStream := make(chan struct{}, 1)
 	clientContext := stdContext.Background()
 	buildRunner := client.BuildRunner(clientContext, fileChangeStream)
@@ -213,7 +206,7 @@ func TestBuildRunnerIfAsyncBuildError(t *testing.T) {
 		errChan <- errors.New("error")
 	})
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	fileChangeStream := make(chan struct{}, 1)
 	clientContext := stdContext.Background()
 
@@ -239,7 +232,7 @@ func TestBuildRunnerCallAsyncBuildFirst(t *testing.T) {
 		calledBuild++
 	})
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	fileChangeStream := make(chan struct{}, 1)
 	clientContext := stdContext.Background()
 
@@ -260,7 +253,7 @@ func TestBuildRunnerCallAsyncBuildFirst(t *testing.T) {
 func TestAsyncBuild(t *testing.T) {
 	defer monkey.UnpatchAll()
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 
 	monkey.Patch((*runnerClient).Build, func(client *runnerClient, ctx stdContext.Context) error {
 		return nil
@@ -304,7 +297,7 @@ func TestBuild(t *testing.T) {
 		return io.NopCloser(strings.NewReader("test")), nil
 	})
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 
 	tests := []struct {
 		name            string
@@ -377,7 +370,7 @@ func TestBuild(t *testing.T) {
 func TestKillProcess(t *testing.T) {
 	defer monkey.UnpatchAll()
 
-	client := NewRunnerClient().(*runnerClient)
+	client := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 	if err := client.killProcess(); err != nil {
 		t.Errorf("Unmatched error (not expected)")
 	}
@@ -418,7 +411,7 @@ func TestKillByOS(t *testing.T) {
 		return nil
 	})
 
-	runnerClient := NewRunnerClient().(*runnerClient)
+	runnerClient := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 
 	tests := []struct {
 		name         string
@@ -467,7 +460,7 @@ func TestClose(t *testing.T) {
 		return nil
 	})
 
-	runnerClient := NewRunnerClient().(*runnerClient)
+	runnerClient := NewRunnerClient(DefaultRunnerOption).(*runnerClient)
 
 	runnerClient.Close()
 

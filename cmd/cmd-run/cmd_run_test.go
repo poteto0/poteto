@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
+	"github.com/poteto0/poteto/cmd/core"
 	"github.com/poteto0/poteto/cmd/engine"
 )
 
@@ -19,7 +20,7 @@ func TestCommandRun(t *testing.T) {
 	monkey.Patch(os.Exit, func(code int) {
 		calledExit = true
 	})
-	monkey.Patch(engine.RunRun, func(param engine.EngineRunParam) error {
+	monkey.Patch(engine.RunRun, func(param core.RunnerOption) error {
 		return nil
 	})
 

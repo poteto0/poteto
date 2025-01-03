@@ -8,10 +8,8 @@ import (
 	"github.com/poteto0/poteto/cmd/core"
 )
 
-type EngineRunParam struct{}
-
-func RunRun(param EngineRunParam) error {
-	runnerClient := core.NewRunnerClient()
+func RunRun(option core.RunnerOption) error {
+	runnerClient := core.NewRunnerClient(option)
 	defer runnerClient.Close()
 
 	// Ctrl+Cで子プロセスをkillする
