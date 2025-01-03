@@ -1,5 +1,4 @@
 # Examples for Poteto
 
-- api
-- fast-api
-- jsonrpc
+now moved to
+https://github.com/poteto-go/poteto-examples

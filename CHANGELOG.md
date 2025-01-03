@@ -1,3 +1,21 @@
+# 1.x.x
+
+## 1.0.x
+
+### 1.0.1
+
+- BUG: fix lf & docker-compose by @poteto0 in https://github.com/poteto-go/poteto-cli/pull/1
+- CHANGE: using PotetoPrint by @poteto0 in https://github.com/poteto-go/poteto-cli/pull/1
+- DOC: on move by @poteto0 in #182
+- OP: poteto-cli & example repo moved by @poteto0 in #182
+
+### 1.0.0
+
+- BREAKING: new mod name by @poteto0
+- DOC: fix typo examples by @poteto0 in #177
+- FEAT: `poteto-cli new` generate `poteto.yaml`, too. by @poteto0 in #177
+- FEAT: `poteto-cli run` start app with hot-reload. by @poteto0 in #177
+
 # 0.x.x
 
 ## 0.26.x
