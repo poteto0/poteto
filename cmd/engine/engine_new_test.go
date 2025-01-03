@@ -24,6 +24,7 @@ func TestRunNew(t *testing.T) {
 		calledIsExist     bool
 		calledExecCommand bool
 		calledCreateMain  bool
+		calledCreateYaml  bool
 	)
 
 	tests := []struct {
@@ -34,6 +35,7 @@ func TestRunNew(t *testing.T) {
 		mockExecCommand func(name string, args ...string) *exec.Cmd
 		mockExecRun     func(*exec.Cmd) error
 		mockCreateMain  func(EngineNewParam) error
+		mockCreateYaml  func() error
 		expectCalled    []bool
 	}{
 		{
@@ -61,7 +63,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, true, true},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, true, true},
 		},
 		{
 			"Test good case docker",
@@ -88,7 +94,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, true, true},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, true, true},
 		},
 		{
 			"Test good case docker bud dockerfile error",
@@ -115,7 +125,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, true, true},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, true, true},
 		},
 		{
 			"Test good case docker bud docker-compose error",
@@ -142,7 +156,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, true, true},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, true, true},
 		},
 		{
 			"Test fail make dir",
@@ -169,7 +187,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, true, false, false},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, true, false, false, false},
 		},
 		{
 			"Test chdir fail",
@@ -196,7 +218,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, false, false},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, false, false, false},
 		},
 		{
 			"Test exec run fail",
@@ -223,7 +249,11 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return nil
 			},
-			[]bool{true, true, false, true, false},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, false, false},
 		},
 		{
 			"Test exec createMain fail",
@@ -250,7 +280,42 @@ func TestRunNew(t *testing.T) {
 				calledCreateMain = true
 				return errors.New("error")
 			},
-			[]bool{true, true, false, true, true},
+			func() error {
+				calledCreateYaml = true
+				return nil
+			},
+			[]bool{true, true, false, true, true, false},
+		},
+		{
+			"Test exec createYaml fail",
+			func(dir string) error {
+				calledChdir = true
+				return nil
+			},
+			func(name string, param fs.FileMode) error {
+				calledMkdir = true
+				return nil
+			},
+			func(err error) bool {
+				calledIsExist = true
+				return true
+			},
+			func(name string, args ...string) *exec.Cmd {
+				calledExecCommand = true
+				return nil
+			},
+			func(*exec.Cmd) error {
+				return nil
+			},
+			func(param EngineNewParam) error {
+				calledCreateMain = true
+				return nil
+			},
+			func() error {
+				calledCreateYaml = true
+				return errors.New("error")
+			},
+			[]bool{true, true, false, true, true, true},
 		},
 	}
 
@@ -262,6 +327,7 @@ func TestRunNew(t *testing.T) {
 				calledIsExist = false
 				calledExecCommand = false
 				calledCreateMain = false
+				calledCreateYaml = false
 				param.IsDocker = false
 			}()
 
@@ -272,6 +338,7 @@ func TestRunNew(t *testing.T) {
 			monkey.Patch(exec.Command, it.mockExecCommand)
 			monkey.Patch((*exec.Cmd).Run, it.mockExecRun)
 			monkey.Patch(createMain, it.mockCreateMain)
+			monkey.Patch(createYaml, it.mockCreateYaml)
 
 			// 書くのめんどい
 			if it.name == "Test good case docker" {
@@ -321,6 +388,9 @@ func TestRunNew(t *testing.T) {
 			if calledCreateMain != it.expectCalled[4] {
 				t.Errorf("Unmatched call for createMain")
 			}
+			if calledCreateYaml != it.expectCalled[5] {
+				t.Errorf("Unmatched call for createYaml")
+			}
 		})
 	}
 }
@@ -352,6 +422,11 @@ func TestCreateTemplateFile(t *testing.T) {
 	createMain(EngineNewParam{})
 	if selected != template.DefaultTemplate {
 		t.Error("Unmatched main.go")
+	}
+
+	createYaml()
+	if selected != template.PotetoYamlTemplate {
+		t.Error("Unmatched poteto.yaml")
 	}
 }
 
