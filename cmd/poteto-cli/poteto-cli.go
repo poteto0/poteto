@@ -5,6 +5,7 @@ import (
 	"os"
 
 	cmdnew "github.com/poteto0/poteto/cmd/cmd-new"
+	cmdrun "github.com/poteto0/poteto/cmd/cmd-run"
 )
 
 func main() {
@@ -15,6 +16,11 @@ func main() {
 
 	if os.Args[1] == "new" {
 		cmdnew.CommandNew()
+		os.Exit(-1)
+	}
+
+	if os.Args[1] == "run" {
+		cmdrun.CommandRun()
 		os.Exit(-1)
 	}
 
@@ -36,6 +42,7 @@ func help() {
 	fmt.Println("========================================")
 	fmt.Println("")
 	fmt.Println("Command: poteto-cli [command]")
+	fmt.Println("  run:        hot-reload run golang app")
 	fmt.Println("  new:        create new poteto app")
 	fmt.Println("")
 	fmt.Println("Options:")
